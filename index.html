@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FOOTOCASSION FIT</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#0b0f14;color:#f5f7fa}
+header{background:#10161e;border-bottom:1px solid #293340;padding:14px 16px;position:sticky;top:0;z-index:5}
+nav{max-width:1100px;margin:auto;display:flex;justify-content:space-between;align-items:center}
+.logo{font-weight:900;font-size:20px}.logo small{display:block;color:#9da8b6;font-size:11px}
+main{max-width:1100px;margin:auto;padding:22px 16px}
+.hero{padding:15px 0}.hero h1{font-size:34px;margin:0 0 8px}.hero p{color:#aeb7c3}
+button{padding:11px 15px;border-radius:10px;font-weight:700;cursor:pointer}
+.primary{background:#fff;color:#0b0f14;border:0}
+.outline{background:#151d27;color:#fff;border:1px solid #364252}
+.search{margin:20px 0}
+input,select,textarea{width:100%;background:#111821;color:#fff;border:1px solid #303b49;border-radius:10px;padding:12px;font-size:15px}
+.filters{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px}
+.catalog{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.card{background:#111821;border:1px solid #27313e;border-radius:15px;overflow:hidden}
+.shirt{height:230px;background:#1a222c;display:flex;align-items:center;justify-content:center;font-size:48px;color:#748092}
+.shirt img{width:100%;height:100%;object-fit:cover}
+.info{padding:14px}.info h3{margin:0 0 7px}.muted,.note{color:#9ca8b6;font-size:13px}
+.price{font-size:22px;font-weight:900;margin:10px 0}
+.tag{display:inline-block;padding:5px 8px;border-radius:7px;background:#202a36;font-size:12px;margin:3px 2px}
+.warn{background:#3a2d19;color:#ffd88a}
+.empty{text-align:center;color:#9ca8b6;padding:40px;border:1px dashed #303b49;border-radius:15px;grid-column:1/-1}
+.modal{display:none;position:fixed;inset:0;background:#000b;z-index:20;padding:18px;overflow:auto}
+.modal.show{display:flex;justify-content:center}
+.box{width:min(650px,100%);background:#10161e;border:1px solid #303b49;border-radius:16px;padding:20px;margin:20px 0}
+.close{float:right;background:transparent;color:#fff;border:0;font-size:24px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{display:block;color:#b9c2ce;font-size:13px;margin:12px 0 6px}
+textarea{min-height:90px}.photos{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.preview{width:90px;height:90px;object-fit:cover;border-radius:10px}
+.fee{background:#151e28;border-radius:12px;padding:14px;line-height:1.8}
+.total{font-size:22px;font-weight:900}
+@media(max-width:800px){.filters{grid-template-columns:1fr 1fr}.catalog{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.catalog{grid-template-columns:1fr}.row{grid-template-columns:1fr}.hero h1{font-size:28px}}
+</style>
+</head>
+
+<body>
+<header>
+<nav>
+<div class="logo">⚽ FOOTOCASSION FIT<small>Football shirts marketplace</small></div>
+<button class="primary" onclick="openM('sell')">＋ Vendre</button>
+</nav>
+</header>
+
+<main>
+<section class="hero">
+<h1>Les maillots que tu cherches.</h1>
+<p>Acheter ou vendre des maillots de football simplement.</p>
+<button class="primary" onclick="openM('sell')">Vendre un maillot</button>
+</section>
+
+<div class="search">
+<input id="q" placeholder="🔎 Rechercher un maillot, une équipe..." oninput="render()">
+</div>
+
+<div class="filters">
+<select id="team" onchange="render()"><option value="">Toutes les équipes</option></select>
+<select id="size" onchange="render()">
+<option value="">Toutes les tailles</option>
+<option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option>
+</select>
+<select id="auth" onchange="render()">
+<option value="">Authenticité</option>
+<option value="auth">Authenticité déclarée</option>
+<option value="replica">Imitation / replica</option>
+</select>
+<select id="cond" onchange="render()">
+<option value="">État</option><option>Neuf</option><option>Très bon état</option><option>Bon état</option><option>Correct</option>
+</select>
+<select id="price" onchange="render()">
+<option value="">Prix</option><option value="30">≤ 30 €</option>
+<option value="60">31–60 €</option><option value="100">61–100 €</option><option value="101">101 €+</option>
+</select>
+</div>
+
+<section id="catalog" class="catalog"></section>
+</main>
+
+<div id="sell" class="modal">
+<div class="box">
+<button class="close" onclick="closeM('sell')">×</button>
+<h2>Vendre un maillot</h2>
+
+<label>Photos — 1 à 3</label>
+<button class="outline" onclick="document.getElementById('photos').click()">📷 Autoriser l’accès à ma galerie</button>
+<input id="photos" type="file" accept="image/*" multiple hidden onchange="preview()">
+<div id="previews" class="photos"></div>
+
+<label>Nom du maillot</label>
+<input id="name" placeholder="Ex. Real Madrid 2024/25">
+
+<div class="row">
+<div><label>Équipe / club</label><input id="club" placeholder="Ex. Real Madrid"></div>
+<div><label>Taille</label><select id="lsize"><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option></select></div>
+</div>
+
+<div class="row">
+<div><label>Prix (€)</label><input id="lprice" type="number" min="1" placeholder="80"></div>
+<div><label>État</label><select id="lcond"><option>Neuf</option><option>Très bon état</option><option>Bon état</option><option>Correct</option></select></div>
+</div>
+
+<label>Authenticité</label>
+<select id="lauth">
+<option value="auth">✓ Authenticité déclarée</option>
+<option value="replica">⚠️ Imitation / replica</option>
+</select>
+
+<label>Description</label>
+<textarea id="desc" placeholder="Saison, défauts éventuels, etc."></textarea>
+
+<button class="primary" style="width:100%;margin-top:15px" onclick="add()">Mettre en vente</button>
+<p class="note">Démo étape 1 : les annonces sont conservées seulement pendant cette session.</p>
+</div>
+</div>
+
+<div id="buy" class="modal">
+<div class="box">
+<button class="close" onclick="closeM('buy')">×</button>
+<h2 id="bt">Acheter</h2>
+
+<div class="fee">
+Prix du maillot : <b id="bp"></b><br>
+Frais de service acheteur (15 %) : <b id="bf"></b><br>
+<span class="total">Total : <span id="btotal"></span></span>
+</div>
+
+<h3>Mode de paiement</h3>
+<button class="outline" style="width:100%;margin:4px 0" onclick="demo('PayPal')">🅿️ PayPal</button>
+<button class="outline" style="width:100%;margin:4px 0" onclick="demo('Carte bancaire')">💳 Carte bancaire</button>
+<button class="outline" style="width:100%;margin:4px 0" onclick="demo('Virement bancaire')">🏦 Virement bancaire</button>
+
+<p class="note">Démo : aucun paiement réel n'est effectué à cette étape.</p>
+</div>
+</div>
+
+<script>
+let products=[
+{name:"Real Madrid 2024/25",club:"Real Madrid",size:"M",price:80,condition:"Très bon état",auth:"auth",desc:"Maillot en très bon état.",img:""},
+{name:"FC Barcelona 2023/24",club:"FC Barcelona",size:"L",price:55,condition:"Bon état",auth:"auth",desc:"Porté quelques fois.",img:""},
+{name:"PSG vintage",club:"PSG",size:"S",price:35,condition:"Correct",auth:"replica",desc:"Imitation / replica.",img:""}
+],filtered=[];
+
+function openM(x){document.getElementById(x).classList.add("show")}
+function closeM(x){document.getElementById(x).classList.remove("show")}
+
+function preview(){
+let f=[...photos.files];
+previews.innerHTML="";
+if(f.length<1||f.length>3){
+alert("Choisis entre 1 et 3 photos.");
+photos.value="";
+return
+}
+f.forEach(x=>{
+let i=document.createElement("img");
+i.className="preview";
+i.src=URL.createObjectURL(x);
+previews.appendChild(i)
+})
+}
+
+function add(){
+let f=[...photos.files],p=parseFloat(lprice.value);
+if(f.length<1||f.length>3)return alert("Ajoute entre 1 et 3 photos.");
+if(!name.value.trim()||!club.value.trim()||!p||p<=0)return alert("Remplis le nom, l’équipe et le prix.");
+
+let x={
+name:name.value.trim(),
+club:club.value.trim(),
+size:lsize.value,
+price:p,
+condition:lcond.value,
+auth:lauth.value,
+desc:desc.value.trim()||"Aucune description.",
+img:""
+};
+
+let r=new FileReader();
+r.onload=e=>{
+x.img=e.target.result;
+products.unshift(x);
+updateTeams();
+render();
+closeM("sell");
+alert("Annonce ajoutée ✅")
+};
+r.readAsDataURL(f[0])
+}
+
+function buy(i){
+let p=filtered[i],fee=p.price*.15;
+bt.textContent="Acheter : "+p.name;
+bp.textContent=p.price.toFixed(2)+" €";
+bf.textContent=fee.toFixed(2)+" €";
+btotal.textContent=(p.price+fee).toFixed(2)+" €";
+openM("buy")
+}
+
+function demo(x){
+alert("Démo : "+x+" sera connecté lors de l’étape des paiements réels.")
+}
+
+function render(){
+let q=document.getElementById("q").value.toLowerCase(),
+t=team.value,s=size.value,a=auth.value,c=cond.value,pr=price.value;
+
+filtered=products.filter(p=>{
+let okpr=!pr||
+(pr==="30"?p.price<=30:
+pr==="60"?p.price>=31&&p.price<=60:
+pr==="100"?p.price>=61&&p.price<=100:
+p.price>=101);
+
+return(!q||(p.name+" "+p.club+" "+p.desc).toLowerCase().includes(q))
+&&(!t||p.club===t)
+&&(!s||p.size===s)
+&&(!a||p.auth===a)
+&&(!c||p.condition===c)
+&&okpr
+});
+
+catalog.innerHTML=filtered.length?
+filtered.map((p,i)=>`
+<article class="card">
+<div class="shirt">${p.img?'<img src="'+p.img+'" alt="Maillot">':'⚽'}</div>
+<div class="info">
+<h3>${esc(p.name)}</h3>
+<div class="muted">${esc(p.club)} · Taille ${p.size}</div>
+<span class="tag ${p.auth==="replica"?"warn":""}">
+${p.auth==="replica"?"⚠️ Imitation / replica":"✓ Authenticité déclarée"}
+</span>
+<span class="tag">${esc(p.condition)}</span>
+<div class="price">${p.price.toFixed(2)} €</div>
+<button class="primary" style="width:100%" onclick="buy(${i})">Acheter</button>
+</div>
+</article>`).join("")
+:'<div class="empty">Aucun maillot ne correspond aux filtres.</div>'
+}
+
+function updateTeams(){
+let cur=team.value;
+let ts=[...new Set(products.map(p=>p.club))].sort();
+team.innerHTML='<option value="">Toutes les équipes</option>'+
+ts.map(x=>'<option>'+esc(x)+'</option>').join("");
+team.value=ts.includes(cur)?cur:""
+}
+
+function esc(s){
+return String(s).replace(/[&<>"']/g,m=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+}[m]))
+}
+
+updateTeams();
+render();
+</script>
+</body>
+  </html>
