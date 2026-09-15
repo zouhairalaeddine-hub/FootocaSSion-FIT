@@ -1,296 +1,519 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>FOOTOCASSION FIT</title>
+
 <style>
-:root{
---bg:#07110d;
---panel:#0d1b15;
---panel2:#12251b;
---line:#294438;
---text:#f4f7f5;
---muted:#9eb0a6;
---green:#35e37b
-}
-*{box-sizing:border-box}
-body{
+
+*{
+box-sizing:border-box;
 margin:0;
-background:var(--bg);
-color:var(--text);
-font-family:Arial,sans-serif
+padding:0;
 }
+
+:root{
+--bg:#06110c;
+--card:#0d1d15;
+--card2:#11261b;
+--line:#24513b;
+--green:#32e879;
+--green2:#1fc765;
+--white:#f4fff8;
+--muted:#9aafa3;
+--yellow:#ffd447;
+}
+
+body{
+background:var(--bg);
+color:var(--white);
+font-family:Arial,Helvetica,sans-serif;
+min-height:100vh;
+}
+
+button{
+border:0;
+cursor:pointer;
+font-weight:800;
+border-radius:12px;
+padding:12px 15px;
+font-size:14px;
+background:var(--green);
+color:#041008;
+}
+
+button:hover{
+background:var(--green2);
+}
+
+button.secondary{
+background:#12271c;
+color:var(--white);
+border:1px solid var(--line);
+}
+
 header{
 position:sticky;
 top:0;
-z-index:20;
-background:#0a1711ee;
-backdrop-filter:blur(12px);
-border-bottom:1px solid #20352b;
-padding:13px
+z-index:50;
+background:#07130eee;
+backdrop-filter:blur(14px);
+border-bottom:1px solid var(--line);
 }
-.top{
-max-width:1150px;
-margin:auto
+
+.header-inner{
+max-width:1200px;
+margin:auto;
+padding:13px 15px;
 }
-.brand{
+
+.logo{
 font-size:22px;
 font-weight:900;
-color:var(--green)
+color:var(--green);
 }
-.sub{
+
+.logo span{
+color:white;
+}
+
+.subtitle{
 font-size:11px;
 color:var(--muted);
-margin-top:3px
+margin-top:3px;
 }
-nav{
+
+.nav{
 display:flex;
-gap:7px;
-overflow:auto;
-margin-top:11px
+gap:8px;
+overflow-x:auto;
+margin-top:12px;
+padding-bottom:2px;
 }
-button{
-border:0;
-border-radius:10px;
-padding:10px 13px;
-font-weight:800;
-cursor:pointer;
-background:var(--green);
-color:#06100a
+
+.nav button{
+white-space:nowrap;
 }
-.ghost{
-background:#14241c;
-color:#dce9e1
-}
-.wrap{
-max-width:1150px;
+
+main{
+max-width:1200px;
 margin:auto;
-padding:18px 14px
+padding:20px 15px 50px;
 }
+
 .hero{
-padding:20px 2px
+padding:25px 0 18px;
 }
+
 .hero h1{
-font-size:32px;
-margin:0 0 7px
+font-size:clamp(29px,7vw,52px);
+line-height:1.05;
+max-width:720px;
 }
+
+.hero h1 span{
+color:var(--green);
+}
+
 .hero p{
 color:var(--muted);
-margin:0
+margin-top:10px;
+font-size:16px;
 }
+
 .search{
 width:100%;
-padding:14px;
-border-radius:12px;
+padding:16px;
+margin:15px 0;
+border-radius:13px;
 border:1px solid var(--line);
-background:var(--panel);
+background:var(--card);
 color:white;
-font-size:15px;
-margin:13px 0
+font-size:16px;
+outline:none;
 }
+
+.search:focus{
+border-color:var(--green);
+}
+
 .filters{
 display:grid;
 grid-template-columns:repeat(5,1fr);
 gap:8px;
-margin-bottom:18px
+margin-bottom:20px;
 }
-select,input,textarea{
-background:var(--panel);
+
+select,
+input,
+textarea{
+width:100%;
+background:var(--card);
 color:white;
 border:1px solid var(--line);
-border-radius:10px;
-padding:11px;
-width:100%;
-margin-bottom:8px
+border-radius:11px;
+padding:12px;
+font-size:14px;
+outline:none;
+margin-bottom:8px;
 }
+
+select:focus,
+input:focus,
+textarea:focus{
+border-color:var(--green);
+}
+
+.catalog-header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin:15px 0;
+}
+
+.catalog-header h2{
+font-size:20px;
+}
+
+.count{
+color:var(--muted);
+font-size:13px;
+}
+
 .grid{
 display:grid;
 grid-template-columns:repeat(2,minmax(0,1fr));
-gap:12px
+gap:12px;
 }
-.card{
-background:var(--panel);
-border:1px solid #20382c;
-border-radius:14px;
+
+.product{
+background:var(--card);
+border:1px solid #1b3b2b;
+border-radius:15px;
 overflow:hidden;
 cursor:pointer;
-transition:.15s
+transition:.15s;
 }
-.card:hover{
+
+.product:hover{
 transform:translateY(-2px);
-border-color:#39614b
+border-color:var(--green);
 }
-.pic{
+
+.product-photo{
 aspect-ratio:1/1;
-background:#16271f;
+background:linear-gradient(135deg,#12271c,#07120d);
 display:flex;
 align-items:center;
 justify-content:center;
-color:#799187;
-font-size:12px
+font-size:45px;
+color:#668274;
 }
-.pic img{
+
+.product-photo img{
 width:100%;
 height:100%;
-object-fit:cover
+object-fit:cover;
 }
-.info{
-padding:11px
+
+.product-info{
+padding:11px;
 }
-.team{
-color:#8fa69b;
-font-size:12px
-}
-.name{
-font-weight:800;
-margin:4px 0;
-min-height:34px
-}
-.price{
-font-size:18px;
-font-weight:900;
-color:var(--green)
-}
-.tag{
-font-size:10px;
-background:#172a20;
-border-radius:6px;
-padding:4px 6px;
-display:inline-block;
-margin-top:6px
-}
-.empty{
-text-align:center;
+
+.club{
+font-size:12px;
 color:var(--muted);
-padding:45px
 }
+
+.product-name{
+font-weight:800;
+font-size:15px;
+margin:5px 0;
+min-height:35px;
+}
+
+.product-price{
+font-size:20px;
+font-weight:900;
+color:var(--green);
+}
+
+.badges{
+display:flex;
+flex-wrap:wrap;
+gap:5px;
+margin-top:8px;
+}
+
+.badge{
+font-size:10px;
+padding:5px 7px;
+border-radius:8px;
+background:#14291e;
+border:1px solid #28503b;
+}
+
+.badge.green{
+color:var(--green);
+}
+
+.badge.yellow{
+color:var(--yellow);
+}
+
+.empty{
+grid-column:1/-1;
+text-align:center;
+padding:50px 15px;
+color:var(--muted);
+}
+
+footer{
+border-top:1px solid #183126;
+text-align:center;
+padding:35px 15px;
+color:var(--muted);
+font-size:12px;
+}
+
 .modal{
 display:none;
 position:fixed;
 inset:0;
-background:#000b;
-z-index:30;
+z-index:100;
+background:rgba(0,0,0,.78);
 padding:15px;
-overflow:auto
+overflow-y:auto;
 }
-.box{
+
+.modal.active{
+display:block;
+}
+
+.modal-box{
 max-width:700px;
-margin:20px auto;
-background:#0b1712;
+margin:25px auto;
+background:#09150f;
 border:1px solid var(--line);
-border-radius:16px;
-padding:18px
+border-radius:18px;
+padding:18px;
+box-shadow:0 20px 60px #000;
 }
-.close{
-float:right;
-background:#17261f;
-color:white
-}
-.detailImg{
-width:100%;
-max-height:430px;
-object-fit:contain;
-background:#13231b;
-border-radius:12px;
-margin:10px 0
-}
-.row{
+
+.modal-top{
 display:flex;
-gap:9px
+justify-content:space-between;
+align-items:center;
+margin-bottom:15px;
 }
-.row>*{
-flex:1
+
+.close{
+background:#17291f;
+color:white;
+padding:8px 11px;
 }
-.total{
-background:#13241b;
-padding:13px;
-border-radius:10px;
-margin:12px 0
+
+.detail-image{
+width:100%;
+max-height:450px;
+object-fit:contain;
+border-radius:13px;
+background:#112219;
+margin-bottom:10px;
 }
-.small{
-font-size:12px;
-color:var(--muted)
-}
-.thumbs{
+
+.thumbnails{
 display:flex;
 gap:7px;
-flex-wrap:wrap
+flex-wrap:wrap;
+margin-bottom:15px;
 }
-.thumbs img{
-width:70px;
-height:70px;
+
+.thumbnails img{
+width:65px;
+height:65px;
 object-fit:cover;
 border-radius:8px;
-border:1px solid var(--line)
+border:1px solid var(--line);
 }
-.rec{
-margin-top:18px
+
+.detail-price{
+font-size:27px;
+font-weight:900;
+color:var(--green);
+margin:12px 0;
 }
-.rec .grid{
-margin-top:8px
+
+.info-box{
+background:var(--card2);
+border-radius:12px;
+padding:13px;
+margin:12px 0;
+line-height:1.7;
 }
-footer{
-color:#71857b;
-text-align:center;
-padding:35px 10px;
-font-size:12px
+
+.form-title{
+margin:15px 0 8px;
 }
-@media(max-width:700px){
+
+.two{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:8px;
+}
+
+.total-box{
+background:var(--card2);
+border-radius:12px;
+padding:15px;
+line-height:2;
+margin:12px 0;
+}
+
+.total-final{
+font-size:20px;
+font-weight:900;
+color:var(--green);
+border-top:1px solid var(--line);
+padding-top:8px;
+}
+
+.small{
+font-size:12px;
+color:var(--muted);
+line-height:1.5;
+}
+
+.recommendations{
+margin-top:22px;
+}
+
+.recommendations .grid{
+margin-top:10px;
+}
+
+.creator-stat{
+background:var(--card2);
+padding:14px;
+border-radius:12px;
+margin-bottom:8px;
+}
+
+.creator-stat strong{
+color:var(--green);
+font-size:20px;
+}
+
+.notice{
+background:#14271d;
+border:1px solid var(--line);
+padding:12px;
+border-radius:10px;
+margin:12px 0;
+font-size:13px;
+line-height:1.5;
+}
+
+@media(max-width:750px){
+
 .filters{
-grid-template-columns:repeat(2,1fr)
+grid-template-columns:1fr 1fr;
 }
-.hero h1{
-font-size:27px
+
+.grid{
+grid-template-columns:1fr 1fr;
 }
-.row{
-flex-direction:column
+
+.two{
+grid-template-columns:1fr;
 }
+
 }
+
+@media(max-width:430px){
+
+.logo{
+font-size:19px;
+}
+
+.nav button{
+font-size:12px;
+padding:10px;
+}
+
+.grid{
+gap:8px;
+}
+
+.product-info{
+padding:9px;
+}
+
+.product-name{
+font-size:13px;
+}
+
+.product-price{
+font-size:17px;
+}
+
+.badge{
+font-size:9px;
+}
+
+}
+
 </style>
 </head>
 
 <body>
 
 <header>
-<div class="top">
 
-<div class="brand">
-⚽ FOOTOCASSION FIT
+<div class="header-inner">
+
+<div class="logo">
+⚽ FOOTOCASSION <span>FIT</span>
 </div>
 
-<div class="sub">
+<div class="subtitle">
 Achetez · Vendez · Trouvez votre maillot
 </div>
 
-<nav>
+<div class="nav">
 
 <button onclick="openSell()">
-Vendre un maillot
+➕ Vendre un maillot
 </button>
 
-<button class="ghost" onclick="openCreators()">
-Programme créateurs
+<button class="secondary" onclick="openCreators()">
+🤝 Programme créateurs
 </button>
 
-<button class="ghost" onclick="openDashboard()">
-Dashboard créateur
+<button class="secondary" onclick="openDashboard()">
+📊 Dashboard
 </button>
 
-<button class="ghost" onclick="openCart()">
-🛒 Panier <span id="cartCount">0</span>
+<button class="secondary" onclick="openCart()">
+🛒 Panier (<span id="cartCount">0</span>)
 </button>
 
-</nav>
 </div>
+
+</div>
+
 </header>
 
-<main class="wrap">
+
+<main>
 
 <section class="hero">
 
 <h1>
-Ta prochaine camiseta est peut-être ici. ⚡
+Ta prochaine camiseta
+<span>est peut-être ici.</span> ⚡
 </h1>
 
 <p>
@@ -299,41 +522,44 @@ Une marketplace pensée pour les passionnés de football.
 
 </section>
 
+
 <input
-class="search"
 id="search"
+class="search"
+type="search"
 placeholder="🔎 Rechercher une équipe, un maillot..."
 oninput="render()"
 >
 
+
 <div class="filters">
 
-<select id="team" onchange="render()">
+<select id="teamFilter" onchange="render()">
 <option value="">Toutes les équipes</option>
 </select>
 
-<select id="size" onchange="render()">
+<select id="sizeFilter" onchange="render()">
 <option value="">Toutes les tailles</option>
-<option>S</option>
-<option>M</option>
-<option>L</option>
-<option>XL</option>
+<option value="S">S</option>
+<option value="M">M</option>
+<option value="L">L</option>
+<option value="XL">XL</option>
 </select>
 
-<select id="auth" onchange="render()">
+<select id="authFilter" onchange="render()">
 <option value="">Authenticité</option>
 <option value="real">Authentique</option>
 <option value="replica">Imitation / replica</option>
 </select>
 
-<select id="condition" onchange="render()">
+<select id="conditionFilter" onchange="render()">
 <option value="">État</option>
-<option>Neuf</option>
-<option>Très bon</option>
-<option>Bon</option>
+<option value="Neuf">Neuf</option>
+<option value="Très bon">Très bon</option>
+<option value="Bon">Bon</option>
 </select>
 
-<select id="price" onchange="render()">
+<select id="priceFilter" onchange="render()">
 <option value="">Prix maximum</option>
 <option value="30">30 €</option>
 <option value="50">50 €</option>
@@ -343,139 +569,180 @@ oninput="render()"
 
 </div>
 
-<div id="grid" class="grid"></div>
+
+<div class="catalog-header">
+
+<h2>🔥 Maillots disponibles</h2>
+
+<div class="count">
+<span id="productCount">0</span> articles
+</div>
+
+</div>
+
+
+<div id="productGrid" class="grid"></div>
 
 </main>
 
+
 <footer>
-FOOTOCASSION FIT · Stage 1 — prototype visuel.
+
+<b style="color:#32e879;">
+FOOTOCASSION FIT
+</b>
+
+· Étape 1 — prototype visuel.
+
+<br><br>
+
 Les paiements, comptes, commandes et livraisons réels seront connectés dans les étapes suivantes.
+
 </footer>
 
 
-<div class="modal" id="detailModal">
+<!-- MODAL PRODUIT -->
 
-<div class="box">
+<div id="detailModal" class="modal">
+
+<div class="modal-box">
+
+<div class="modal-top">
+
+<h2>Détails du maillot</h2>
 
 <button class="close" onclick="closeModal('detailModal')">
 ✕
 </button>
 
-<div id="detail"></div>
+</div>
+
+<div id="detailContent"></div>
 
 </div>
 
 </div>
 
 
-<div class="modal" id="cartModal">
+<!-- MODAL PANIER -->
 
-<div class="box">
+<div id="cartModal" class="modal">
+
+<div class="modal-box">
+
+<div class="modal-top">
+
+<h2>🛒 Ton panier</h2>
 
 <button class="close" onclick="closeModal('cartModal')">
 ✕
 </button>
 
-<div id="cart"></div>
+</div>
+
+<div id="cartContent"></div>
 
 </div>
 
 </div>
 
 
-<div class="modal" id="sellModal">
+<!-- MODAL VENTE -->
 
-<div class="box">
+<div id="sellModal" class="modal">
+
+<div class="modal-box">
+
+<div class="modal-top">
+
+<h2>📸 Vendre un maillot</h2>
 
 <button class="close" onclick="closeModal('sellModal')">
 ✕
 </button>
 
-<h2>📸 Vendre un maillot</h2>
+</div>
 
 <p class="small">
-Autorise l'accès à ta galerie et sélectionne 1 à 3 photos.
+Sélectionne entre 1 et 3 photos depuis ta galerie.
 </p>
 
+<br>
+
 <input
-id="photos"
+id="photoInput"
 type="file"
 accept="image/*"
 multiple
 onchange="previewPhotos(event)"
 >
 
-<div class="thumbs" id="preview"></div>
+<div id="photoPreview" class="thumbnails"></div>
 
-<div class="row">
+<div class="two">
 
 <input
-id="pname"
+id="sellName"
 placeholder="Nom du maillot"
 >
 
 <input
-id="pclub"
+id="sellClub"
 placeholder="Équipe / club"
 >
 
 </div>
 
-<div class="row">
+<div class="two">
 
 <input
-id="pprice"
+id="sellPrice"
 type="number"
 min="1"
 placeholder="Prix (€)"
 >
 
-<select id="psize">
+<select id="sellSize">
 
-<option>S</option>
-<option>M</option>
-<option>L</option>
-<option>XL</option>
+<option value="S">S</option>
+<option value="M">M</option>
+<option value="L">L</option>
+<option value="XL">XL</option>
 
 </select>
 
 </div>
 
-<div class="row">
+<div class="two">
 
-<select id="pcondition">
+<select id="sellCondition">
 
-<option>Neuf</option>
-<option>Très bon</option>
-<option>Bon</option>
+<option value="Neuf">Neuf</option>
+<option value="Très bon">Très bon</option>
+<option value="Bon">Bon</option>
 
 </select>
 
-<select id="pauth">
+<select id="sellAuth">
 
-<option value="real">
-Authentique
-</option>
-
-<option value="replica">
-Imitation / replica
-</option>
+<option value="real">Authentique</option>
+<option value="replica">Imitation / replica</option>
 
 </select>
 
 </div>
 
 <textarea
-id="pdesc"
+id="sellDescription"
 rows="4"
-placeholder="Description du maillot"
+placeholder="Description du maillot..."
 ></textarea>
 
 <button
 onclick="addProduct()"
-style="width:100%"
+style="width:100%;"
 >
-Publier le maillot
+🚀 Publier le maillot
 </button>
 
 </div>
@@ -483,40 +750,59 @@ Publier le maillot
 </div>
 
 
-<div class="modal" id="checkoutModal">
+<!-- MODAL CHECKOUT -->
 
-<div class="box">
+<div id="checkoutModal" class="modal">
+
+<div class="modal-box">
+
+<div class="modal-top">
+
+<h2>🧾 Checkout</h2>
 
 <button class="close" onclick="closeModal('checkoutModal')">
 ✕
 </button>
 
-<div id="checkout"></div>
+</div>
+
+<div id="checkoutContent"></div>
 
 </div>
 
 </div>
 
 
-<div class="modal" id="creatorModal">
+<!-- MODAL CREATEUR -->
 
-<div class="box">
+<div id="creatorModal" class="modal">
+
+<div class="modal-box">
+
+<div class="modal-top">
+
+<h2>🤝 Programme créateurs</h2>
 
 <button class="close" onclick="closeModal('creatorModal')">
 ✕
 </button>
 
-<h2>🤝 Programme créateurs</h2>
+</div>
 
 <p>
 Les créateurs approuvés peuvent recevoir
-<b>5%</b>
+<b style="color:#32e879;">5%</b>
 sur les ventes attribuées à leur code.
 </p>
 
+<div class="notice">
+Exemple de code créateur :
+<b>Messi1010</b>
+</div>
+
 <input
 id="creatorName"
-placeholder="Pseudo"
+placeholder="Ton pseudo"
 >
 
 <input
@@ -533,53 +819,70 @@ placeholder="Nombre d'abonnés"
 
 <button
 onclick="applyCreator()"
-style="width:100%"
+style="width:100%;"
 >
-Envoyer la candidature
+Envoyer ma candidature
 </button>
-
-<p class="small">
-Exemple de code créateur : Messi1010
-</p>
 
 </div>
 
 </div>
 
 
-<div class="modal" id="dashModal">
+<!-- MODAL DASHBOARD -->
 
-<div class="box">
+<div id="dashboardModal" class="modal">
 
-<button class="close" onclick="closeModal('dashModal')">
-✕
-</button>
+<div class="modal-box">
+
+<div class="modal-top">
 
 <h2>📊 Dashboard créateur</h2>
 
-<div class="total">
-
-<b>Code :</b> Messi1010
-<br>
-
-<b>Ventes attribuées :</b> 0
-<br>
-
-<b>Chiffre généré :</b> 0 €
-<br>
-
-<b>Commission :</b> 0 €
-<br>
-
-<b>Clics :</b> 0
-<br>
-
-<b>Conversion :</b> 0%
+<button class="close" onclick="closeModal('dashboardModal')">
+✕
+</button>
 
 </div>
 
+<div class="creator-stat">
+Code créateur
+<br>
+<strong>Messi1010</strong>
+</div>
+
+<div class="creator-stat">
+Ventes attribuées
+<br>
+<strong>0</strong>
+</div>
+
+<div class="creator-stat">
+Chiffre généré
+<br>
+<strong>0,00 €</strong>
+</div>
+
+<div class="creator-stat">
+Commission
+<br>
+<strong>0,00 €</strong>
+</div>
+
+<div class="creator-stat">
+Clics
+<br>
+<strong>0</strong>
+</div>
+
+<div class="creator-stat">
+Conversion
+<br>
+<strong>0%</strong>
+</div>
+
 <p class="small">
-Prototype. En production, ces données seront reliées aux vraies commandes et paiements.
+Prototype Stage 1. Les données seront reliées aux vraies commandes dans les étapes suivantes.
 </p>
 
 </div>
@@ -589,7 +892,7 @@ Prototype. En production, ces données seront reliées aux vraies commandes et p
 
 <script>
 
-const demo=[
+const DEMO_PRODUCTS = [
 
 {
 id:1,
@@ -599,8 +902,8 @@ price:80,
 size:"M",
 condition:"Très bon",
 auth:"real",
-desc:"Maillot de football en très bon état.",
-imgs:[]
+description:"Maillot de football du Real Madrid en très bon état.",
+images:[]
 },
 
 {
@@ -611,8 +914,8 @@ price:55,
 size:"L",
 condition:"Bon",
 auth:"real",
-desc:"Maillot porté quelques fois.",
-imgs:[]
+description:"Maillot porté quelques fois.",
+images:[]
 },
 
 {
@@ -623,8 +926,8 @@ price:70,
 size:"S",
 condition:"Neuf",
 auth:"real",
-desc:"Maillot neuf.",
-imgs:[]
+description:"Maillot neuf du PSG.",
+images:[]
 },
 
 {
@@ -635,544 +938,889 @@ price:35,
 size:"M",
 condition:"Très bon",
 auth:"replica",
-desc:"Réplique déclarée par le vendeur.",
-imgs:[]
+description:"Réplique déclarée par le vendeur.",
+images:[]
 }
 
 ];
 
-let products =
-JSON.parse(localStorage.getItem("ffc_products")||"null")
-|| demo;
+let products = loadProducts();
 
-let cart=[];
-let currentProduct=null;
-let photosData=[];
+let cart = [];
 
-function save(){
+let uploadedPhotos = [];
+
+function loadProducts(){
+
+try{
+
+const saved =
+localStorage.getItem("footocassion_products");
+
+if(saved){
+
+return JSON.parse(saved);
+
+}
+
+}catch(error){
+
+console.log(error);
+
+}
+
+return DEMO_PRODUCTS;
+
+}
+
+function saveProducts(){
+
+try{
 
 localStorage.setItem(
-"ffc_products",
+"footocassion_products",
 JSON.stringify(products)
 );
 
-}
+}catch(error){
 
-function esc(s){
-
-return String(s||"").replace(
-/[&<>"']/g,
-m=>({
-"&":"&amp;",
-"<":"&lt;",
-">":"&gt;",
-'"':"&quot;",
-"'":"&#039;"
-}[m])
-);
+console.log(error);
 
 }
 
-function placeholder(){
+}
 
-return 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22600%22%3E%3Crect width=%22100%25%22 height=%22100%25%22 fill=%22%2316271f%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 fill=%22white%22 text-anchor=%22middle%22 font-size=%2224%22%3EFOOTOCASSION FIT%3C/text%3E%3C/svg%3E';
+function escapeHTML(value){
+
+return String(value || "")
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+function placeholderImage(){
+
+return "data:image/svg+xml;charset=UTF-8,"+
+encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg"
+width="600"
+height="600">
+
+<rect width="100%" height="100%"
+fill="#12271c"/>
+
+<text
+x="50%"
+y="50%"
+fill="#32e879"
+font-size="28"
+font-family="Arial"
+text-anchor="middle">
+
+FOOTOCASSION FIT
+
+</text>
+
+</svg>
+`);
 
 }
 
 function render(){
 
-const q=
-document.getElementById("search").value.toLowerCase();
-
-const t=
-document.getElementById("team").value;
-
-const s=
-document.getElementById("size").value;
-
-const a=
-document.getElementById("auth").value;
-
-const c=
-document.getElementById("condition").value;
-
-const max=
-document.getElementById("price").value;
-
-const list=products.filter(p=>
-
-(!q ||
-(p.name+" "+p.club)
+const search =
+document.getElementById("search")
+.value
 .toLowerCase()
-.includes(q))
+.trim();
+
+const team =
+document.getElementById("teamFilter")
+.value;
+
+const size =
+document.getElementById("sizeFilter")
+.value;
+
+const auth =
+document.getElementById("authFilter")
+.value;
+
+const condition =
+document.getElementById("conditionFilter")
+.value;
+
+const maxPrice =
+document.getElementById("priceFilter")
+.value;
+
+const filtered = products.filter(product=>{
+
+const text =
+(product.name+" "+product.club)
+.toLowerCase();
+
+return (
+
+(!search || text.includes(search))
 
 &&
 
-(!t || p.club===t)
+(!team || product.club===team)
 
 &&
 
-(!s || p.size===s)
+(!size || product.size===size)
 
 &&
 
-(!a || p.auth===a)
+(!auth || product.auth===auth)
 
 &&
 
-(!c || p.condition===c)
+(!condition || product.condition===condition)
 
 &&
 
-(!max || p.price<=+max)
+(!maxPrice || product.price<=Number(maxPrice))
 
 );
 
-document.getElementById("grid").innerHTML=
+});
 
-list.length
+const grid =
+document.getElementById("productGrid");
 
+if(!filtered.length){
+
+grid.innerHTML=`
+<div class="empty">
+😕<br><br>
+Aucun maillot ne correspond à ta recherche.
+</div>
+`;
+
+}else{
+
+grid.innerHTML =
+filtered.map(product=>{
+
+const image =
+product.images &&
+product.images.length
 ?
+`<img src="${product.images[0]}" alt="">`
+:
+`⚽`;
 
-list.map(p=>`
+return `
 
 <article
-class="card"
-onclick="openDetail(${p.id})"
+class="product"
+onclick="openProduct(${product.id})"
 >
 
-<div class="pic">
-
-${
-p.imgs&&p.imgs[0]
-?
-`<img src="${p.imgs[0]}">`
-:
-"⚽ PHOTO DU MAILLOT"
-}
-
+<div class="product-photo">
+${image}
 </div>
 
-<div class="info">
+<div class="product-info">
 
-<div class="team">
-${esc(p.club)}
+<div class="club">
+${escapeHTML(product.club)}
 </div>
 
-<div class="name">
-${esc(p.name)}
+<div class="product-name">
+${escapeHTML(product.name)}
 </div>
 
-<div class="price">
-${Number(p.price).toFixed(2)} €
+<div class="product-price">
+${Number(product.price).toFixed(2)} €
 </div>
 
-<span class="tag">
-Taille ${esc(p.size)}
+<div class="badges">
+
+<span class="badge">
+Taille ${escapeHTML(product.size)}
 </span>
 
-<span class="tag">
-
+<span class="badge green">
 ${
-p.auth==="real"
+product.auth==="real"
 ?
 "✓ Authentique"
 :
 "⚠️ Imitation"
 }
-
 </span>
+
+<span class="badge">
+${escapeHTML(product.condition)}
+</span>
+
+</div>
 
 </div>
 
 </article>
 
-`).join("")
+`;
 
-:
+}).join("");
 
-`<div class="empty">
-Aucun maillot ne correspond aux filtres.
-</div>`;
+}
 
-const teams=
-[...new Set(products.map(p=>p.club))];
+document.getElementById("productCount")
+.textContent=filtered.length;
 
-const sel=
-document.getElementById("team");
+updateTeamFilter();
 
-const old=sel.value;
+document.getElementById("cartCount")
+.textContent=cart.length;
 
-sel.innerHTML=
-'<option value="">Toutes les équipes</option>'
+}
+
+function updateTeamFilter(){
+
+const select =
+document.getElementById("teamFilter");
+
+const current=select.value;
+
+const teams=[
+...new Set(products.map(product=>product.club))
+];
+
+select.innerHTML=
+`<option value="">Toutes les équipes</option>`
 +
-teams.map(x=>
-`<option>${esc(x)}</option>`
+teams.map(team=>
+`<option value="${escapeHTML(team)}">
+${escapeHTML(team)}
+</option>`
 ).join("");
 
-sel.value=
-teams.includes(old)
+if(teams.includes(current)){
+
+select.value=current;
+
+}
+
+}
+
+<!-- FIN PARTE 1 -->function openProduct(id){
+
+const product =
+products.find(p=>p.id===id);
+
+if(!product)return;
+
+const image =
+product.images &&
+product.images.length
 ?
-old
+product.images[0]
+:
+placeholderImage();
+
+const thumbnails =
+product.images &&
+product.images.length
+?
+product.images.map(img=>
+`<img src="${img}" alt="">`
+).join("")
 :
 "";
 
-document.getElementById("cartCount").textContent=
-cart.length;
-function openDetail(id){
-const p=products.find(x=>x.id===id);
-currentProduct=p;
-const others=products.filter(x=>x.id!==id).slice(0,3);
-const main=(p.imgs&&p.imgs[0])||placeholder();
-const thumbs=(p.imgs||[]).map(x=>`<img src="${x}">`).join("");
+const recommendations =
+products
+.filter(p=>p.id!==id)
+.slice(0,3);
 
-document.getElementById("detail").innerHTML=`
-<h2>${esc(p.name)}</h2>
+document.getElementById("detailContent").innerHTML=`
 
-<img class="detailImg" src="${main}">
+<img
+class="detail-image"
+src="${image}"
+alt=""
+>
 
-<div class="thumbs">${thumbs}</div>
-
-<p>${esc(p.desc)}</p>
-
-<p>
-<b>Club :</b> ${esc(p.club)}
-·
-<b>Taille :</b> ${esc(p.size)}
-·
-<b>État :</b> ${esc(p.condition)}
-</p>
-
-<p>
-${p.auth==="real"
-?"✓ Authenticité déclarée par le vendeur"
-:"⚠️ Imitation / replica déclarée par le vendeur"}
-</p>
-
-<h2>${Number(p.price).toFixed(2)} €</h2>
-
-<button onclick="addToCart(${p.id})">
-Ajouter au panier
-</button>
-
-<div class="rec">
-<h3>Vous aimerez peut-être</h3>
-
-<div class="grid">
-${others.map(o=>`
-<div class="card" onclick="openDetail(${o.id})">
-
-<div class="pic">
-${o.imgs&&o.imgs[0]
-?`<img src="${o.imgs[0]}">`
-:"⚽"}
+<div class="thumbnails">
+${thumbnails}
 </div>
 
-<div class="info">
-${esc(o.name)}
+<h2>
+${escapeHTML(product.name)}
+</h2>
+
+<div class="club">
+${escapeHTML(product.club)}
+</div>
+
+<div class="detail-price">
+${Number(product.price).toFixed(2)} €
+</div>
+
+<div class="info-box">
+
+<b>Taille :</b>
+${escapeHTML(product.size)}
+
 <br>
-<b>${Number(o.price).toFixed(2)} €</b>
-</div>
 
-</div>
-`).join("")}
-</div>
-</div>
-`;
+<b>État :</b>
+${escapeHTML(product.condition)}
 
-openModal("detailModal")
+<br>
+
+<b>Authenticité :</b>
+${
+product.auth==="real"
+?
+"✓ Authenticité déclarée par le vendeur"
+:
+"⚠️ Imitation / replica déclarée par le vendeur"
 }
 
+</div>
+
+<p>
+${escapeHTML(product.description)}
+</p>
+
+<br>
+
+<button
+onclick="addToCart(${product.id})"
+style="width:100%;"
+>
+🛒 Ajouter au panier
+</button>
+
+<div class="recommendations">
+
+<h3>
+Vous aimerez peut-être
+</h3>
+
+<div class="grid">
+
+${
+recommendations.map(p=>`
+
+<div
+class="product"
+onclick="openProduct(${p.id})"
+>
+
+<div class="product-photo">
+
+${
+p.images&&p.images.length
+?
+`<img src="${p.images[0]}" alt="">`
+:
+"⚽"
+}
+
+</div>
+
+<div class="product-info">
+
+<div class="club">
+${escapeHTML(p.club)}
+</div>
+
+<div class="product-name">
+${escapeHTML(p.name)}
+</div>
+
+<div class="product-price">
+${Number(p.price).toFixed(2)} €
+</div>
+
+</div>
+
+</div>
+
+`).join("")
+}
+
+</div>
+
+</div>
+
+`;
+
+openModal("detailModal");
+
+}
 
 function addToCart(id){
 
-const p=products.find(x=>x.id===id);
+const product =
+products.find(p=>p.id===id);
 
-if(p)cart=[p];
+if(!product)return;
+
+cart=[product];
 
 closeModal("detailModal");
 
-openCart()
-}
+openCart();
 
+}
 
 function openCart(){
 
-const box=document.getElementById("cart");
+const container =
+document.getElementById("cartContent");
 
 if(!cart.length){
 
-box.innerHTML=
-"<h2>🛒 Panier</h2><p>Ton panier est vide.</p>";
+container.innerHTML=`
+
+<div class="empty">
+
+🛒<br><br>
+
+Ton panier est vide.
+
+</div>
+
+`;
 
 }else{
 
-const p=cart[0];
+const product=cart[0];
 
-box.innerHTML=`
-<h2>🛒 Panier</h2>
+container.innerHTML=`
 
-<p>
-<b>${esc(p.name)}</b>
+<div class="info-box">
+
+<b>
+${escapeHTML(product.name)}
+</b>
+
 <br>
-${Number(p.price).toFixed(2)} €
-</p>
 
-<button onclick="closeModal('cartModal');openCheckout()">
-Continuer vers le checkout
+${Number(product.price).toFixed(2)} €
+
+</div>
+
+<button
+onclick="openCheckout()"
+style="width:100%;"
+>
+Continuer vers le paiement
 </button>
+
 `;
 
 }
 
-openModal("cartModal")
-}
+openModal("cartModal");
 
+}
 
 function openCheckout(){
 
-const p=cart[0];
+if(!cart.length){
 
-if(!p)return;
+closeModal("cartModal");
 
-const fee=p.price*.15;
-const ship=4.99;
-const total=p.price+fee+ship;
+return;
 
-document.getElementById("checkout").innerHTML=`
+}
 
-<h2>🧾 Checkout</h2>
+const product=cart[0];
 
-<p>
-<b>${esc(p.name)}</b>
-</p>
+const fee =
+product.price*0.15;
 
-<div class="total">
+const shipping=4.99;
 
-Prix du maillot : ${p.price.toFixed(2)} €
+const total =
+product.price+
+fee+
+shipping;
+
+document.getElementById("checkoutContent").innerHTML=`
+
+<h3>
+${escapeHTML(product.name)}
+</h3>
+
+<div class="total-box">
+
+Prix du maillot :
+<b>${product.price.toFixed(2)} €</b>
 
 <br>
 
 <span class="small">
-Frais de service (15%) : ${fee.toFixed(2)} €
+Frais de service (15%) :
+${fee.toFixed(2)} €
 </span>
 
 <br>
 
-Livraison : ${ship.toFixed(2)} €
+Livraison :
+${shipping.toFixed(2)} €
 
-<hr>
+<div class="total-final">
 
-<b>
-Total à payer : ${total.toFixed(2)} €
-</b>
+Total à payer :
+${total.toFixed(2)} €
 
 </div>
 
+</div>
+
+<label>
+Code créateur
+</label>
+
 <input
-id="creatorCode"
-placeholder="Code créateur (ex. Messi1010)"
+id="creatorCodeInput"
+placeholder="Ex. Messi1010"
 >
 
-<h3>Choisir le paiement</h3>
+<h3 style="margin:15px 0 10px;">
+Choisir le paiement
+</h3>
 
-<div class="row">
+<div class="two">
 
-<button onclick="pay('Carte bancaire')">
-💳 Carte
+<button onclick="demoPayment('Carte bancaire')">
+💳 Carte bancaire
 </button>
 
-<button onclick="pay('PayPal')">
+<button onclick="demoPayment('PayPal')">
 PayPal
 </button>
 
-<button onclick="pay('Virement bancaire')">
-🏦 Banque
+</div>
+
+<br>
+
+<button
+class="secondary"
+onclick="demoPayment('Virement bancaire')"
+style="width:100%;"
+>
+🏦 Virement bancaire
 </button>
 
-</div>
+<br><br>
 
 <p class="small">
 Prototype Stage 1 : aucun paiement réel n'est effectué.
+Les paiements réels seront connectés dans une étape ultérieure.
 </p>
 
 `;
 
-openModal("checkoutModal")
+closeModal("cartModal");
+
+openModal("checkoutModal");
+
 }
 
-
-function pay(method){
+function demoPayment(method){
 
 alert(
-"Démo : "+method+
-". Le paiement réel sera connecté dans une étape ultérieure."
-)
+"Démo FOOTOCASSION FIT\\n\\n"+
+"Mode choisi : "+method+
+"\\n\\nLe paiement réel sera connecté dans une étape ultérieure."
+);
 
 }
-
 
 function openSell(){
 
-photosData=[];
+uploadedPhotos=[];
 
-document.getElementById("preview").innerHTML="";
+document.getElementById("photoPreview")
+.innerHTML="";
 
-document.getElementById("photos").value="";
+document.getElementById("photoInput")
+.value="";
 
-openModal("sellModal")
+document.getElementById("sellName")
+.value="";
+
+document.getElementById("sellClub")
+.value="";
+
+document.getElementById("sellPrice")
+.value="";
+
+document.getElementById("sellDescription")
+.value="";
+
+openModal("sellModal");
+
 }
 
+function previewPhotos(event){
 
-function previewPhotos(e){
+const files =
+Array.from(event.target.files)
+.slice(0,3);
 
-const files=[...e.target.files].slice(0,3);
+uploadedPhotos=[];
 
-photosData=[];
+if(event.target.files.length>3){
 
-files.forEach(f=>{
+alert(
+"Maximum 3 photos. Les 3 premières seront utilisées."
+);
 
-const r=new FileReader();
+}
 
-r.onload=()=>{
+files.forEach(file=>{
 
-photosData.push(r.result);
+const reader=new FileReader();
 
-document.getElementById("preview").innerHTML=
-photosData.map(x=>`<img src="${x}">`).join("");
+reader.onload=function(e){
+
+uploadedPhotos.push(e.target.result);
+
+document.getElementById("photoPreview")
+.innerHTML=
+uploadedPhotos.map(image=>
+`<img src="${image}" alt="">`
+).join("");
 
 };
 
-r.readAsDataURL(f);
+reader.readAsDataURL(file);
 
 });
 
-if(e.target.files.length>3)
-
-alert(
-"Maximum 3 photos. Seules les 3 premières sont utilisées."
-)
-
 }
-
 
 function addProduct(){
 
-const name=
-document.getElementById("pname").value.trim();
+const name =
+document.getElementById("sellName")
+.value.trim();
 
-const club=
-document.getElementById("pclub").value.trim();
+const club =
+document.getElementById("sellClub")
+.value.trim();
 
-const price=
-+document.getElementById("pprice").value;
-
-if(!name||!club||!price){
-
-alert(
-"Remplis au minimum le nom, le club et le prix."
+const price =
+Number(
+document.getElementById("sellPrice")
+.value
 );
 
-return
+const size =
+document.getElementById("sellSize")
+.value;
+
+const condition =
+document.getElementById("sellCondition")
+.value;
+
+const auth =
+document.getElementById("sellAuth")
+.value;
+
+const description =
+document.getElementById("sellDescription")
+.value.trim();
+
+if(!name){
+
+alert("Écris le nom du maillot.");
+
+return;
+
 }
 
-if(!photosData.length){
+if(!club){
 
-alert("Ajoute au moins 1 photo.");
+alert("Écris l'équipe ou le club.");
 
-return
+return;
+
 }
 
-products.unshift({
+if(!price || price<=0){
+
+alert("Indique un prix valide.");
+
+return;
+
+}
+
+if(!uploadedPhotos.length){
+
+alert("Ajoute au moins une photo.");
+
+return;
+
+}
+
+const product={
 
 id:Date.now(),
 
-name,
+name:name,
 
-club,
+club:club,
 
-price,
+price:price,
 
-size:
-document.getElementById("psize").value,
+size:size,
 
-condition:
-document.getElementById("pcondition").value,
+condition:condition,
 
-auth:
-document.getElementById("pauth").value,
+auth:auth,
 
-desc:
-document.getElementById("pdesc").value,
+description:
+description ||
+"Maillot mis en vente sur FOOTOCASSION FIT.",
 
-imgs:
-photosData.slice(0,3)
+images:uploadedPhotos.slice(0,3)
 
-});
+};
 
-save();
+products.unshift(product);
+
+saveProducts();
 
 closeModal("sellModal");
 
 render();
 
-alert("Maillot ajouté à la démo !")
+alert(
+"✅ Ton maillot a été ajouté à la marketplace !"
+);
 
 }
-
 
 function openCreators(){
 
-openModal("creatorModal")
+openModal("creatorModal");
 
 }
-
 
 function applyCreator(){
 
-const n=
-document.getElementById("creatorName").value.trim();
+const name =
+document.getElementById("creatorName")
+.value.trim();
 
-if(!n){
+const social =
+document.getElementById("creatorSocial")
+.value.trim();
+
+const followers =
+document.getElementById("creatorFollowers")
+.value;
+
+if(!name){
 
 alert("Indique ton pseudo.");
 
-return
+return;
+
+}
+
+if(!social){
+
+alert("Indique ton Instagram ou TikTok.");
+
+return;
+
 }
 
 alert(
-"Candidature enregistrée en démo. En production, elle sera envoyée à l'administration."
-)
+"✅ Candidature enregistrée en démo !\\n\\n"+
+"Elle sera examinée par l'administration en production."
+);
 
 }
-
 
 function openDashboard(){
 
-openModal("dashModal")
+openModal("dashboardModal");
 
 }
-
 
 function openModal(id){
 
-document.getElementById(id).style.display="block"
+const modal =
+document.getElementById(id);
+
+if(modal){
+
+modal.classList.add("active");
 
 }
 
+}
 
 function closeModal(id){
 
-document.getElementById(id).style.display="none"
+const modal =
+document.getElementById(id);
+
+if(modal){
+
+modal.classList.remove("active");
 
 }
 
+}
+
+/* Fermer une fenêtre en touchant l'arrière-plan */
+
+document.querySelectorAll(".modal")
+.forEach(modal=>{
+
+modal.addEventListener("click",function(event){
+
+if(event.target===modal){
+
+modal.classList.remove("active");
+
+}
+
+});
+
+});
+
+
+/* ESC sur clavier */
+
+document.addEventListener("keydown",function(event){
+
+if(event.key==="Escape"){
+
+document.querySelectorAll(".modal")
+.forEach(modal=>
+modal.classList.remove("active")
+);
+
+}
+
+});
+
+
+/* Lancement */
 
 render();
 
 </script>
 
 </body>
-
 </html>
-}
