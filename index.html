@@ -1,266 +1,1178 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>FOOTOCASSION FIT</title>
 <style>
+:root{
+--bg:#07110d;
+--panel:#0d1b15;
+--panel2:#12251b;
+--line:#294438;
+--text:#f4f7f5;
+--muted:#9eb0a6;
+--green:#35e37b
+}
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#0b0f14;color:#f5f7fa}
-header{background:#10161e;border-bottom:1px solid #293340;padding:14px 16px;position:sticky;top:0;z-index:5}
-nav{max-width:1100px;margin:auto;display:flex;justify-content:space-between;align-items:center}
-.logo{font-weight:900;font-size:20px}.logo small{display:block;color:#9da8b6;font-size:11px}
-main{max-width:1100px;margin:auto;padding:22px 16px}
-.hero{padding:15px 0}.hero h1{font-size:34px;margin:0 0 8px}.hero p{color:#aeb7c3}
-button{padding:11px 15px;border-radius:10px;font-weight:700;cursor:pointer}
-.primary{background:#fff;color:#0b0f14;border:0}
-.outline{background:#151d27;color:#fff;border:1px solid #364252}
-.search{margin:20px 0}
-input,select,textarea{width:100%;background:#111821;color:#fff;border:1px solid #303b49;border-radius:10px;padding:12px;font-size:15px}
-.filters{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px}
-.catalog{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
-.card{background:#111821;border:1px solid #27313e;border-radius:15px;overflow:hidden}
-.shirt{height:230px;background:#1a222c;display:flex;align-items:center;justify-content:center;font-size:48px;color:#748092}
-.shirt img{width:100%;height:100%;object-fit:cover}
-.info{padding:14px}.info h3{margin:0 0 7px}.muted,.note{color:#9ca8b6;font-size:13px}
-.price{font-size:22px;font-weight:900;margin:10px 0}
-.tag{display:inline-block;padding:5px 8px;border-radius:7px;background:#202a36;font-size:12px;margin:3px 2px}
-.warn{background:#3a2d19;color:#ffd88a}
-.empty{text-align:center;color:#9ca8b6;padding:40px;border:1px dashed #303b49;border-radius:15px;grid-column:1/-1}
-.modal{display:none;position:fixed;inset:0;background:#000b;z-index:20;padding:18px;overflow:auto}
-.modal.show{display:flex;justify-content:center}
-.box{width:min(650px,100%);background:#10161e;border:1px solid #303b49;border-radius:16px;padding:20px;margin:20px 0}
-.close{float:right;background:transparent;color:#fff;border:0;font-size:24px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-label{display:block;color:#b9c2ce;font-size:13px;margin:12px 0 6px}
-textarea{min-height:90px}.photos{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.preview{width:90px;height:90px;object-fit:cover;border-radius:10px}
-.fee{background:#151e28;border-radius:12px;padding:14px;line-height:1.8}
-.total{font-size:22px;font-weight:900}
-@media(max-width:800px){.filters{grid-template-columns:1fr 1fr}.catalog{grid-template-columns:1fr 1fr}}
-@media(max-width:520px){.catalog{grid-template-columns:1fr}.row{grid-template-columns:1fr}.hero h1{font-size:28px}}
+body{
+margin:0;
+background:var(--bg);
+color:var(--text);
+font-family:Arial,sans-serif
+}
+header{
+position:sticky;
+top:0;
+z-index:20;
+background:#0a1711ee;
+backdrop-filter:blur(12px);
+border-bottom:1px solid #20352b;
+padding:13px
+}
+.top{
+max-width:1150px;
+margin:auto
+}
+.brand{
+font-size:22px;
+font-weight:900;
+color:var(--green)
+}
+.sub{
+font-size:11px;
+color:var(--muted);
+margin-top:3px
+}
+nav{
+display:flex;
+gap:7px;
+overflow:auto;
+margin-top:11px
+}
+button{
+border:0;
+border-radius:10px;
+padding:10px 13px;
+font-weight:800;
+cursor:pointer;
+background:var(--green);
+color:#06100a
+}
+.ghost{
+background:#14241c;
+color:#dce9e1
+}
+.wrap{
+max-width:1150px;
+margin:auto;
+padding:18px 14px
+}
+.hero{
+padding:20px 2px
+}
+.hero h1{
+font-size:32px;
+margin:0 0 7px
+}
+.hero p{
+color:var(--muted);
+margin:0
+}
+.search{
+width:100%;
+padding:14px;
+border-radius:12px;
+border:1px solid var(--line);
+background:var(--panel);
+color:white;
+font-size:15px;
+margin:13px 0
+}
+.filters{
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:8px;
+margin-bottom:18px
+}
+select,input,textarea{
+background:var(--panel);
+color:white;
+border:1px solid var(--line);
+border-radius:10px;
+padding:11px;
+width:100%;
+margin-bottom:8px
+}
+.grid{
+display:grid;
+grid-template-columns:repeat(2,minmax(0,1fr));
+gap:12px
+}
+.card{
+background:var(--panel);
+border:1px solid #20382c;
+border-radius:14px;
+overflow:hidden;
+cursor:pointer;
+transition:.15s
+}
+.card:hover{
+transform:translateY(-2px);
+border-color:#39614b
+}
+.pic{
+aspect-ratio:1/1;
+background:#16271f;
+display:flex;
+align-items:center;
+justify-content:center;
+color:#799187;
+font-size:12px
+}
+.pic img{
+width:100%;
+height:100%;
+object-fit:cover
+}
+.info{
+padding:11px
+}
+.team{
+color:#8fa69b;
+font-size:12px
+}
+.name{
+font-weight:800;
+margin:4px 0;
+min-height:34px
+}
+.price{
+font-size:18px;
+font-weight:900;
+color:var(--green)
+}
+.tag{
+font-size:10px;
+background:#172a20;
+border-radius:6px;
+padding:4px 6px;
+display:inline-block;
+margin-top:6px
+}
+.empty{
+text-align:center;
+color:var(--muted);
+padding:45px
+}
+.modal{
+display:none;
+position:fixed;
+inset:0;
+background:#000b;
+z-index:30;
+padding:15px;
+overflow:auto
+}
+.box{
+max-width:700px;
+margin:20px auto;
+background:#0b1712;
+border:1px solid var(--line);
+border-radius:16px;
+padding:18px
+}
+.close{
+float:right;
+background:#17261f;
+color:white
+}
+.detailImg{
+width:100%;
+max-height:430px;
+object-fit:contain;
+background:#13231b;
+border-radius:12px;
+margin:10px 0
+}
+.row{
+display:flex;
+gap:9px
+}
+.row>*{
+flex:1
+}
+.total{
+background:#13241b;
+padding:13px;
+border-radius:10px;
+margin:12px 0
+}
+.small{
+font-size:12px;
+color:var(--muted)
+}
+.thumbs{
+display:flex;
+gap:7px;
+flex-wrap:wrap
+}
+.thumbs img{
+width:70px;
+height:70px;
+object-fit:cover;
+border-radius:8px;
+border:1px solid var(--line)
+}
+.rec{
+margin-top:18px
+}
+.rec .grid{
+margin-top:8px
+}
+footer{
+color:#71857b;
+text-align:center;
+padding:35px 10px;
+font-size:12px
+}
+@media(max-width:700px){
+.filters{
+grid-template-columns:repeat(2,1fr)
+}
+.hero h1{
+font-size:27px
+}
+.row{
+flex-direction:column
+}
+}
 </style>
 </head>
 
 <body>
+
 <header>
+<div class="top">
+
+<div class="brand">
+⚽ FOOTOCASSION FIT
+</div>
+
+<div class="sub">
+Achetez · Vendez · Trouvez votre maillot
+</div>
+
 <nav>
-<div class="logo">⚽ FOOTOCASSION FIT<small>Football shirts marketplace</small></div>
-<button class="primary" onclick="openM('sell')">＋ Vendre</button>
+
+<button onclick="openSell()">
+Vendre un maillot
+</button>
+
+<button class="ghost" onclick="openCreators()">
+Programme créateurs
+</button>
+
+<button class="ghost" onclick="openDashboard()">
+Dashboard créateur
+</button>
+
+<button class="ghost" onclick="openCart()">
+🛒 Panier <span id="cartCount">0</span>
+</button>
+
 </nav>
+</div>
 </header>
 
-<main>
+<main class="wrap">
+
 <section class="hero">
-<h1>Les maillots que tu cherches.</h1>
-<p>Acheter ou vendre des maillots de football simplement.</p>
-<button class="primary" onclick="openM('sell')">Vendre un maillot</button>
+
+<h1>
+Ta prochaine camiseta est peut-être ici. ⚡
+</h1>
+
+<p>
+Une marketplace pensée pour les passionnés de football.
+</p>
+
 </section>
 
-<div class="search">
-<input id="q" placeholder="🔎 Rechercher un maillot, une équipe..." oninput="render()">
-</div>
+<input
+class="search"
+id="search"
+placeholder="🔎 Rechercher une équipe, un maillot..."
+oninput="render()"
+>
 
 <div class="filters">
-<select id="team" onchange="render()"><option value="">Toutes les équipes</option></select>
+
+<select id="team" onchange="render()">
+<option value="">Toutes les équipes</option>
+</select>
+
 <select id="size" onchange="render()">
 <option value="">Toutes les tailles</option>
-<option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option>
+<option>S</option>
+<option>M</option>
+<option>L</option>
+<option>XL</option>
 </select>
+
 <select id="auth" onchange="render()">
 <option value="">Authenticité</option>
-<option value="auth">Authenticité déclarée</option>
+<option value="real">Authentique</option>
 <option value="replica">Imitation / replica</option>
 </select>
-<select id="cond" onchange="render()">
-<option value="">État</option><option>Neuf</option><option>Très bon état</option><option>Bon état</option><option>Correct</option>
+
+<select id="condition" onchange="render()">
+<option value="">État</option>
+<option>Neuf</option>
+<option>Très bon</option>
+<option>Bon</option>
 </select>
+
 <select id="price" onchange="render()">
-<option value="">Prix</option><option value="30">≤ 30 €</option>
-<option value="60">31–60 €</option><option value="100">61–100 €</option><option value="101">101 €+</option>
+<option value="">Prix maximum</option>
+<option value="30">30 €</option>
+<option value="50">50 €</option>
+<option value="80">80 €</option>
+<option value="120">120 €</option>
 </select>
+
 </div>
 
-<section id="catalog" class="catalog"></section>
+<div id="grid" class="grid"></div>
+
 </main>
 
-<div id="sell" class="modal">
+<footer>
+FOOTOCASSION FIT · Stage 1 — prototype visuel.
+Les paiements, comptes, commandes et livraisons réels seront connectés dans les étapes suivantes.
+</footer>
+
+
+<div class="modal" id="detailModal">
+
 <div class="box">
-<button class="close" onclick="closeM('sell')">×</button>
-<h2>Vendre un maillot</h2>
 
-<label>Photos — 1 à 3</label>
-<button class="outline" onclick="document.getElementById('photos').click()">📷 Autoriser l’accès à ma galerie</button>
-<input id="photos" type="file" accept="image/*" multiple hidden onchange="preview()">
-<div id="previews" class="photos"></div>
+<button class="close" onclick="closeModal('detailModal')">
+✕
+</button>
 
-<label>Nom du maillot</label>
-<input id="name" placeholder="Ex. Real Madrid 2024/25">
+<div id="detail"></div>
+
+</div>
+
+</div>
+
+
+<div class="modal" id="cartModal">
+
+<div class="box">
+
+<button class="close" onclick="closeModal('cartModal')">
+✕
+</button>
+
+<div id="cart"></div>
+
+</div>
+
+</div>
+
+
+<div class="modal" id="sellModal">
+
+<div class="box">
+
+<button class="close" onclick="closeModal('sellModal')">
+✕
+</button>
+
+<h2>📸 Vendre un maillot</h2>
+
+<p class="small">
+Autorise l'accès à ta galerie et sélectionne 1 à 3 photos.
+</p>
+
+<input
+id="photos"
+type="file"
+accept="image/*"
+multiple
+onchange="previewPhotos(event)"
+>
+
+<div class="thumbs" id="preview"></div>
 
 <div class="row">
-<div><label>Équipe / club</label><input id="club" placeholder="Ex. Real Madrid"></div>
-<div><label>Taille</label><select id="lsize"><option>XS</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option></select></div>
+
+<input
+id="pname"
+placeholder="Nom du maillot"
+>
+
+<input
+id="pclub"
+placeholder="Équipe / club"
+>
+
 </div>
 
 <div class="row">
-<div><label>Prix (€)</label><input id="lprice" type="number" min="1" placeholder="80"></div>
-<div><label>État</label><select id="lcond"><option>Neuf</option><option>Très bon état</option><option>Bon état</option><option>Correct</option></select></div>
-</div>
 
-<label>Authenticité</label>
-<select id="lauth">
-<option value="auth">✓ Authenticité déclarée</option>
-<option value="replica">⚠️ Imitation / replica</option>
+<input
+id="pprice"
+type="number"
+min="1"
+placeholder="Prix (€)"
+>
+
+<select id="psize">
+
+<option>S</option>
+<option>M</option>
+<option>L</option>
+<option>XL</option>
+
 </select>
 
-<label>Description</label>
-<textarea id="desc" placeholder="Saison, défauts éventuels, etc."></textarea>
-
-<button class="primary" style="width:100%;margin-top:15px" onclick="add()">Mettre en vente</button>
-<p class="note">Démo étape 1 : les annonces sont conservées seulement pendant cette session.</p>
-</div>
 </div>
 
-<div id="buy" class="modal">
+<div class="row">
+
+<select id="pcondition">
+
+<option>Neuf</option>
+<option>Très bon</option>
+<option>Bon</option>
+
+</select>
+
+<select id="pauth">
+
+<option value="real">
+Authentique
+</option>
+
+<option value="replica">
+Imitation / replica
+</option>
+
+</select>
+
+</div>
+
+<textarea
+id="pdesc"
+rows="4"
+placeholder="Description du maillot"
+></textarea>
+
+<button
+onclick="addProduct()"
+style="width:100%"
+>
+Publier le maillot
+</button>
+
+</div>
+
+</div>
+
+
+<div class="modal" id="checkoutModal">
+
 <div class="box">
-<button class="close" onclick="closeM('buy')">×</button>
-<h2 id="bt">Acheter</h2>
 
-<div class="fee">
-Prix du maillot : <b id="bp"></b><br>
-Frais de service acheteur (15 %) : <b id="bf"></b><br>
-<span class="total">Total : <span id="btotal"></span></span>
+<button class="close" onclick="closeModal('checkoutModal')">
+✕
+</button>
+
+<div id="checkout"></div>
+
 </div>
 
-<h3>Mode de paiement</h3>
-<button class="outline" style="width:100%;margin:4px 0" onclick="demo('PayPal')">🅿️ PayPal</button>
-<button class="outline" style="width:100%;margin:4px 0" onclick="demo('Carte bancaire')">💳 Carte bancaire</button>
-<button class="outline" style="width:100%;margin:4px 0" onclick="demo('Virement bancaire')">🏦 Virement bancaire</button>
+</div>
 
-<p class="note">Démo : aucun paiement réel n'est effectué à cette étape.</p>
+
+<div class="modal" id="creatorModal">
+
+<div class="box">
+
+<button class="close" onclick="closeModal('creatorModal')">
+✕
+</button>
+
+<h2>🤝 Programme créateurs</h2>
+
+<p>
+Les créateurs approuvés peuvent recevoir
+<b>5%</b>
+sur les ventes attribuées à leur code.
+</p>
+
+<input
+id="creatorName"
+placeholder="Pseudo"
+>
+
+<input
+id="creatorSocial"
+placeholder="Instagram / TikTok"
+>
+
+<input
+id="creatorFollowers"
+type="number"
+min="0"
+placeholder="Nombre d'abonnés"
+>
+
+<button
+onclick="applyCreator()"
+style="width:100%"
+>
+Envoyer la candidature
+</button>
+
+<p class="small">
+Exemple de code créateur : Messi1010
+</p>
+
 </div>
+
 </div>
+
+
+<div class="modal" id="dashModal">
+
+<div class="box">
+
+<button class="close" onclick="closeModal('dashModal')">
+✕
+</button>
+
+<h2>📊 Dashboard créateur</h2>
+
+<div class="total">
+
+<b>Code :</b> Messi1010
+<br>
+
+<b>Ventes attribuées :</b> 0
+<br>
+
+<b>Chiffre généré :</b> 0 €
+<br>
+
+<b>Commission :</b> 0 €
+<br>
+
+<b>Clics :</b> 0
+<br>
+
+<b>Conversion :</b> 0%
+
+</div>
+
+<p class="small">
+Prototype. En production, ces données seront reliées aux vraies commandes et paiements.
+</p>
+
+</div>
+
+</div>
+
 
 <script>
-let products=[
-{name:"Real Madrid 2024/25",club:"Real Madrid",size:"M",price:80,condition:"Très bon état",auth:"auth",desc:"Maillot en très bon état.",img:""},
-{name:"FC Barcelona 2023/24",club:"FC Barcelona",size:"L",price:55,condition:"Bon état",auth:"auth",desc:"Porté quelques fois.",img:""},
-{name:"PSG vintage",club:"PSG",size:"S",price:35,condition:"Correct",auth:"replica",desc:"Imitation / replica.",img:""}
-],filtered=[];
 
-function openM(x){document.getElementById(x).classList.add("show")}
-function closeM(x){document.getElementById(x).classList.remove("show")}
+const demo=[
 
-function preview(){
-let f=[...photos.files];
-previews.innerHTML="";
-if(f.length<1||f.length>3){
-alert("Choisis entre 1 et 3 photos.");
-photos.value="";
-return
-}
-f.forEach(x=>{
-let i=document.createElement("img");
-i.className="preview";
-i.src=URL.createObjectURL(x);
-previews.appendChild(i)
-})
-}
+{
+id:1,
+name:"Real Madrid 2024/25",
+club:"Real Madrid",
+price:80,
+size:"M",
+condition:"Très bon",
+auth:"real",
+desc:"Maillot de football en très bon état.",
+imgs:[]
+},
 
-function add(){
-let f=[...photos.files],p=parseFloat(lprice.value);
-if(f.length<1||f.length>3)return alert("Ajoute entre 1 et 3 photos.");
-if(!name.value.trim()||!club.value.trim()||!p||p<=0)return alert("Remplis le nom, l’équipe et le prix.");
+{
+id:2,
+name:"FC Barcelona 2023/24",
+club:"FC Barcelona",
+price:55,
+size:"L",
+condition:"Bon",
+auth:"real",
+desc:"Maillot porté quelques fois.",
+imgs:[]
+},
 
-let x={
-name:name.value.trim(),
-club:club.value.trim(),
-size:lsize.value,
-price:p,
-condition:lcond.value,
-auth:lauth.value,
-desc:desc.value.trim()||"Aucune description.",
-img:""
-};
+{
+id:3,
+name:"PSG Home",
+club:"PSG",
+price:70,
+size:"S",
+condition:"Neuf",
+auth:"real",
+desc:"Maillot neuf.",
+imgs:[]
+},
 
-let r=new FileReader();
-r.onload=e=>{
-x.img=e.target.result;
-products.unshift(x);
-updateTeams();
-render();
-closeM("sell");
-alert("Annonce ajoutée ✅")
-};
-r.readAsDataURL(f[0])
+{
+id:4,
+name:"France Édition",
+club:"France",
+price:35,
+size:"M",
+condition:"Très bon",
+auth:"replica",
+desc:"Réplique déclarée par le vendeur.",
+imgs:[]
 }
 
-function buy(i){
-let p=filtered[i],fee=p.price*.15;
-bt.textContent="Acheter : "+p.name;
-bp.textContent=p.price.toFixed(2)+" €";
-bf.textContent=fee.toFixed(2)+" €";
-btotal.textContent=(p.price+fee).toFixed(2)+" €";
-openM("buy")
-}
+];
 
-function demo(x){
-alert("Démo : "+x+" sera connecté lors de l’étape des paiements réels.")
-}
+let products =
+JSON.parse(localStorage.getItem("ffc_products")||"null")
+|| demo;
 
-function render(){
-let q=document.getElementById("q").value.toLowerCase(),
-t=team.value,s=size.value,a=auth.value,c=cond.value,pr=price.value;
+let cart=[];
+let currentProduct=null;
+let photosData=[];
 
-filtered=products.filter(p=>{
-let okpr=!pr||
-(pr==="30"?p.price<=30:
-pr==="60"?p.price>=31&&p.price<=60:
-pr==="100"?p.price>=61&&p.price<=100:
-p.price>=101);
+function save(){
 
-return(!q||(p.name+" "+p.club+" "+p.desc).toLowerCase().includes(q))
-&&(!t||p.club===t)
-&&(!s||p.size===s)
-&&(!a||p.auth===a)
-&&(!c||p.condition===c)
-&&okpr
-});
+localStorage.setItem(
+"ffc_products",
+JSON.stringify(products)
+);
 
-catalog.innerHTML=filtered.length?
-filtered.map((p,i)=>`
-<article class="card">
-<div class="shirt">${p.img?'<img src="'+p.img+'" alt="Maillot">':'⚽'}</div>
-<div class="info">
-<h3>${esc(p.name)}</h3>
-<div class="muted">${esc(p.club)} · Taille ${p.size}</div>
-<span class="tag ${p.auth==="replica"?"warn":""}">
-${p.auth==="replica"?"⚠️ Imitation / replica":"✓ Authenticité déclarée"}
-</span>
-<span class="tag">${esc(p.condition)}</span>
-<div class="price">${p.price.toFixed(2)} €</div>
-<button class="primary" style="width:100%" onclick="buy(${i})">Acheter</button>
-</div>
-</article>`).join("")
-:'<div class="empty">Aucun maillot ne correspond aux filtres.</div>'
-}
-
-function updateTeams(){
-let cur=team.value;
-let ts=[...new Set(products.map(p=>p.club))].sort();
-team.innerHTML='<option value="">Toutes les équipes</option>'+
-ts.map(x=>'<option>'+esc(x)+'</option>').join("");
-team.value=ts.includes(cur)?cur:""
 }
 
 function esc(s){
-return String(s).replace(/[&<>"']/g,m=>({
-"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-}[m]))
+
+return String(s||"").replace(
+/[&<>"']/g,
+m=>({
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#039;"
+}[m])
+);
+
 }
 
-updateTeams();
+function placeholder(){
+
+return 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22600%22 height=%22600%22%3E%3Crect width=%22100%25%22 height=%22100%25%22 fill=%22%2316271f%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 fill=%22white%22 text-anchor=%22middle%22 font-size=%2224%22%3EFOOTOCASSION FIT%3C/text%3E%3C/svg%3E';
+
+}
+
+function render(){
+
+const q=
+document.getElementById("search").value.toLowerCase();
+
+const t=
+document.getElementById("team").value;
+
+const s=
+document.getElementById("size").value;
+
+const a=
+document.getElementById("auth").value;
+
+const c=
+document.getElementById("condition").value;
+
+const max=
+document.getElementById("price").value;
+
+const list=products.filter(p=>
+
+(!q ||
+(p.name+" "+p.club)
+.toLowerCase()
+.includes(q))
+
+&&
+
+(!t || p.club===t)
+
+&&
+
+(!s || p.size===s)
+
+&&
+
+(!a || p.auth===a)
+
+&&
+
+(!c || p.condition===c)
+
+&&
+
+(!max || p.price<=+max)
+
+);
+
+document.getElementById("grid").innerHTML=
+
+list.length
+
+?
+
+list.map(p=>`
+
+<article
+class="card"
+onclick="openDetail(${p.id})"
+>
+
+<div class="pic">
+
+${
+p.imgs&&p.imgs[0]
+?
+`<img src="${p.imgs[0]}">`
+:
+"⚽ PHOTO DU MAILLOT"
+}
+
+</div>
+
+<div class="info">
+
+<div class="team">
+${esc(p.club)}
+</div>
+
+<div class="name">
+${esc(p.name)}
+</div>
+
+<div class="price">
+${Number(p.price).toFixed(2)} €
+</div>
+
+<span class="tag">
+Taille ${esc(p.size)}
+</span>
+
+<span class="tag">
+
+${
+p.auth==="real"
+?
+"✓ Authentique"
+:
+"⚠️ Imitation"
+}
+
+</span>
+
+</div>
+
+</article>
+
+`).join("")
+
+:
+
+`<div class="empty">
+Aucun maillot ne correspond aux filtres.
+</div>`;
+
+const teams=
+[...new Set(products.map(p=>p.club))];
+
+const sel=
+document.getElementById("team");
+
+const old=sel.value;
+
+sel.innerHTML=
+'<option value="">Toutes les équipes</option>'
++
+teams.map(x=>
+`<option>${esc(x)}</option>`
+).join("");
+
+sel.value=
+teams.includes(old)
+?
+old
+:
+"";
+
+document.getElementById("cartCount").textContent=
+cart.length;
+function openDetail(id){
+const p=products.find(x=>x.id===id);
+currentProduct=p;
+const others=products.filter(x=>x.id!==id).slice(0,3);
+const main=(p.imgs&&p.imgs[0])||placeholder();
+const thumbs=(p.imgs||[]).map(x=>`<img src="${x}">`).join("");
+
+document.getElementById("detail").innerHTML=`
+<h2>${esc(p.name)}</h2>
+
+<img class="detailImg" src="${main}">
+
+<div class="thumbs">${thumbs}</div>
+
+<p>${esc(p.desc)}</p>
+
+<p>
+<b>Club :</b> ${esc(p.club)}
+·
+<b>Taille :</b> ${esc(p.size)}
+·
+<b>État :</b> ${esc(p.condition)}
+</p>
+
+<p>
+${p.auth==="real"
+?"✓ Authenticité déclarée par le vendeur"
+:"⚠️ Imitation / replica déclarée par le vendeur"}
+</p>
+
+<h2>${Number(p.price).toFixed(2)} €</h2>
+
+<button onclick="addToCart(${p.id})">
+Ajouter au panier
+</button>
+
+<div class="rec">
+<h3>Vous aimerez peut-être</h3>
+
+<div class="grid">
+${others.map(o=>`
+<div class="card" onclick="openDetail(${o.id})">
+
+<div class="pic">
+${o.imgs&&o.imgs[0]
+?`<img src="${o.imgs[0]}">`
+:"⚽"}
+</div>
+
+<div class="info">
+${esc(o.name)}
+<br>
+<b>${Number(o.price).toFixed(2)} €</b>
+</div>
+
+</div>
+`).join("")}
+</div>
+</div>
+`;
+
+openModal("detailModal")
+}
+
+
+function addToCart(id){
+
+const p=products.find(x=>x.id===id);
+
+if(p)cart=[p];
+
+closeModal("detailModal");
+
+openCart()
+}
+
+
+function openCart(){
+
+const box=document.getElementById("cart");
+
+if(!cart.length){
+
+box.innerHTML=
+"<h2>🛒 Panier</h2><p>Ton panier est vide.</p>";
+
+}else{
+
+const p=cart[0];
+
+box.innerHTML=`
+<h2>🛒 Panier</h2>
+
+<p>
+<b>${esc(p.name)}</b>
+<br>
+${Number(p.price).toFixed(2)} €
+</p>
+
+<button onclick="closeModal('cartModal');openCheckout()">
+Continuer vers le checkout
+</button>
+`;
+
+}
+
+openModal("cartModal")
+}
+
+
+function openCheckout(){
+
+const p=cart[0];
+
+if(!p)return;
+
+const fee=p.price*.15;
+const ship=4.99;
+const total=p.price+fee+ship;
+
+document.getElementById("checkout").innerHTML=`
+
+<h2>🧾 Checkout</h2>
+
+<p>
+<b>${esc(p.name)}</b>
+</p>
+
+<div class="total">
+
+Prix du maillot : ${p.price.toFixed(2)} €
+
+<br>
+
+<span class="small">
+Frais de service (15%) : ${fee.toFixed(2)} €
+</span>
+
+<br>
+
+Livraison : ${ship.toFixed(2)} €
+
+<hr>
+
+<b>
+Total à payer : ${total.toFixed(2)} €
+</b>
+
+</div>
+
+<input
+id="creatorCode"
+placeholder="Code créateur (ex. Messi1010)"
+>
+
+<h3>Choisir le paiement</h3>
+
+<div class="row">
+
+<button onclick="pay('Carte bancaire')">
+💳 Carte
+</button>
+
+<button onclick="pay('PayPal')">
+PayPal
+</button>
+
+<button onclick="pay('Virement bancaire')">
+🏦 Banque
+</button>
+
+</div>
+
+<p class="small">
+Prototype Stage 1 : aucun paiement réel n'est effectué.
+</p>
+
+`;
+
+openModal("checkoutModal")
+}
+
+
+function pay(method){
+
+alert(
+"Démo : "+method+
+". Le paiement réel sera connecté dans une étape ultérieure."
+)
+
+}
+
+
+function openSell(){
+
+photosData=[];
+
+document.getElementById("preview").innerHTML="";
+
+document.getElementById("photos").value="";
+
+openModal("sellModal")
+}
+
+
+function previewPhotos(e){
+
+const files=[...e.target.files].slice(0,3);
+
+photosData=[];
+
+files.forEach(f=>{
+
+const r=new FileReader();
+
+r.onload=()=>{
+
+photosData.push(r.result);
+
+document.getElementById("preview").innerHTML=
+photosData.map(x=>`<img src="${x}">`).join("");
+
+};
+
+r.readAsDataURL(f);
+
+});
+
+if(e.target.files.length>3)
+
+alert(
+"Maximum 3 photos. Seules les 3 premières sont utilisées."
+)
+
+}
+
+
+function addProduct(){
+
+const name=
+document.getElementById("pname").value.trim();
+
+const club=
+document.getElementById("pclub").value.trim();
+
+const price=
++document.getElementById("pprice").value;
+
+if(!name||!club||!price){
+
+alert(
+"Remplis au minimum le nom, le club et le prix."
+);
+
+return
+}
+
+if(!photosData.length){
+
+alert("Ajoute au moins 1 photo.");
+
+return
+}
+
+products.unshift({
+
+id:Date.now(),
+
+name,
+
+club,
+
+price,
+
+size:
+document.getElementById("psize").value,
+
+condition:
+document.getElementById("pcondition").value,
+
+auth:
+document.getElementById("pauth").value,
+
+desc:
+document.getElementById("pdesc").value,
+
+imgs:
+photosData.slice(0,3)
+
+});
+
+save();
+
+closeModal("sellModal");
+
 render();
+
+alert("Maillot ajouté à la démo !")
+
+}
+
+
+function openCreators(){
+
+openModal("creatorModal")
+
+}
+
+
+function applyCreator(){
+
+const n=
+document.getElementById("creatorName").value.trim();
+
+if(!n){
+
+alert("Indique ton pseudo.");
+
+return
+}
+
+alert(
+"Candidature enregistrée en démo. En production, elle sera envoyée à l'administration."
+)
+
+}
+
+
+function openDashboard(){
+
+openModal("dashModal")
+
+}
+
+
+function openModal(id){
+
+document.getElementById(id).style.display="block"
+
+}
+
+
+function closeModal(id){
+
+document.getElementById(id).style.display="none"
+
+}
+
+
+render();
+
 </script>
+
 </body>
-  </html>
+
+</html>
+}
