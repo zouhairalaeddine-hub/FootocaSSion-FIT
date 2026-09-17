@@ -1103,7 +1103,7 @@ render();
 (async()=>{
   const {data,error}=await supabaseClient
     .from("products")
-    .select("id")
+    .select("name")
     .limit(1);
 
   if(error){
