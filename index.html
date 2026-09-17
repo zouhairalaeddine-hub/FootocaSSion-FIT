@@ -710,6 +710,33 @@ img:""
 }
 
 ];
+async function loadProducts(){
+  const {data,error}=await supabaseClient
+    .from("products")
+    .select("*");
+
+  if(error){
+    alert("❌ Error cargando productos: "+error.message);
+    return;
+  }
+
+  products=data.map(p=>({
+    id:p.id,
+    name:p.name,
+    club:p.club,
+    size:p.size,
+    price:Number(p.price),
+    condition:p.condition,
+    auth:p.authenticity,
+    desc:p.description,
+    img:p.image_url
+  }));
+
+  updateTeams();
+  render();
+}
+
+loadProducts();
 
 let filtered=[];
 
