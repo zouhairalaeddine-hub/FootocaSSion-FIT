@@ -720,7 +720,8 @@ async function loadProducts(){
     return;
   }
 
-  products=data.map(p=>({
+  if(data && data.length){
+products=data.map(p=>({
     id:p.id,
     name:p.name,
     club:p.club,
@@ -730,7 +731,7 @@ async function loadProducts(){
     auth:p.authenticity,
     desc:p.description,
     img:p.image_url
-  }));
+  }));}
 
   updateTeams();
   render();
