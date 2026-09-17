@@ -1099,6 +1099,20 @@ updateTeams();
 render();
 
 </script>
+<script>
+(async()=>{
+  const {data,error}=await supabaseClient
+    .from("products")
+    .select("id")
+    .limit(1);
+
+  if(error){
+    alert("❌ Error Supabase: " + error.message);
+  }else{
+    alert("✅ Supabase conectado correctamente");
+  }
+})();
+</script>
 
 </body>
   </html>
