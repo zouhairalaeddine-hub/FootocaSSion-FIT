@@ -1133,7 +1133,11 @@ await supabaseClient.auth.signUp({
 
 email:email,
 
-password:password
+password:password,
+
+options:{
+emailRedirectTo:SITE_URL
+}
 
 });
 
