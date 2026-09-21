@@ -1172,7 +1172,55 @@ document.getElementById("resendButton").style.display="block";
 }
 
 }
+async function resendConfirmation(){
 
+const email=
+document
+.getElementById("authEmail")
+.value
+.trim();
+
+if(!email){
+
+setAuthMessage(
+"Entre ton email pour renvoyer la confirmation.",
+"error"
+);
+
+return;
+
+}
+
+const {error}=
+await supabaseClient.auth.resend({
+
+type:"signup",
+
+email:email,
+
+options:{
+emailRedirectTo:SITE_URL
+}
+
+});
+
+if(error){
+
+setAuthMessage(
+"Erreur : "+error.message,
+"error"
+);
+
+return;
+
+}
+
+setAuthMessage(
+"Email de confirmation renvoyé ✅ Vérifie ta boîte Gmail.",
+"success"
+);
+
+  }
 
 async function signIn(){
 
