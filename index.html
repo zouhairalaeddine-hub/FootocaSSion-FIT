@@ -29,7 +29,8 @@ max-width:1100px;
 margin:auto;
 display:flex;
 justify-content:space-between;
-align-items:center
+align-items:center;
+gap:10px
 }
 
 .logo{font-weight:900;font-size:20px}
@@ -239,7 +240,6 @@ font-size:15px
 background:#202a36
 }
 
-/* Input invisible mais cliquable par le label */
 #photos{
 position:absolute;
 width:1px;
@@ -290,7 +290,23 @@ display:block
 margin:8px 0
 }
 
+.authStatus{
+font-size:12px;
+color:#9ca8b6;
+margin-top:5px;
+text-align:right
+}
+
+.success{
+color:#7ee2a8
+}
+
+.error{
+color:#ff8f8f
+}
+
 @media(max-width:800px){
+
 .filters{
 grid-template-columns:1fr 1fr
 }
@@ -298,9 +314,11 @@ grid-template-columns:1fr 1fr
 .catalog{
 grid-template-columns:1fr 1fr
 }
+
 }
 
 @media(max-width:520px){
+
 .catalog{
 grid-template-columns:1fr
 }
@@ -312,36 +330,69 @@ grid-template-columns:1fr
 .hero h1{
 font-size:28px
 }
+
+nav{
+align-items:flex-start
+}
+
 }
 </style>
-<script src="https://cdn.jsdelivr.net/npm
-/@supabase/supabase-js@2"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
 const SUPABASE_URL = "https://uwtjjqrsvwbqzxajdqub.supabase.co";
+
 const SUPABASE_KEY = "sb_publishable_UbmzdSuIMyI-VjEglZlnCQ_c5k9p_8T";
 
 const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
+SUPABASE_URL,
+SUPABASE_KEY
 );
 </script>
+
 </head>
 
 <body>
 
 <header>
+
 <nav>
 
 <div class="logo">
+
 ⚽ FOOTOCASSION FIT
+
 <small>Football shirts marketplace</small>
+
 </div>
 
-<button class="primary" onclick="openM('sell')">
+<div>
+
+<button
+id="accountButton"
+class="outline"
+onclick="openM('account')"
+>
+👤 Compte
+</button>
+
+<button
+class="primary"
+onclick="openSell()"
+>
 ＋ Vendre
 </button>
 
+<div
+id="authStatus"
+class="authStatus"
+></div>
+
+</div>
+
 </nav>
+
 </header>
 
 
@@ -349,13 +400,18 @@ const supabaseClient = window.supabase.createClient(
 
 <section class="hero">
 
-<h1>Les maillots que tu cherches.</h1>
+<h1>
+Les maillots que tu cherches.
+</h1>
 
 <p>
 Acheter ou vendre des maillots de football simplement.
 </p>
 
-<button class="primary" onclick="openM('sell')">
+<button
+class="primary"
+onclick="openSell()"
+>
 Vendre un maillot
 </button>
 
@@ -376,67 +432,218 @@ oninput="render()"
 <div class="filters">
 
 <select id="team" onchange="render()">
-<option value="">Toutes les équipes</option>
+
+<option value="">
+Toutes les équipes
+</option>
+
 </select>
 
+
 <select id="size" onchange="render()">
-<option value="">Toutes les tailles</option>
+
+<option value="">
+Toutes les tailles
+</option>
+
 <option>XS</option>
 <option>S</option>
 <option>M</option>
 <option>L</option>
 <option>XL</option>
 <option>XXL</option>
+
 </select>
+
 
 <select id="auth" onchange="render()">
-<option value="">Authenticité</option>
-<option value="auth">Authenticité déclarée</option>
-<option value="replica">Imitation / replica</option>
+
+<option value="">
+Authenticité
+</option>
+
+<option value="auth">
+Authenticité déclarée
+</option>
+
+<option value="replica">
+Imitation / replica
+</option>
+
 </select>
 
+
 <select id="cond" onchange="render()">
-<option value="">État</option>
+
+<option value="">
+État
+</option>
+
 <option>Neuf</option>
 <option>Très bon état</option>
 <option>Bon état</option>
 <option>Correct</option>
+
 </select>
 
+
 <select id="price" onchange="render()">
-<option value="">Prix</option>
-<option value="30">≤ 30 €</option>
-<option value="60">31–60 €</option>
-<option value="100">61–100 €</option>
-<option value="101">101 €+</option>
+
+<option value="">
+Prix
+</option>
+
+<option value="30">
+≤ 30 €
+</option>
+
+<option value="60">
+31–60 €
+</option>
+
+<option value="100">
+61–100 €
+</option>
+
+<option value="101">
+101 €+
+</option>
+
 </select>
 
 </div>
 
 
-<section id="catalog" class="catalog"></section>
+<section
+id="catalog"
+class="catalog"
+></section>
 
 </main>
 
 
-<!-- VENDRE -->
+<!-- COMPTE -->
 
-<div id="sell" class="modal">
+<div
+id="account"
+class="modal"
+>
 
 <div class="box">
 
-<button class="close" onclick="closeM('sell')">×</button>
+<button
+class="close"
+onclick="closeM('account')"
+>
+×
+</button>
 
-<h2>Vendre un maillot</h2>
+<h2>
+👤 Mon compte
+</h2>
+
+<p class="note">
+Crée un compte ou connecte-toi pour vendre tes maillots.
+</p>
 
 
-<label>Photos — 1 à 3</label>
+<label>
+Email
+</label>
 
-<!-- BOUTON GALERIE DIRECT -->
+<input
+id="authEmail"
+type="email"
+placeholder="ton@email.com"
+>
 
-<label for="photos" class="gallery">
+
+<label>
+Mot de passe
+</label>
+
+<input
+id="authPassword"
+type="password"
+placeholder="Minimum 6 caractères"
+>
+
+
+<div
+class="row"
+style="margin-top:15px"
+>
+
+<button
+class="primary"
+onclick="signUp()"
+>
+Créer un compte
+</button>
+
+<button
+class="outline"
+onclick="signIn()"
+>
+Se connecter
+</button>
+
+</div>
+
+
+<button
+id="logoutButton"
+class="outline"
+style="width:100%;margin-top:10px;display:none"
+onclick="signOut()"
+>
+Se déconnecter
+</button>
+
+
+<p
+id="authMessage"
+class="note"
+></p>
+
+</div>
+
+</div>
+
+
+<!-- VENDRE -->
+
+<div
+id="sell"
+class="modal"
+>
+
+<div class="box">
+
+<button
+class="close"
+onclick="closeM('sell')"
+>
+×
+</button>
+
+<h2>
+Vendre un maillot
+</h2>
+
+
+<label>
+Photos — 1 à 3
+</label>
+
+
+<label
+for="photos"
+class="gallery"
+>
 📷 Choisir une photo dans la galerie
 </label>
+
 
 <input
 id="photos"
@@ -446,10 +653,16 @@ multiple
 onchange="preview()"
 >
 
-<div id="previews" class="photos"></div>
+
+<div
+id="previews"
+class="photos"
+></div>
 
 
-<label>Nom du maillot</label>
+<label>
+Nom du maillot
+</label>
 
 <input
 id="name"
@@ -461,7 +674,9 @@ placeholder="Ex. Real Madrid 2024/25"
 
 <div>
 
-<label>Équipe / club</label>
+<label>
+Équipe / club
+</label>
 
 <input
 id="club"
@@ -470,17 +685,22 @@ placeholder="Ex. Real Madrid"
 
 </div>
 
+
 <div>
 
-<label>Taille</label>
+<label>
+Taille
+</label>
 
 <select id="lsize">
+
 <option>XS</option>
 <option>S</option>
 <option>M</option>
 <option>L</option>
 <option>XL</option>
 <option>XXL</option>
+
 </select>
 
 </div>
@@ -492,7 +712,9 @@ placeholder="Ex. Real Madrid"
 
 <div>
 
-<label>Prix (€)</label>
+<label>
+Prix (€)
+</label>
 
 <input
 id="lprice"
@@ -503,15 +725,20 @@ placeholder="80"
 
 </div>
 
+
 <div>
 
-<label>État</label>
+<label>
+État
+</label>
 
 <select id="lcond">
+
 <option>Neuf</option>
 <option>Très bon état</option>
 <option>Bon état</option>
 <option>Correct</option>
+
 </select>
 
 </div>
@@ -519,7 +746,9 @@ placeholder="80"
 </div>
 
 
-<label>Authenticité</label>
+<label>
+Authenticité
+</label>
 
 <select id="lauth">
 
@@ -534,7 +763,9 @@ placeholder="80"
 </select>
 
 
-<label>Description</label>
+<label>
+Description
+</label>
 
 <textarea
 id="desc"
@@ -550,23 +781,36 @@ onclick="add()"
 Mettre en vente
 </button>
 
+
 <p class="note">
-Démo étape 1 : les annonces sont conservées dans ce navigateur.
+Ton annonce sera liée à ton compte vendeur.
 </p>
 
 </div>
+
 </div>
 
 
 <!-- ACHAT -->
 
-<div id="buy" class="modal">
+<div
+id="buy"
+class="modal"
+>
 
 <div class="box">
 
-<button class="close" onclick="closeM('buy')">×</button>
+<button
+class="close"
+onclick="closeM('buy')"
+>
+×
+</button>
 
-<h2 id="bt">Acheter</h2>
+
+<h2 id="bt">
+Acheter
+</h2>
 
 
 <div class="fee">
@@ -582,14 +826,14 @@ Frais de service acheteur (15 %) :
 <br>
 
 <span class="total">
+
 Total :
 <span id="btotal"></span>
+
 </span>
 
 </div>
 
-
-<!-- CREATEUR DEPLOYABLE -->
 
 <div class="creatorBox">
 
@@ -597,8 +841,13 @@ Total :
 class="creatorButton"
 onclick="toggleCreator()"
 >
+
 🤝 Soutenir un créateur de contenu
-<span style="float:right">⌄</span>
+
+<span style="float:right">
+⌄
+</span>
+
 </button>
 
 
@@ -611,10 +860,12 @@ class="creatorContent"
 Optionnel. Entre le code d'un créateur.
 </p>
 
+
 <input
 id="creatorCode"
 placeholder="Ex. Messi1010"
 >
+
 
 <button
 class="outline"
@@ -623,6 +874,7 @@ onclick="applyCreator()"
 >
 Appliquer le code
 </button>
+
 
 <p
 id="creatorMessage"
@@ -634,7 +886,9 @@ class="note"
 </div>
 
 
-<h3>Mode de paiement</h3>
+<h3>
+Mode de paiement
+</h3>
 
 
 <button
@@ -669,6 +923,7 @@ Démo : aucun paiement réel n'est effectué à cette étape.
 </p>
 
 </div>
+
 </div>
 
 
@@ -710,76 +965,388 @@ img:""
 }
 
 ];
-async function loadProducts(){
-  const {data,error}=await supabaseClient
-    .from("products")
-    .select("*");
 
-  if(error){
-    alert("❌ Error cargando productos: "+error.message);
-    return;
-  }
 
-  if(data && data.length){
-products=data.map(p=>({
-    id:p.id,
-    name:p.name,
-    club:p.club,
-    size:p.size,
-    price:Number(p.price),
-    condition:p.condition,
-    auth:p.authenticity,
-    desc:p.description,
-    img:p.image_url
-  }));}
-
-  updateTeams();
-  render();
-}
-
-loadProducts();
+let currentUser=null;
 
 let filtered=[];
 
 
+async function loadProducts(){
+
+const {data,error}=await supabaseClient
+.from("products")
+.select("*");
+
+
+if(error){
+
+console.error(
+"Error cargando productos:",
+error.message
+);
+
+return;
+
+}
+
+
+if(data && data.length){
+
+products=data.map(p=>({
+
+id:p.id,
+
+name:p.name,
+
+club:p.club,
+
+size:p.size,
+
+price:Number(p.price),
+
+condition:p.condition,
+
+auth:p.authenticity,
+
+desc:p.description,
+
+img:p.image_url
+
+}));
+
+}
+
+
+updateTeams();
+
+render();
+
+}
+
+
 function openM(x){
-document.getElementById(x).classList.add("show");
+
+document
+.getElementById(x)
+.classList
+.add("show");
+
 }
 
 
 function closeM(x){
-document.getElementById(x).classList.remove("show");
+
+document
+.getElementById(x)
+.classList
+.remove("show");
+
+}
+
+
+function openSell(){
+
+if(!currentUser){
+
+openM("account");
+
+setAuthMessage(
+"Connecte-toi pour pouvoir vendre un maillot.",
+"error"
+);
+
+return;
+
+}
+
+openM("sell");
+
+}
+
+
+function setAuthMessage(
+text,
+type=""
+){
+
+const el=
+document.getElementById("authMessage");
+
+el.textContent=text;
+
+el.className="note "+type;
+
+}
+
+
+async function signUp(){
+
+const email=
+document
+.getElementById("authEmail")
+.value
+.trim();
+
+const password=
+document
+.getElementById("authPassword")
+.value;
+
+
+if(!email||!password){
+
+setAuthMessage(
+"Remplis ton email et ton mot de passe.",
+"error"
+);
+
+return;
+
+}
+
+
+if(password.length<6){
+
+setAuthMessage(
+"Le mot de passe doit contenir au moins 6 caractères.",
+"error"
+);
+
+return;
+
+}
+
+
+const {data,error}=
+await supabaseClient.auth.signUp({
+
+email:email,
+
+password:password
+
+});
+
+
+if(error){
+
+setAuthMessage(
+"Erreur : "+error.message,
+"error"
+);
+
+return;
+
+}
+
+
+if(data.session){
+
+setAuthMessage(
+"Compte créé et connecté ✅",
+"success"
+);
+
+}else{
+
+setAuthMessage(
+"Compte créé ✅ Vérifie ton email pour confirmer ton compte.",
+"success"
+);
+
+}
+
+}
+
+
+async function signIn(){
+
+const email=
+document
+.getElementById("authEmail")
+.value
+.trim();
+
+const password=
+document
+.getElementById("authPassword")
+.value;
+
+
+if(!email||!password){
+
+setAuthMessage(
+"Remplis ton email et ton mot de passe.",
+"error"
+);
+
+return;
+
+}
+
+
+const {data,error}=
+await supabaseClient.auth.signInWithPassword({
+
+email:email,
+
+password:password
+
+});
+
+
+if(error){
+
+setAuthMessage(
+"Erreur : "+error.message,
+"error"
+);
+
+return;
+
+}
+
+
+setAuthMessage(
+"Connexion réussie ✅",
+"success"
+);
+
+}
+
+
+async function signOut(){
+
+const {error}=
+await supabaseClient.auth.signOut();
+
+
+if(error){
+
+setAuthMessage(
+"Erreur : "+error.message,
+"error"
+);
+
+return;
+
+}
+
+
+setAuthMessage(
+"Déconnexion réussie.",
+"success"
+);
+
+}
+
+
+function updateAuthUI(){
+
+const button=
+document.getElementById("accountButton");
+
+const logout=
+document.getElementById("logoutButton");
+
+const status=
+document.getElementById("authStatus");
+
+
+if(currentUser){
+
+button.textContent=
+"👤 Mon compte";
+
+logout.style.display=
+"block";
+
+status.textContent=
+currentUser.email;
+
+}else{
+
+button.textContent=
+"👤 Compte";
+
+logout.style.display=
+"none";
+
+status.textContent="";
+
+}
+
+}
+
+
+async function initAuth(){
+
+const {data}=
+await supabaseClient.auth.getSession();
+
+currentUser=
+data.session
+?
+data.session.user
+:
+null;
+
+updateAuthUI();
+
+
+supabaseClient.auth.onAuthStateChange(
+(event,session)=>{
+
+currentUser=
+session
+?
+session.user
+:
+null;
+
+updateAuthUI();
+
+}
+);
+
 }
 
 
 function preview(){
 
-let input=document.getElementById("photos");
+let input=
+document.getElementById("photos");
 
 let f=[...input.files];
 
-let box=document.getElementById("previews");
+let box=
+document.getElementById("previews");
 
 box.innerHTML="";
 
 
 if(f.length<1||f.length>3){
 
-alert("Choisis entre 1 et 3 photos.");
+alert(
+"Choisis entre 1 et 3 photos."
+);
 
 input.value="";
 
 return;
+
 }
 
 
 f.forEach(x=>{
 
-let i=document.createElement("img");
+let i=
+document.createElement("img");
 
 i.className="preview";
 
-i.src=URL.createObjectURL(x);
+i.src=
+URL.createObjectURL(x);
 
 box.appendChild(i);
 
@@ -788,80 +1355,73 @@ box.appendChild(i);
 }
 
 
-function add(){
+async function add(){
 
-let input=document.getElementById("photos");
+if(!currentUser){
+
+openM("account");
+
+setAuthMessage(
+"Connecte-toi pour pouvoir vendre un maillot.",
+"error"
+);
+
+return;
+
+}
+
+
+let input=
+document.getElementById("photos");
 
 let f=[...input.files];
 
 let p=parseFloat(
-document.getElementById("lprice").value
+document
+.getElementById("lprice")
+.value
 );
 
 
 if(f.length<1||f.length>3){
 
-alert("Ajoute entre 1 et 3 photos.");
+alert(
+"Ajoute entre 1 et 3 photos."
+);
 
 return;
+
 }
 
 
 if(
-!document.getElementById("name").value.trim()||
-!document.getElementById("club").value.trim()||
-!p||
+!document
+.getElementById("name")
+.value
+.trim()
+||
+!document
+.getElementById("club")
+.value
+.trim()
+||
+!p
+||
 p<=0
 ){
 
-alert("Remplis le nom, l’équipe et le prix.");
+alert(
+"Remplis le nom, l’équipe et le prix."
+);
 
 return;
+
 }
 
 
-let x={
-
-name:document.getElementById("name").value.trim(),
-
-club:document.getElementById("club").value.trim(),
-
-size:document.getElementById("lsize").value,
-
-price:p,
-
-condition:document.getElementById("lcond").value,
-
-auth:document.getElementById("lauth").value,
-
-desc:document.getElementById("desc").value.trim()||"Aucune description.",
-
-img:""
-
-};
-
-
-let r=new FileReader();
-
-
-r.onload=function(e){
-
-x.img=e.target.result;
-
-products.unshift(x);
-
-updateTeams();
-
-render();
-
-closeM("sell");
-
-alert("Annonce ajoutée ✅");
-
-};
-
-
-r.readAsDataURL(f[0]);
+alert(
+"Compte vendeur OK ✅. La prochaine étape sera de connecter cette annonce à Supabase."
+);
 
 }
 
@@ -873,27 +1433,38 @@ let p=filtered[i];
 let fee=p.price*0.15;
 
 
-document.getElementById("bt").textContent=
+document.getElementById("bt")
+.textContent=
 "Acheter : "+p.name;
 
 
-document.getElementById("bp").textContent=
+document.getElementById("bp")
+.textContent=
 p.price.toFixed(2)+" €";
 
 
-document.getElementById("bf").textContent=
+document.getElementById("bf")
+.textContent=
 fee.toFixed(2)+" €";
 
 
-document.getElementById("btotal").textContent=
+document.getElementById("btotal")
+.textContent=
 (p.price+fee).toFixed(2)+" €";
 
 
-document.getElementById("creatorCode").value="";
+document.getElementById("creatorCode")
+.value="";
 
-document.getElementById("creatorMessage").textContent="";
 
-document.getElementById("creatorContent").classList.remove("show");
+document.getElementById("creatorMessage")
+.textContent="";
+
+
+document
+.getElementById("creatorContent")
+.classList
+.remove("show");
 
 
 openM("buy");
@@ -913,13 +1484,15 @@ document
 
 function applyCreator(){
 
-let code=document
+let code=
+document
 .getElementById("creatorCode")
 .value
 .trim();
 
 
-let msg=document
+let msg=
+document
 .getElementById("creatorMessage");
 
 
@@ -951,35 +1524,61 @@ alert(
 
 function render(){
 
-let q=document
+let q=
+document
 .getElementById("q")
 .value
 .toLowerCase();
 
 
-let t=document.getElementById("team").value;
-
-let s=document.getElementById("size").value;
-
-let a=document.getElementById("auth").value;
-
-let c=document.getElementById("cond").value;
-
-let pr=document.getElementById("price").value;
+let t=
+document
+.getElementById("team")
+.value;
 
 
-filtered=products.filter(p=>{
+let s=
+document
+.getElementById("size")
+.value;
 
-let okpr=!pr||
 
-(pr==="30"
-?p.price<=30
+let a=
+document
+.getElementById("auth")
+.value;
+
+
+let c=
+document
+.getElementById("cond")
+.value;
+
+
+let pr=
+document
+.getElementById("price")
+.value;
+
+
+filtered=
+products.filter(p=>{
+
+let okpr=
+!pr
+||
+(
+pr==="30"
+?
+p.price<=30
 :
 pr==="60"
-?p.price>=31&&p.price<=60
+?
+p.price>=31&&p.price<=60
 :
 pr==="100"
-?p.price>=61&&p.price<=100
+?
+p.price>=61&&p.price<=100
 :
 p.price>=101
 );
@@ -987,12 +1586,20 @@ p.price>=101
 
 return(
 
-!q||
-(p.name+" "+p.club+" "+p.desc)
+!q
+||
+(
+p.name+
+" "+
+p.club+
+" "+
+p.desc
+)
 .toLowerCase()
 .includes(q)
 
-)&&(!t||p.club===t)
+)
+&&(!t||p.club===t)
 
 &&(!s||p.size===s)
 
@@ -1005,9 +1612,13 @@ return(
 });
 
 
-document.getElementById("catalog").innerHTML=
+document
+.getElementById("catalog")
+.innerHTML=
 
-filtered.length?
+filtered.length
+
+?
 
 filtered.map((p,i)=>`
 
@@ -1028,14 +1639,23 @@ p.img
 
 <div class="info">
 
-<h3>${esc(p.name)}</h3>
+<h3>
+${esc(p.name)}
+</h3>
+
 
 <div class="muted">
-${esc(p.club)} · Taille ${esc(p.size)}
+
+${esc(p.club)}
+· Taille
+${esc(p.size)}
+
 </div>
 
 
-<span class="tag ${p.auth==="replica"?"warn":""}">
+<span
+class="tag ${p.auth==="replica"?"warn":""}"
+>
 
 ${
 p.auth==="replica"
@@ -1049,12 +1669,16 @@ p.auth==="replica"
 
 
 <span class="tag">
+
 ${esc(p.condition)}
+
 </span>
 
 
 <div class="price">
+
 ${p.price.toFixed(2)} €
+
 </div>
 
 
@@ -1063,7 +1687,9 @@ class="primary"
 style="width:100%"
 onclick="buy(${i})"
 >
+
 Acheter
+
 </button>
 
 </div>
@@ -1081,25 +1707,44 @@ Acheter
 
 function updateTeams(){
 
-let cur=document
+let cur=
+document
 .getElementById("team")
 .value;
 
 
 let ts=
-[...new Set(products.map(p=>p.club))]
+[
+...new Set(
+products.map(p=>p.club)
+)
+]
 .sort();
 
 
-document.getElementById("team").innerHTML=
+document
+.getElementById("team")
+.innerHTML=
+
 '<option value="">Toutes les équipes</option>'+
-ts.map(x=>
-'<option>'+esc(x)+'</option>'
-).join("");
+
+ts
+.map(x=>
+'<option>'+
+esc(x)+
+'</option>'
+)
+.join("");
 
 
-document.getElementById("team").value=
-ts.includes(cur)?cur:"";
+document
+.getElementById("team")
+.value=
+ts.includes(cur)
+?
+cur
+:
+"";
 
 }
 
@@ -1122,24 +1767,18 @@ m=>({
 }
 
 
+(async()=>{
+
+await initAuth();
+
+await loadProducts();
+
 updateTeams();
 
 render();
 
-</script>
-<script>
-(async()=>{
-  const {data,error}=await supabaseClient
-    .from("products")
-    .select("name")
-    .limit(1);
-
-  if(error){
-    alert("❌ Error Supabase: " + error.message);
-  }else{
-    alert("✅ Supabase conectado correctamente");
-  }
 })();
+
 </script>
 
 </body>
