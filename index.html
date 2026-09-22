@@ -1482,31 +1482,147 @@ return;
 }
 
 
-const { data, error } = await supabaseClient
-  .from("products")
-  .insert([
-    {
-      name: document.getElementById("name").value.trim(),
-      club: document.getElementById("club").value.trim(),
-      size: document.getElementById("lsize").value || "M",
-condition: document.getElementById("lcond").value || "Neuf",
-authenticity: "auth",
-      description: document.getElementById("desc").value.trim(),
-      image_url: "",
-      price: p,
-      seller_id: currentUser.id
-    }
-  ])
-  .select()
-  .single();
-      
-if(error){
-  console.error("Erreur création annonce:", error);
-  alert("Erreur lors de la publication : " + error.message);
-  return;
-}
+const imageUrls = [];
 
-alert("Maillot publié sur FOOTOCASSION FIT ✅");
+try {
+
+  // 1. Upload des photos
+  for(let i = 0; i < f.length; i++){
+
+    const file = f[i];
+
+    const extension =
+      file.name.split(".").pop().toLowerCase();
+
+    const filePath =
+      currentUser.id +
+      "/" +
+      Date.now() +
+      "-" +
+      i +
+      "." +
+      extension;
+
+    const { error: uploadError } =
+      await supabaseClient
+        .storage
+        .from("product-images")
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: false
+        });
+
+    if(uploadError){
+      console.error(
+        "Erreur upload photo:",
+        uploadError
+      );
+
+      alert(
+        "Erreur lors de l’envoi de la photo : " +
+        uploadError.message
+      );
+
+      return;
+    }
+
+    const { data: publicUrlData } =
+      supabaseClient
+        .storage
+        .from("product-images")
+        .getPublicUrl(filePath);
+
+    imageUrls.push(
+      publicUrlData.publicUrl
+    );
+  }
+
+
+  // 2. Créer le produit
+  const { data, error } =
+    await supabaseClient
+      .from("products")
+      .insert([
+        {
+          name:
+            document
+              .getElementById("name")
+              .value
+              .trim(),
+
+          club:
+            document
+              .getElementById("club")
+              .value
+              .trim(),
+
+          size:
+            document
+              .getElementById("lsize")
+              .value || "M",
+
+          condition:
+            document
+              .getElementById("lcond")
+              .value || "Neuf",
+
+          authenticity: "auth",
+
+          description:
+            document
+              .getElementById("desc")
+              .value
+              .trim() || "",
+
+          image_url:
+            imageUrls[0] || "",
+
+          image_urls:
+            imageUrls,
+
+          price: p,
+
+          seller_id:
+            currentUser.id
+        }
+      ])
+      .select()
+      .single();
+
+
+  if(error){
+
+    console.error(
+      "Erreur création annonce:",
+      error
+    );
+
+    alert(
+      "Erreur lors de la publication : " +
+      error.message
+    );
+
+    return;
+  }
+
+
+  alert(
+    "Maillot publié avec ses photos ✅"
+  );
+
+} catch(error){
+
+  console.error(error);
+
+  alert(
+    "Une erreur est survenue : " +
+    error.message
+  );
+
+  }
+      
+      
+      
 
 await loadProducts();
 closeM("sell");
