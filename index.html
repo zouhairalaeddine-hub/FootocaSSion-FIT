@@ -1832,12 +1832,18 @@ filtered.map((p,i)=>`
 <div class="shirt">
 
 ${
+p.imgs && p.imgs.length
+?
+p.imgs.map(img =>
+  '<img src="'+img+'" alt="Maillot">'
+).join("")
+:
 p.img
 ?
 '<img src="'+p.img+'" alt="Maillot">'
 :
 '⚽'
-}
+  }
 
 </div>
 
