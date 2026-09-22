@@ -1488,6 +1488,7 @@ const { data, error } = await supabaseClient
     {
       name: document.getElementById("name").value.trim(),
       club: document.getElementById("club").value.trim(),
+      size: document.getElementById("size").value,
       price: p,
       seller_id: currentUser.id
     }
