@@ -1726,7 +1726,6 @@ alert(
 
 }
 
-
 function render(){
 
 let q=
@@ -1735,36 +1734,30 @@ document
 .value
 .toLowerCase();
 
-
 let t=
 document
 .getElementById("team")
 .value;
-
 
 let s=
 document
 .getElementById("size")
 .value;
 
-
 let a=
 document
 .getElementById("auth")
 .value;
-
 
 let c=
 document
 .getElementById("cond")
 .value;
 
-
 let pr=
 document
 .getElementById("price")
 .value;
-
 
 filtered=
 products.filter(p=>{
@@ -1787,7 +1780,6 @@ p.price>=61&&p.price<=100
 :
 p.price>=101
 );
-
 
 return(
 
@@ -1815,6 +1807,92 @@ p.desc
 &&okpr;
 
 });
+
+document
+.getElementById("catalog")
+.innerHTML=
+
+filtered.length
+
+?
+
+filtered.map((p,i)=>`
+
+<article class="card">
+
+<div class="shirt">
+
+${
+p.img
+?
+'<img src="'+p.img+'" alt="Maillot">'
+:
+'⚽'
+}
+
+</div>
+
+<div class="info">
+
+<h3>
+${esc(p.name)}
+</h3>
+
+<div class="muted">
+
+${esc(p.club)}
+· Taille
+${esc(p.size)}
+
+</div>
+
+<span
+class="tag ${p.auth==="replica"?"warn":""}"
+>
+
+${
+p.auth==="replica"
+?
+"⚠️ Imitation / replica"
+:
+"✓ Authenticité déclarée"
+}
+
+</span>
+
+<span class="tag">
+
+${esc(p.condition)}
+
+</span>
+
+<div class="price">
+
+${p.price.toFixed(2)} €
+
+</div>
+
+<button
+class="primary"
+style="width:100%"
+onclick="buy(${i})"
+>
+
+Acheter
+
+</button>
+
+</div>
+
+</article>
+
+`).join("")
+
+:
+
+'<div class="empty">Aucun maillot ne correspond aux filtres.</div>';
+
+  });
 
 
 document
