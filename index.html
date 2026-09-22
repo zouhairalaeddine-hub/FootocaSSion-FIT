@@ -1482,9 +1482,29 @@ return;
 }
 
 
-alert(
-"Compte vendeur OK ✅. La prochaine étape sera de connecter cette annonce à Supabase."
-);
+const { data, error } = await supabaseClient
+  .from("products")
+  .insert([
+    {
+      name: document.getElementById("name").value.trim(),
+      club: document.getElementById("club").value.trim(),
+      price: p,
+      seller_id: currentUser.id
+    }
+  ])
+  .select()
+  .single();
+
+if(error){
+  console.error("Erreur création annonce:", error);
+  alert("Erreur lors de la publication : " + error.message);
+  return;
+}
+
+alert("Maillot publié sur FOOTOCASSION FIT ✅");
+
+await loadProducts();
+closeM("sell");
 
 }
 
