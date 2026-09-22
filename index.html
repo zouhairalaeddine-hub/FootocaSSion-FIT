@@ -1488,9 +1488,9 @@ const { data, error } = await supabaseClient
     {
       name: document.getElementById("name").value.trim(),
       club: document.getElementById("club").value.trim(),
-      size: document.getElementById("lsize").value,
-      condition: document.getElementById("lcond").value,
-      authenticity: document.getElementById("lauth").value,
+      size: document.getElementById("lsize").value || "M",
+condition: document.getElementById("lcond").value || "Neuf",
+authenticity: document.getElementById("lauth").value || "auth",
       description: document.getElementById("desc").value.trim(),
       image_url: "",
       price: p,
