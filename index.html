@@ -1866,7 +1866,8 @@ const { data, error } = await supabaseClient
       service_fee: fee,
       total_price: total,
       status: "pending",
-      payment_provider: x
+payment_provider: x,
+shipping_country: shippingCountry
     }
   ])
   .select()
