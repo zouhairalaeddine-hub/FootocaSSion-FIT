@@ -1421,6 +1421,9 @@ box.appendChild(i);
 
 async function add(){
 
+if(add.locked)return;
+add.locked=true;
+
 if(!currentUser){
 
 openM("account");
