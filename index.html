@@ -1668,6 +1668,11 @@ render();
 
 function buy(i){
 
+if(!currentUser){
+  openM("account");
+  setAuthMessage("Connecte-toi pour acheter un maillot.","error");
+  return;
+  }
 let p=filtered[i];
 
 window.selectedProduct = p;
