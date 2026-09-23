@@ -1636,6 +1636,35 @@ closeM("sell");
 
 }
 
+async function deleteProduct(id){
+
+if(!currentUser){
+alert("Connecte-toi pour supprimer une annonce.");
+return;
+}
+
+if(!confirm("Supprimer cette annonce ?")){
+return;
+}
+
+const {error}=await supabaseClient
+.from("products")
+.delete()
+.eq("id",id)
+.eq("seller_id",currentUser.id);
+
+if(error){
+alert("Erreur lors de la suppression : "+error.message);
+return;
+}
+
+alert("Annonce supprimée ✅");
+
+await loadProducts();
+render();
+
+  }
+
 
 function buy(i){
 
