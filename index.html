@@ -1759,14 +1759,61 @@ msg.textContent=
 }
 
 
-function demo(x){
+async function demo(x){
+
+if(!currentUser){
+  openM("account");
+  setAuthMessage(
+    "Connecte-toi pour pouvoir acheter un maillot.",
+    "error"
+  );
+  return;
+}
+
+const p = window.selectedProduct;
+
+if(!p){
+  alert("Aucun maillot sélectionné.");
+  return;
+}
+
+const fee = p.price * 0.15;
+const total = p.price + fee;
+
+const { data, error } = await supabaseClient
+  .from("orders")
+  .insert([
+    {
+      buyer_id: currentUser.id,
+      seller_id: p.sellerId,
+      product_id: p.id,
+      product_name: p.name,
+      shirt_price: p.price,
+      service_fee: fee,
+      total_price: total,
+      status: "pending",
+      payment_provider: x
+    }
+  ])
+  .select()
+  .single();
+
+if(error){
+  console.error("Erreur création commande:", error);
+  alert("Erreur lors de la création de la commande : " + error.message);
+  return;
+}
 
 alert(
-"Démo : "+x+
-" sera connecté lors de l’étape des paiements réels."
+  "Commande créée ✅\n\n" +
+  "Maillot : " + p.name +
+  "\nTotal : " + total.toFixed(2) + " €" +
+  "\nPaiement : " + x
 );
 
-}
+console.log("Commande créée :", data);
+
+  }
 
 function render(){
 
