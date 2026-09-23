@@ -1860,6 +1860,17 @@ const total = p.price + fee;
 
 const shippingCountry =
   document.getElementById("shippingCountry").value;
+  const shippingName =
+document.getElementById("shippingName").value.trim();
+
+const shippingAddress =
+document.getElementById("shippingAddress").value.trim();
+
+const shippingPostalCode =
+document.getElementById("shippingPostalCode").value.trim();
+
+const shippingCity =
+document.getElementById("shippingCity").value.trim();
 
 const { data, error } = await supabaseClient
   .from("orders")
