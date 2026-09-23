@@ -1851,6 +1851,9 @@ if(!p){
 const fee = p.price * 0.15;
 const total = p.price + fee;
 
+const shippingCountry =
+  document.getElementById("shippingCountry").value;
+
 const { data, error } = await supabaseClient
   .from("orders")
   .insert([
