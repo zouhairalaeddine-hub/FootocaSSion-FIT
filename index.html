@@ -1916,6 +1916,21 @@ onclick="buy(${i})"
 Acheter
 
 </button>
+${
+currentUser && p.sellerId === currentUser.id
+?
+`
+<button
+class="primary"
+style="width:100%;margin-top:8px"
+onclick="deleteProduct('${p.id}')"
+>
+Supprimer
+</button>
+`
+:
+""
+  }
 
 </div>
 
