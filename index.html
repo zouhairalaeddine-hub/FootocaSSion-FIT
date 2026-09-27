@@ -1859,8 +1859,9 @@ const fee = p.price * 0.15;
 const total = p.price + fee;
 
 const shippingCountry =
-  document.getElementById("shippingCountry").value;
-  const shippingName =
+document.getElementById("shippingCountry").value;
+
+const shippingName =
 document.getElementById("shippingName").value.trim();
 
 const shippingAddress =
@@ -1872,32 +1873,171 @@ document.getElementById("shippingPostalCode").value.trim();
 const shippingCity =
 document.getElementById("shippingCity").value.trim();
 
-const { data, error } = await supabaseClient
-  .from("orders")
-  .insert([
-    {
-      buyer_id: currentUser.id,
-      seller_id: p.sellerId,
-      product_id: p.id,
-      product_name: p.name,
-      shirt_price: p.price,
-      service_fee: fee,
-      total_price: total,
-      status: "pending",
-payment_provider: x,
-shipping_country: shippingCountry,
-      shipping_name: shippingName,
-shipping_address: shippingAddress,
-shipping_postal_code: shippingPostalCode,
-shipping_city: shippingCity
-    }
-  ])
-  .select()
-  .single();
+if(
+!shippingCountry ||
+!shippingName ||
+!shippingAddress ||
+!shippingPostalCode ||
+!shippingCity
+){
+alert("Remplis toutes les informations de livraison.");
+return;
+}
+
+/* =========================
+   PAYPAL
+========================= */
+
+if(x === "PayPal"){
+
+  const { data: paypalData, error: paypalError } =
+    await supabaseClient.functions.invoke(
+      "create-paypal-order",
+      {
+        body: {
+          amount: total
+        }
+      }
+    );
+
+  if(paypalError){
+    console.error(
+      "Erreur PayPal:",
+      paypalError
+    );
+
+    alert(
+      "Erreur lors de la connexion à PayPal : " +
+      paypalError.message
+    );
+
+    return;
+  }
+
+  if(
+    !paypalData ||
+    !paypalData.id ||
+    !paypalData.links
+  ){
+    console.error(
+      "Réponse PayPal invalide:",
+      paypalData
+    );
+
+    alert(
+      "PayPal n'a pas renvoyé une commande valide."
+    );
+
+    return;
+  }
+
+  const approvalLink =
+    paypalData.links.find(
+      link => link.rel === "approve"
+    );
+
+  if(!approvalLink){
+    console.error(
+      "Lien PayPal introuvable:",
+      paypalData
+    );
+
+    alert(
+      "Lien de paiement PayPal introuvable."
+    );
+
+    return;
+  }
+
+  const { data: orderData, error: orderError } =
+    await supabaseClient
+      .from("orders")
+      .insert([
+        {
+          buyer_id: currentUser.id,
+          seller_id: p.sellerId,
+          product_id: p.id,
+          product_name: p.name,
+          shirt_price: p.price,
+          service_fee: fee,
+          total_price: total,
+          status: "pending",
+          payment_provider: "PayPal",
+          payment_id: paypalData.id,
+          shipping_country: shippingCountry,
+          shipping_name: shippingName,
+          shipping_address: shippingAddress,
+          shipping_postal_code: shippingPostalCode,
+          shipping_city: shippingCity
+        }
+      ])
+      .select()
+      .single();
+
+  if(orderError){
+    console.error(
+      "Erreur création commande:",
+      orderError
+    );
+
+    alert(
+      "Erreur lors de la création de la commande : " +
+      orderError.message
+    );
+
+    return;
+  }
+
+  console.log(
+    "Commande PayPal créée:",
+    orderData
+  );
+
+  window.location.href =
+    approvalLink.href;
+
+  return;
+}
+
+/* =========================
+   AUTRES PAIEMENTS
+========================= */
+
+const { data, error } =
+  await supabaseClient
+    .from("orders")
+    .insert([
+      {
+        buyer_id: currentUser.id,
+        seller_id: p.sellerId,
+        product_id: p.id,
+        product_name: p.name,
+        shirt_price: p.price,
+        service_fee: fee,
+        total_price: total,
+        status: "pending",
+        payment_provider: x,
+        shipping_country: shippingCountry,
+        shipping_name: shippingName,
+        shipping_address: shippingAddress,
+        shipping_postal_code: shippingPostalCode,
+        shipping_city: shippingCity
+      }
+    ])
+    .select()
+    .single();
 
 if(error){
-  console.error("Erreur création commande:", error);
-  alert("Erreur lors de la création de la commande : " + error.message);
+  console.error(
+    "Erreur création commande:",
+    error
+  );
+
+  alert(
+    "Erreur lors de la création de la commande : " +
+    error.message
+  );
+
   return;
 }
 
@@ -1908,7 +2048,10 @@ alert(
   "\nPaiement : " + x
 );
 
-console.log("Commande créée :", data);
+console.log(
+  "Commande créée :",
+  data
+);
 
   }
 
