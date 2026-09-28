@@ -2054,6 +2054,116 @@ console.log(
 );
 
   }
+async function handlePayPalReturn(){
+
+  const params = new URLSearchParams(
+    window.location.search
+  );
+
+  const paypalStatus =
+    params.get("paypal");
+
+  const paypalToken =
+    params.get("token");
+
+  if(paypalStatus === "cancel"){
+    alert(
+      "Paiement PayPal annulé."
+    );
+
+    window.history.replaceState(
+      {},
+      document.title,
+      SITE_URL
+    );
+
+    return;
+  }
+
+  if(
+    paypalStatus !== "success" ||
+    !paypalToken
+  ){
+    return;
+  }
+
+  if(!currentUser){
+    alert(
+      "Connecte-toi pour terminer le paiement."
+    );
+    return;
+  }
+
+  try{
+
+    const {
+      data: captureData,
+      error: captureError
+    } =
+      await supabaseClient.functions.invoke(
+        "capture-paypal-order",
+        {
+          body: {
+            orderId: paypalToken
+          }
+        }
+      );
+
+    if(captureError){
+
+      console.error(
+        "Erreur capture PayPal:",
+        captureError
+      );
+
+      alert(
+        "Erreur lors de la confirmation du paiement."
+      );
+
+      return;
+    }
+
+    console.log(
+      "Résultat capture PayPal:",
+      captureData
+    );
+
+    if(
+      captureData &&
+      captureData.status === "COMPLETED"
+    ){
+
+      alert(
+        "Paiement PayPal confirmé ✅"
+      );
+
+    }else{
+
+      alert(
+        "PayPal n'a pas encore confirmé le paiement."
+      );
+
+    }
+
+    window.history.replaceState(
+      {},
+      document.title,
+      SITE_URL
+    );
+
+  }catch(error){
+
+    console.error(
+      "Erreur PayPal:",
+      error
+    );
+
+    alert(
+      "Une erreur est survenue pendant la confirmation du paiement."
+    );
+  }
+  }
+  handlePayPalReturn();
 
 function render(){
 
