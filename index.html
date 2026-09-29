@@ -605,7 +605,7 @@ Se déconnecter
 id="salesButton"
 class="outline"
 style="width:100%;margin-top:10px"
-onclick="loadMySales()"
+onclick="loadMySales().catch(e=>alert(e.message))"
 >
 📦 Mes ventes
 </button>
