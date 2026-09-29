@@ -2433,7 +2433,10 @@ m=>({
 }
 
 async function loadMySales(){
+  const box=document.getElementById("mySales");
+
   if(!currentUser){
+    box.innerHTML="<p class='note'>❌ Aucun utilisateur connecté.</p>";
     return;
   }
 
