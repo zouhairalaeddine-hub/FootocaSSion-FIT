@@ -605,7 +605,7 @@ Se déconnecter
 id="salesButton"
 class="outline"
 style="width:100%;margin-top:10px"
-onclick="loadMySales()"
+onclick="openM('salesPage'); loadMySales()"
 >
 📦 Mes ventes
 </button>
@@ -633,7 +633,33 @@ onclick="resendConfirmation()"
 </div>
 
 </div>
+<!-- MES VENTES -->
+<div
+id="salesPage"
+class="modal"
+>
 
+  <div class="box">
+
+    <button
+      class="outline"
+      onclick="openM('account')"
+      style="margin-bottom:15px"
+    >
+      ← Retour
+    </button>
+
+    <h2>📦 Mes ventes</h2>
+
+    <div
+      id="salesList"
+      style="margin-top:15px"
+    >
+    </div>
+
+  </div>
+
+</div>
 
 <!-- VENDRE -->
 
