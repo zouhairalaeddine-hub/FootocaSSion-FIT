@@ -2432,7 +2432,45 @@ m=>({
 
 }
 
+async function loadMySales(){
+  if(!currentUser){
+    return;
+  }
 
+  const {data,error}=await supabaseClient
+    .from("orders")
+    .select("*")
+    .eq("seller_id",currentUser.id)
+    .order("created_at",{ascending:false});
+
+  const box=document.getElementById("mySales");
+
+  if(error){
+    box.innerHTML="<p class='note'>Erreur lors du chargement des ventes.</p>";
+    return;
+  }
+
+  if(!data || data.length===0){
+    box.innerHTML="<p class='note'>Aucune vente pour le moment.</p>";
+    return;
+  }
+
+  box.innerHTML=data.map(order=>`
+    <div class="box" style="margin-top:10px">
+      <strong>${escapeHTML(order.product_name || "Maillot")}</strong>
+      <p>${Number(order.shirt_price || 0).toFixed(2)} €</p>
+      <p>Statut : ${escapeHTML(order.status || "pending")}</p>
+      <p>
+        📦 ${escapeHTML(order.shipping_name || "")}<br>
+        ${escapeHTML(order.shipping_address || "")}<br>
+        ${escapeHTML(order.shipping_postal_code || "")}
+        ${escapeHTML(order.shipping_city || "")}<br>
+        ${escapeHTML(order.shipping_country || "")}
+      </p>
+    </div>
+  `).join("");
+  }
+  
 (async()=>{
 
 await initAuth();
