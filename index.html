@@ -2087,11 +2087,18 @@ async function handlePayPalReturn(){
     return;
   }
 
-  if(!currentUser){
-    alert(
-      "Connecte-toi pour terminer le paiement."
-    );
-    return;
+  const { data: sessionData } =
+  await supabaseClient.auth.getSession();
+
+if(sessionData.session){
+  currentUser = sessionData.session.user;
+}
+
+if(!currentUser){
+  alert(
+    "Connecte-toi pour terminer le paiement."
+  );
+  return;
   }
 
   try{
