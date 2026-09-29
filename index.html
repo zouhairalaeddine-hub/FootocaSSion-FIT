@@ -2433,7 +2433,7 @@ m=>({
 }
 
 async function loadMySales(){
-  alert("ENTRÓ EN LOADMYSALES");
+  alert(currentUser ? "USER OK: " + currentUser.id : "CURRENTUSER ES NULL");
  
   if(!currentUser){
     return;
