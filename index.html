@@ -2445,6 +2445,12 @@ async function loadMySales(){
     .eq("seller_id",currentUser.id)
     .order("created_at",{ascending:false});
 
+alert(
+  error
+    ? "ERROR: " + error.message
+    : "QUERY OK — VENTAS: " + (data ? data.length : 0)
+);
+  
   const box=document.getElementById("mySales");
 
   if(error){
