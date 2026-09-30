@@ -2564,7 +2564,79 @@ async function loadMySales(){
 
   }
 }
-  
+
+async function openSaleDetail(orderId){
+
+  const box = document.getElementById("saleDetailContent");
+
+  box.innerHTML = "<p>Chargement...</p>";
+
+  openM("saleDetailPage");
+
+  const { data: order, error } = await supabaseClient
+    .from("orders")
+    .select("*")
+    .eq("id", orderId)
+    .single();
+
+  if(error || !order){
+    box.innerHTML = "<p class='note'>Impossible de charger cette vente.</p>";
+    return;
+  }
+
+  let paiement = "🟠 Paiement en attente";
+
+  if(order.status === "completed"){
+    paiement = "🟢 Paiement confirmé";
+  }
+
+  let expedition = "🚚 À expédier";
+
+  if(order.shipping_status === "shipped"){
+    expedition = "🟢 Expédié";
+  }
+
+  box.innerHTML = `
+    <div class="box">
+
+      <h3>
+        📦 ${esc(order.product_name || "Maillot")}
+      </h3>
+
+      <p style="font-size:22px;font-weight:700">
+        ${Number(order.shirt_price || 0).toFixed(2)} €
+      </p>
+
+      <hr>
+
+      <p style="font-size:18px">
+        ${paiement}
+      </p>
+
+      <p style="font-size:18px">
+        ${expedition}
+      </p>
+
+      <hr>
+
+      <strong>👤 Acheteur</strong>
+
+      <p>
+        ${esc(order.shipping_name || "")}
+      </p>
+
+      <strong>📍 Adresse de livraison</strong>
+
+      <p>
+        ${esc(order.shipping_address || "")}<br>
+        ${esc(order.shipping_postal_code || "")}
+        ${esc(order.shipping_city || "")}<br>
+        ${esc(order.shipping_country || "")}
+      </p>
+
+    </div>
+  `;
+  }
 (async()=>{
 
 await initAuth();
