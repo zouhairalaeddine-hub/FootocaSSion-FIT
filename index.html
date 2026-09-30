@@ -1929,7 +1929,8 @@ if(!p){
 }
 
 const fee = p.price * 0.15;
-const total = p.price + fee;
+const shipping = 5.99;
+const total = p.price + fee + shipping;
 
 const shippingCountry =
 document.getElementById("shippingCountry").value;
