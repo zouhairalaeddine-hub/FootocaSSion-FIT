@@ -1829,6 +1829,9 @@ let fee=p.price*0.15;
 let shipping=5.99;
 let total=p.price+fee+shipping;
 
+document.getElementById("bshipping")
+.textContent=shipping.toFixed(2)+" €";
+
 document.getElementById("bt")
 .textContent=
 "Acheter : "+p.name;
