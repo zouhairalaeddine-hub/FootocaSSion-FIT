@@ -2489,28 +2489,47 @@ async function loadMySales(){
     }
 
     box.innerHTML=data.map(order=>`
-      <div class="box" style="margin-top:10px">
+    box.innerHTML=data.map(order=>{
 
-        <strong>${esc(order.product_name || "Maillot")}</strong>
+  let statut="Paiement en attente";
+  let icone="🟠";
 
-        <p>
-          ${Number(order.shirt_price || 0).toFixed(2)} €
-        </p>
+  if(order.status==="completed"){
+    statut="Paiement confirmé";
+    icone="🟢";
+  }
 
-        <p>
-          Statut : ${esc(order.status || "pending")}
-        </p>
+  return `
+    <div class="box" style="margin-top:15px">
 
-        <p>
-          📦 ${esc(order.shipping_name || "")}<br>
-          ${esc(order.shipping_address || "")}<br>
-          ${esc(order.shipping_postal_code || "")}
-          ${esc(order.shipping_city || "")}<br>
-          ${esc(order.shipping_country || "")}
-        </p>
+      <h3 style="margin-bottom:5px">
+        📦 ${esc(order.product_name || "Maillot")}
+      </h3>
 
-      </div>
-    `).join("");
+      <p style="font-size:20px;font-weight:bold">
+        ${Number(order.shirt_price || 0).toFixed(2)} €
+      </p>
+
+      <p>
+        ${icone} ${statut}
+      </p>
+
+      <hr>
+
+      <strong>📍 Livraison</strong>
+
+      <p>
+        ${esc(order.shipping_name || "")}<br>
+        ${esc(order.shipping_address || "")}<br>
+        ${esc(order.shipping_postal_code || "")}
+        ${esc(order.shipping_city || "")}<br>
+        ${esc(order.shipping_country || "")}
+      </p>
+
+    </div>
+  `;
+
+}).join("");
 
   }catch(e){
 
