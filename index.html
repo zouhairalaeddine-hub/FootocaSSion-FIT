@@ -2499,8 +2499,11 @@ async function loadMySales(){
   }
 
   return `
-    <div class="box" style="margin-top:15px">
-
+    <div
+  class="box"
+  style="margin-top:15px;cursor:pointer"
+  onclick="openSaleDetail(${order.id})"
+>
       <h3 style="margin-bottom:5px">
         📦 ${esc(order.product_name || "Maillot")}
       </h3>
