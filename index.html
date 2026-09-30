@@ -2637,6 +2637,32 @@ async function openSaleDetail(orderId){
     </div>
   `;
   }
+  async function markOrderShipped(orderId){
+
+  const tracking = prompt("Numéro de suivi :");
+
+  if(!tracking){
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("orders")
+    .update({
+      shipping_status: "shipped",
+      tracking_number: tracking,
+      shipped_at: new Date().toISOString()
+    })
+    .eq("id", orderId);
+
+  if(error){
+    alert("Erreur lors de l'expédition.");
+    return;
+  }
+
+  alert("Expédition enregistrée ✅");
+
+  openSaleDetail(orderId);
+  }
 (async()=>{
 
 await initAuth();
