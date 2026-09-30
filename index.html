@@ -2617,6 +2617,14 @@ async function openSaleDetail(orderId){
         ${expedition}
       </p>
 
+${order.status==="completed" && order.shipping_status!=="shipped"
+  ? "<button class='outline' onclick='markOrderShipped("+order.id+")' style='width:100%;margin-top:10px'>🚚 Marquer comme expédié</button>"
+  : ""}
+
+${order.shipping_status==="shipped"
+  ? "<p style='margin-top:10px'>🔎 Suivi : "+esc(order.tracking_number || "")+"</p>"
+  : ""}
+
       <hr>
 
       <strong>👤 Acheteur</strong>
