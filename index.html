@@ -1820,11 +1820,7 @@ window.selectedProduct = p;
 
 let fee=p.price*0.15;
 
-let shipping=5.99;
-let total=p.price+fee+shipping;
-
-document.getElementById("bshipping")
-.textContent=shipping.toFixed(2)+" €";
+let total=p.price+fee;
 
 document.getElementById("bt")
 .textContent=
@@ -1833,12 +1829,7 @@ document.getElementById("bt")
 
 document.getElementById("bp")
 .textContent=
-p.price.toFixed(2)+" €";
-
-
-document.getElementById("bf")
-.textContent=
-fee.toFixed(2)+" €";
+total.toFixed(2)+" €";
 
 
 document.getElementById("btotal")
