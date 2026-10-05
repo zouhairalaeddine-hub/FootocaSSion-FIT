@@ -1739,6 +1739,8 @@ try {
 
           seller_id:
             currentUser.id
+
+          stock: Number(document.getElementById("stock").value) || 1,
         }
       ])
       .select()
