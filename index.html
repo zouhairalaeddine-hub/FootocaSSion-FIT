@@ -2380,7 +2380,11 @@ filtered.length
 
 filtered.map((p,i)=>`
 
-<article class="card">
+<article
+class="card"
+onclick="openProductDetail(${i})"
+style="cursor:pointer"
+>
 
 <div class="shirt">
 
