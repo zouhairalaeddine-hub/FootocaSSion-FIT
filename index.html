@@ -2643,6 +2643,26 @@ ${p.price.toFixed(2)} €
 
 </div>
 
+<div class="stock">
+
+${
+p.stock <= 0
+?
+"❌ Agotado"
+:
+p.stock <= 2
+?
+"🔴 Últimas "+p.stock+" unidades"
+:
+p.stock <= 5
+?
+"🟠 Solo quedan "+p.stock
+:
+"🟢 En stock"
+}
+
+</div>
+   
 <button
 class="primary"
 style="width:100%"
