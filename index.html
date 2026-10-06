@@ -336,6 +336,209 @@ align-items:flex-start
 }
 
 }
+
+/* =========================
+   FICHA PRODUCTO — PREMIUM
+========================= */
+
+#productDetail{
+  padding:0;
+  align-items:flex-end;
+  background:rgba(0,0,0,.72);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+}
+
+#productDetail .box{
+  position:relative;
+  width:min(720px,100%);
+  max-height:96vh;
+  margin:0;
+  padding:0 0 20px;
+  border:1px solid #293443;
+  border-bottom:0;
+  border-radius:26px 26px 0 0;
+  overflow:hidden;
+  background:#0f151d;
+  box-shadow:0 -15px 50px #0009;
+}
+
+/* Bouton fermer */
+
+#productDetail .close{
+  position:absolute;
+  right:16px;
+  top:16px;
+  z-index:20;
+  width:44px;
+  height:44px;
+  padding:0;
+  border:1px solid #ffffff33;
+  border-radius:50%;
+  background:#0b0f14cc;
+  color:#fff;
+  font-size:25px;
+  line-height:44px;
+  text-align:center;
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+}
+
+/* Galerie */
+
+#productGallery{
+  margin:0;
+  border-radius:0 !important;
+  background:#090d12 !important;
+  position:relative;
+}
+
+#productGallery > div{
+  height:min(64vh,560px);
+  display:flex;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scroll-snap-type:x mandatory;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+  overscroll-behavior-x:contain;
+}
+
+#productGallery > div::-webkit-scrollbar{
+  display:none;
+}
+
+#productGallery img{
+  width:100% !important;
+  min-width:100%;
+  height:100% !important;
+  flex-shrink:0;
+  object-fit:contain !important;
+  scroll-snap-align:center;
+  background:#090d12;
+}
+
+/* Dégradé en bas de la photo */
+
+#productGallery::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:90px;
+  pointer-events:none;
+  background:linear-gradient(
+    transparent,
+    rgba(9,13,18,.65)
+  );
+}
+
+/* Indicateurs */
+
+#productDots{
+  position:relative;
+  z-index:5;
+  margin:-3px 0 0 !important;
+  height:18px;
+  color:#fff;
+  font-size:10px;
+  letter-spacing:4px;
+  text-align:center;
+}
+
+/* Informations */
+
+#productDetailInfo{
+  padding:4px 20px 0;
+}
+
+#productDetailInfo h2{
+  margin:8px 0 5px;
+  font-size:27px;
+  line-height:1.15;
+  font-weight:900;
+  letter-spacing:-.5px;
+}
+
+#productDetailInfo .muted{
+  margin:0 0 10px;
+  color:#aab5c3;
+  font-size:14px;
+}
+
+#productDetailInfo .tag{
+  padding:6px 10px;
+  border-radius:8px;
+  background:#1b2531;
+  color:#e8edf3;
+}
+
+#productDetailInfo .price{
+  margin:14px 0 4px;
+  font-size:32px;
+  font-weight:900;
+  letter-spacing:-1px;
+}
+
+/* Bouton achat */
+
+#productBuyButton{
+  position:relative;
+  z-index:5;
+  width:calc(100% - 40px) !important;
+  height:56px;
+  margin:14px 20px 0 !important;
+  border-radius:15px;
+  background:#fff;
+  color:#0b0f14;
+  font-size:18px;
+  font-weight:900;
+  border:0;
+  box-shadow:0 8px 25px #0005;
+}
+
+#productBuyButton:active{
+  transform:scale(.98);
+}
+
+/* Mobile */
+
+@media(max-width:520px){
+
+  #productDetail{
+    padding:0;
+  }
+
+  #productDetail .box{
+    width:100%;
+    max-height:97vh;
+    border-radius:24px 24px 0 0;
+  }
+
+  #productGallery > div{
+    height:55vh;
+  }
+
+  #productDetailInfo{
+    padding-left:20px;
+    padding-right:20px;
+  }
+
+  #productDetailInfo h2{
+    font-size:25px;
+  }
+
+  #productDetailInfo .price{
+    font-size:30px;
+  }
+
+  #productBuyButton{
+    height:54px;
+  }
+
+  }  
+  
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
