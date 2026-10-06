@@ -2441,7 +2441,7 @@ ${p.price.toFixed(2)} €
 <button
 class="primary"
 style="width:100%"
-onclick="buy(${i})"
+onclick="event.stopPropagation();buy(${i})"
 >
 
 Acheter
