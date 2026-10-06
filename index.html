@@ -2561,18 +2561,32 @@ function openProductDetail(i){
   const info =
     document.getElementById("productDetailInfo");
 
-  gallery.innerHTML = images.map((img,index)=>`
-    <img
-      src="${esc(img)}"
-      alt="Maillot"
-      style="
-        width:100%;
-        height:360px;
-        object-fit:cover;
-        display:${index===0 ? "block" : "none"};
-      "
-    >
-  `).join("");
+gallery.innerHTML = `
+  <div
+    style="
+      display:flex;
+      overflow-x:auto;
+      scroll-snap-type:x mandatory;
+      scrollbar-width:none;
+      width:100%;
+    "
+  >
+    ${images.map(img=>`
+      <img
+        src="${esc(img)}"
+        alt="Maillot"
+        style="
+          width:100%;
+          min-width:100%;
+          height:360px;
+          object-fit:cover;
+          scroll-snap-align:start;
+          flex-shrink:0;
+        "
+      >
+    `).join("")}
+  </div>
+`;
 
   dots.textContent =
     images.length > 1
