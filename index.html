@@ -1623,6 +1623,27 @@ return "allowed";
 return "unavailable";
 }
 
+   function getShippingCost(sellerCountry, buyerCountry){
+
+const sellerRegion = getRegion(sellerCountry);
+const buyerRegion = getRegion(buyerCountry);
+
+if(
+sellerRegion === "europe" &&
+buyerRegion === "europe"
+){
+return 14.99;
+}
+
+if(
+sellerRegion === "latam" &&
+buyerRegion === "latam"
+){
+return 0;
+}
+
+return null;
+   }
 
 function openM(x){
 document
