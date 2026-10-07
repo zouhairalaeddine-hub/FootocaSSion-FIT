@@ -1625,6 +1625,52 @@ return "unavailable";
 
    function getShippingCost(sellerCountry, buyerCountry){
 
+const priorityCountries = [
+"France",
+"Espagne",
+"Italie",
+"Royaume-Uni"
+];
+
+if(
+priorityCountries.includes(sellerCountry) &&
+priorityCountries.includes(buyerCountry)
+){
+
+if(sellerCountry === buyerCountry){
+return 7.59;
+}
+
+if(
+sellerCountry === "Royaume-Uni" ||
+buyerCountry === "Royaume-Uni"
+){
+return 18.99;
+}
+
+return 14.99;
+
+}
+
+const sellerRegion = getRegion(sellerCountry);
+const buyerRegion = getRegion(buyerCountry);
+
+if(
+sellerRegion === "europe" &&
+buyerRegion === "europe"
+){
+return 14.99;
+}
+
+if(
+sellerRegion === "latam" &&
+buyerRegion === "latam"
+){
+return 0;
+}
+
+return null;
+   }
 const sellerRegion = getRegion(sellerCountry);
 const buyerRegion = getRegion(buyerCountry);
 
