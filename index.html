@@ -1492,6 +1492,20 @@ let filtered=[];
 
 function saveBuyerCountry(){
 
+function loadBuyerCountry(){
+
+const savedCountry =
+localStorage.getItem("buyerCountry");
+
+if(savedCountry){
+
+document.getElementById("buyerCountry").value =
+savedCountry;
+
+}
+
+}
+
 const country=
 document.getElementById("buyerCountry").value;
 
