@@ -2267,6 +2267,14 @@ let p=filtered[i];
 
 window.selectedProduct = p;
 
+const buyerCountry =
+document.getElementById("buyerCountry").value;
+
+if(buyerCountry){
+  document.getElementById("shippingCountry").value =
+    buyerCountry;
+   }
+   
 let fee=p.price*0.15;
 let total=p.price+fee;
 
