@@ -2752,7 +2752,16 @@ p.desc
 
 &&(!c||p.condition===c)
 
-&&okpr;
+&&okpr
+
+&&(
+!document.getElementById("buyerCountry").value
+||
+getShippingRoute(
+p.sellerCountry,
+document.getElementById("buyerCountry").value
+)==="allowed"
+);
 
 });
 
