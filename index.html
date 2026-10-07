@@ -1500,6 +1500,29 @@ render();
 }
 
 
+function getRegion(country){
+
+const europe = [
+"France","Espagne","Portugal","Belgique","Suisse",
+"Luxembourg","Italie","Allemagne","Pays-Bas","Autriche",
+"Irlande","Royaume-Uni","Danemark","Suède","Norvège",
+"Finlande","Pologne","Tchéquie","Grèce","Roumanie",
+"Hongrie","Croatie","Serbie","Bulgarie"
+];
+
+const latam = [
+"Brésil","Argentine","Mexique","Colombie","Chili",
+"Pérou","Uruguay","Paraguay","Bolivie","Équateur",
+"Costa Rica","Panama","République dominicaine"
+];
+
+if(europe.includes(country)) return "europe";
+if(latam.includes(country)) return "latam";
+
+return "other";
+}
+
+
 function openM(x){
 
 document
