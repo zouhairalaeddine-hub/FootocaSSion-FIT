@@ -1523,8 +1523,30 @@ return "other";
 }
 
 
-function openM(x){
+function getShippingRoute(sellerCountry, buyerCountry){
 
+const sellerRegion = getRegion(sellerCountry);
+const buyerRegion = getRegion(buyerCountry);
+
+if(
+sellerRegion === "europe" &&
+buyerRegion === "europe"
+){
+return "allowed";
+}
+
+if(
+sellerRegion === "latam" &&
+buyerRegion === "latam"
+){
+return "allowed";
+}
+
+return "unavailable";
+}
+
+
+function openM(x){
 document
 .getElementById(x)
 .classList
