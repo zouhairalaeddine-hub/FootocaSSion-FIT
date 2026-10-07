@@ -2049,9 +2049,12 @@ try {
           price: p,
 
           seller_id:
-            currentUser.id,
+  currentUser.id,
 
-          stock: Number(document.getElementById("stock").value) || 1,
+seller_country:
+  document.getElementById("sellerCountry").value,
+
+stock: Number(document.getElementById("stock").value) || 1,
         }
       ])
       .select()
