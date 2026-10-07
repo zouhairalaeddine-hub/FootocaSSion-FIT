@@ -2387,7 +2387,24 @@ if(!p){
 }
 
 const fee = p.price * 0.15;
-const total = p.price + fee;
+
+const shippingCost =
+  getShippingCost(
+    p.sellerCountry,
+    shippingCountry
+  );
+
+if(shippingCost === null){
+  alert(
+    "La livraison vers ce pays n'est pas disponible pour ce maillot."
+  );
+  return;
+}
+
+const total =
+  p.price +
+  fee +
+  shippingCost;
 
 const shippingCountry =
 document.getElementById("shippingCountry").value;
