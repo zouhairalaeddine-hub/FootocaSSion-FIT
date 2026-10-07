@@ -101,7 +101,31 @@ color:#fff;
 border:1px solid #364252
 }
 
-.search{margin:20px 0}
+.search{
+margin:18px 0 14px;
+position:relative;
+}
+
+.search input{
+width:100%;
+box-sizing:border-box;
+background:#151c25;
+border:1px solid #293442;
+border-radius:14px;
+padding:14px 16px;
+color:#f5f7fa;
+font-size:14px;
+outline:none;
+}
+
+.search input:focus{
+border-color:#63d5ff;
+box-shadow:0 0 0 3px rgba(99,213,255,.10);
+}
+
+.search input::placeholder{
+color:#7f8b9a;
+   }
 
 input,select,textarea{
 width:100%;
