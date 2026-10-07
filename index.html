@@ -1490,6 +1490,17 @@ let currentUser=null;
 
 let filtered=[];
 
+function saveBuyerCountry(){
+
+const country=
+document.getElementById("buyerCountry").value;
+
+localStorage.setItem(
+"buyerCountry",
+country
+);
+
+   }
 
 async function loadProducts(){
 
