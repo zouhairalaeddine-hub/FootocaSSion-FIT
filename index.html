@@ -866,6 +866,88 @@ height:76px;
 }
 
    }
+
+/* BOTTOM NAV */
+
+.bottom-nav{
+position:fixed;
+left:50%;
+bottom:12px;
+transform:translateX(-50%);
+width:calc(100% - 24px);
+max-width:520px;
+height:68px;
+background:rgba(17,24,33,.96);
+border:1px solid #293442;
+border-radius:20px;
+display:grid;
+grid-template-columns:1fr 1fr 1fr 1fr;
+align-items:center;
+padding:6px;
+box-sizing:border-box;
+z-index:999;
+box-shadow:0 10px 35px rgba(0,0,0,.35);
+backdrop-filter:blur(12px);
+}
+
+.bottom-nav button{
+background:transparent;
+border:0;
+color:#8e9baa;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+gap:3px;
+height:100%;
+border-radius:15px;
+}
+
+.bottom-nav button span{
+font-size:22px;
+line-height:1;
+}
+
+.bottom-nav button small{
+font-size:10px;
+font-weight:700;
+}
+
+.bottom-nav button:hover{
+color:#f5f7fa;
+background:rgba(99,213,255,.07);
+}
+
+.bottom-nav .sell-nav{
+background:#63d5ff;
+color:#071018;
+width:52px;
+height:52px;
+border-radius:17px;
+justify-self:center;
+box-shadow:0 6px 18px rgba(99,213,255,.20);
+}
+
+.bottom-nav .sell-nav span{
+font-size:27px;
+}
+
+.bottom-nav .sell-nav small{
+display:none;
+}
+
+body{
+padding-bottom:95px;
+}
+
+@media(max-width:520px){
+
+.bottom-nav{
+bottom:10px;
+width:calc(100% - 20px);
+}
+
+   }
    
 </style>
 
