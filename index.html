@@ -1189,10 +1189,7 @@ class="catalog"
 
 <!-- COMPTE -->
 
-<div
-id="account"
-class="modal"
->
+<div id="account" class="modal">
 
 <div class="box">
 
@@ -1203,10 +1200,127 @@ onclick="closeM('account')"
 ×
 </button>
 
-<div class="account-head">
+<div class="account-profile">
 
 <div class="account-avatar">
 👤
+</div>
+
+<div>
+<h2>Mon compte</h2>
+<p class="note">Ton espace FOOTOCASSION-FIT</p>
+</div>
+
+</div>
+
+<div class="account-stats">
+
+<div>
+<strong>0</strong>
+<span>Annonces</span>
+</div>
+
+<div>
+<strong>0</strong>
+<span>Favoris</span>
+</div>
+
+<div>
+<strong>0</strong>
+<span>Ventes</span>
+</div>
+
+<div>
+<strong>0</strong>
+<span>Achats</span>
+</div>
+
+</div>
+
+<div class="account-menu">
+
+<button>
+<span class="account-icon">🛒</span>
+<strong>Mes achats</strong>
+<small>Voir mes commandes</small>
+</button>
+
+<button>
+<span class="account-icon">🚚</span>
+<strong>En chemin</strong>
+<small>Suivre mes livraisons</small>
+</button>
+
+<button
+onclick="closeM('account'); openM('favoritesPage'); renderFavorites()"
+>
+<span class="account-icon">♡</span>
+<strong>Mes favoris</strong>
+<small>Les maillots que tu aimes</small>
+</button>
+
+<button
+onclick="closeM('account'); openM('salesPage'); loadMySales()"
+>
+<span class="account-icon">📦</span>
+<strong>Mes ventes</strong>
+<small>Gérer mes ventes</small>
+</button>
+
+</div>
+
+<label>Email</label>
+
+<input
+id="authEmail"
+type="email"
+placeholder="ton@email.com"
+>
+
+<label>Mot de passe</label>
+
+<input
+id="authPassword"
+type="password"
+placeholder="Minimum 6 caractères"
+>
+
+<div class="row" style="margin-top:15px">
+
+<button class="primary" onclick="signUp()">
+Créer un compte
+</button>
+
+<button class="outline" onclick="signIn()">
+Se connecter
+</button>
+
+</div>
+
+<button
+id="logoutButton"
+class="outline"
+style="width:100%;margin-top:10px;display:none"
+onclick="signOut()"
+>
+Se déconnecter
+</button>
+
+<div id="mySales" style="margin-top:15px"></div>
+
+<p id="authMessage" class="note"></p>
+
+<button
+id="resendButton"
+class="outline"
+style="width:100%;margin-top:10px;display:none"
+onclick="resendConfirmation()"
+>
+📧 Renvoyer l’email de confirmation
+</button>
+
+</div>
+
 </div>
 
 <!-- FAVORIS -->
