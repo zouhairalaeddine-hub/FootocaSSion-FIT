@@ -3863,15 +3863,58 @@ p.img
 
 <div class="info">
 
-<h3>
-${esc(p.name)}
-</h3>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:7px">
 
-<div class="muted">
+    <span class="tag">
+      ${p.auth==="replica" ? "⚠️ Replica" : "✓ Authenticité"}
+    </span>
 
-${esc(p.club)}
-· Taille
-${esc(p.size)}
+    ${
+      document.getElementById("buyerCountry").value &&
+      getShippingCost(
+        p.sellerCountry,
+        document.getElementById("buyerCountry").value
+      ) !== null
+      ?
+      '<span class="tag">📦 Livraison incluse</span>'
+      :
+      ''
+    }
+
+  </div>
+
+  <h3>
+    ${esc(p.name)}
+  </h3>
+
+  <div class="muted">
+    ${esc(p.club)} · Taille ${esc(p.size)}
+  </div>
+
+  <div class="muted" style="margin-top:3px">
+    ${esc(p.condition)}
+  </div>
+
+  <div class="price">
+    ${
+      document.getElementById("buyerCountry").value &&
+      getShippingCost(
+        p.sellerCountry,
+        document.getElementById("buyerCountry").value
+      ) !== null
+      ?
+      (
+        p.price +
+        p.price * 0.15 +
+        getShippingCost(
+          p.sellerCountry,
+          document.getElementById("buyerCountry").value
+        )
+      ).toFixed(2)
+      :
+      p.price.toFixed(2)
+    } €
+  </div>
 
 </div>
 
