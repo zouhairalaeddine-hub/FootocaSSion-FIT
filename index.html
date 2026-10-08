@@ -3623,6 +3623,35 @@ localStorage.getItem("footocassion_favorites") || "[]"
 
 function toggleFavorite(productId){
 
+function toggleFavorite(productId){
+
+  const id = String(productId);
+
+  let favorites = getFavorites().map(String);
+
+  if(favorites.includes(id)){
+
+    favorites = favorites.filter(item => item !== id);
+
+  }else{
+
+    favorites.push(id);
+
+  }
+
+  localStorage.setItem(
+    "footocassion_favorites",
+    JSON.stringify(favorites)
+  );
+
+  render();
+
+  if(typeof renderFavorites === "function"){
+    renderFavorites();
+  }
+
+}
+   
 let favorites = getFavorites();
 
 if(favorites.includes(productId)){
