@@ -956,12 +956,87 @@ white-space:nowrap;
 color:#63d5ff;
 }
 
-.nav-item:active{
-transform:scale(.94);
+/* =========================
+   BOTTOM NAV
+========================= */
+
+.bottom-nav{
+position:fixed;
+left:50%;
+bottom:10px;
+transform:translateX(-50%);
+
+width:calc(100% - 20px);
+max-width:520px;
+height:68px;
+
+background:rgba(13,20,28,.97);
+border:1px solid #293442;
+border-radius:22px;
+
+display:grid;
+grid-template-columns:1fr 1fr 1fr 1fr;
+align-items:center;
+
+padding:5px 8px;
+box-sizing:border-box;
+
+z-index:9999;
+
+box-shadow:0 12px 35px rgba(0,0,0,.40);
+
+backdrop-filter:blur(14px);
+-webkit-backdrop-filter:blur(14px);
 }
 
-.nav-favorites:hover svg{
-fill:rgba(99,213,255,.12);
+
+/* ELEMENTOS DE LA BARRA */
+
+.nav-item{
+height:100%;
+background:transparent;
+border:0;
+
+color:#8593a2;
+
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+
+gap:4px;
+
+font-family:inherit;
+-webkit-tap-highlight-color:transparent;
+
+transition:
+color .2s ease,
+transform .2s ease;
+}
+
+.nav-item svg{
+width:21px;
+height:21px;
+
+fill:none;
+stroke:currentColor;
+stroke-width:1.8;
+stroke-linecap:round;
+stroke-linejoin:round;
+}
+
+.nav-item small{
+font-size:10px;
+font-weight:700;
+white-space:nowrap;
+}
+
+.nav-item:hover{
+color:#63d5ff;
+}
+
+.nav-item:active{
+transform:scale(.94);
 }
 
 
@@ -970,12 +1045,13 @@ fill:rgba(99,213,255,.12);
 ========================= */
 
 .sell-nav{
-position:absolute;
+position:relative;
 
-left:50%;
-top:-20px;
+left:auto;
+top:-18px;
+transform:none;
 
-transform:translateX(-50%);
+justify-self:center;
 
 width:58px;
 height:58px;
@@ -1000,25 +1076,19 @@ box-shadow:
 0 7px 20px rgba(99,213,255,.30),
 0 0 0 1px rgba(99,213,255,.18);
 
-transition:
-transform .2s ease,
-box-shadow .2s ease;
+transition:transform .2s ease;
 }
 
 .sell-nav:hover{
-transform:translateX(-50%) scale(1.05);
-
-box-shadow:
-0 9px 25px rgba(99,213,255,.38),
-0 0 0 1px rgba(99,213,255,.25);
+transform:scale(1.05);
 }
 
 .sell-nav:active{
-transform:translateX(-50%) scale(.96);
+transform:scale(.96);
 }
 
 
-/* ESPACIO INFERIOR */
+/* ESPACIO PARA LA BARRA */
 
 body{
 padding-bottom:94px;
@@ -1038,6 +1108,7 @@ width:calc(100% - 20px);
 .sell-nav{
 width:57px;
 height:57px;
+top:-17px;
 }
 
 .nav-item svg{
@@ -1049,7 +1120,7 @@ height:21px;
 font-size:10px;
 }
 
-}
+   }
 
 @media(max-width:520px){
 
