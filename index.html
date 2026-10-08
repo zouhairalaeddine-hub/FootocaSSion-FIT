@@ -3821,5 +3821,30 @@ render();
 
 </script>
 
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+
+<button onclick="window.scrollTo({top:0,behavior:'smooth'})">
+<span>⌂</span>
+<small>Accueil</small>
+</button>
+
+<button class="sell-nav" onclick="openSell()">
+<span>＋</span>
+<small>Vendre</small>
+</button>
+
+<button onclick="openM('favoritesPage'); renderFavorites()">
+<span>♥</span>
+<small>Favoris</small>
+</button>
+
+<button onclick="openM('account')">
+<span>👤</span>
+<small>Compte</small>
+</button>
+
+</nav>
+   
 </body>
   </html>
