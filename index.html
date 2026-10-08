@@ -3053,6 +3053,63 @@ JSON.stringify(favorites)
 
 render();
 }
+
+function renderFavorites(){
+
+const list = document.getElementById("favoritesList");
+
+if(!list) return;
+
+const favorites = getFavorites();
+
+const favoriteProducts = products.filter(p =>
+favorites.includes(p.id)
+);
+
+if(favoriteProducts.length === 0){
+
+list.innerHTML = `
+<div class="empty-state">
+<div class="empty-icon">♡</div>
+<h3>Aucun favori pour le moment</h3>
+<p>Les maillots que tu aimes apparaîtront ici.</p>
+</div>
+`;
+
+return;
+}
+
+list.innerHTML = favoriteProducts.map(p => `
+
+<div class="favorite-item">
+
+<div class="favorite-image">
+
+${p.image_url
+? `<img src="${p.image_url}" alt="${p.name}">`
+: "⚽"}
+
+</div>
+
+<div class="favorite-info">
+
+<h3>${p.name}</h3>
+
+<div class="muted">
+${p.club || ""} · ${p.size || ""}
+</div>
+
+<div class="price">
+${Number(p.price).toFixed(2)} €
+</div>
+
+</div>
+
+</div>
+
+`).join("");
+
+}
    
 function render(){
 
