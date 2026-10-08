@@ -3469,6 +3469,12 @@ render();
 
 function renderFavorites(){
 
+const count = document.getElementById("accountFavoritesCount");
+
+if(count){
+count.textContent = getFavorites().length;
+}
+   
 const list = document.getElementById("favoritesList");
 
 if(!list) return;
