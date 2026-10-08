@@ -3187,7 +3187,10 @@ return;
 
 list.innerHTML = favoriteProducts.map(p => `
 
-<div class="favorite-item">
+<div
+class="favorite-item"
+onclick="openProduct('${p.id}')"
+>
 
 <div class="favorite-image">
 
