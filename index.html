@@ -3852,10 +3852,12 @@ p.img
 }
 
 <button
-class="favorite"
-onclick="event.stopPropagation(); toggleFavorite('${p.id}')"
+  type="button"
+  class="favorite ${getFavorites().map(String).includes(String(p.id)) ? "active" : ""}"
+  onclick="event.preventDefault(); event.stopPropagation(); toggleFavorite('${p.id}')"
+  aria-label="Ajouter aux favoris"
 >
-${getFavorites().includes(p.id) ? "♥" : "♡"}
+  ${getFavorites().map(String).includes(String(p.id)) ? "♥" : "♡"}
 </button>
 
 </div>
