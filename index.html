@@ -1146,6 +1146,91 @@ width:calc(100% - 20px);
 }
 
    }
+
+/* ================================
+   FOOTOCASSION FIT — AJUSTES FINALES
+   ================================ */
+
+/* Foto de camiseta más compacta */
+.shirt{
+  height:170px;
+}
+
+.shirt img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+/* Corazón de favorito */
+.favorite{
+  position:absolute;
+  top:10px;
+  right:10px;
+  width:38px;
+  height:38px;
+  padding:0;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(8,15,23,.82);
+  border:1px solid rgba(255,255,255,.10);
+  color:#9aa8b7;
+  font-family:Arial,sans-serif;
+  font-size:22px;
+  font-weight:900;
+  line-height:1;
+  z-index:20;
+  cursor:pointer;
+  transition:
+    transform .18s ease,
+    color .18s ease,
+    background .18s ease,
+    border-color .18s ease;
+}
+
+.favorite:hover{
+  transform:scale(1.06);
+}
+
+.favorite:active{
+  transform:scale(.92);
+}
+
+.favorite.active{
+  color:#63d5ff;
+  border-color:rgba(99,213,255,.40);
+  background:rgba(99,213,255,.12);
+}
+
+/* En móvil: imagen todavía un poco más compacta */
+@media(max-width:520px){
+
+  .shirt{
+    height:160px;
+  }
+
+  /* En Pour toi no mostramos botones de perfil/venta arriba */
+  header nav > div:last-child{
+    display:none;
+  }
+
+  .hero{
+    padding:18px 17px;
+    margin-bottom:14px;
+  }
+
+  .hero h1{
+    font-size:26px;
+    margin-bottom:6px;
+  }
+
+  .hero p{
+    margin-bottom:0;
+  }
+
+                        }
    
 </style>
 
