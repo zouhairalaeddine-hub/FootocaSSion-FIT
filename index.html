@@ -3144,7 +3144,7 @@ p.img
 class="favorite"
 onclick="event.stopPropagation(); toggleFavorite('${p.id}')"
 >
-♡
+${getFavorites().includes(p.id) ? "♥" : "♡"}
 </button>
 
 </div>
