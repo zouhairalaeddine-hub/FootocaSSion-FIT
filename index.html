@@ -205,17 +205,30 @@ box-shadow:0 8px 25px rgba(0,0,0,.25);
 }
    
 .shirt{
-height:210px;
-background:#0f151d;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:48px;
-color:#748092;
-padding:8px;
-box-sizing:border-box;
-position:relative;
+  height:240px;
+  background:#0f151d;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:48px;
+  color:#748092;
+  padding:8px;
+  box-sizing:border-box;
+  position:relative;
 }
+
+.shirt img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  border-radius:10px;
+}
+
+@media(max-width:520px){
+  .shirt{
+    height:220px;
+  }
+   }
 
 .favorite{
 position:absolute;
