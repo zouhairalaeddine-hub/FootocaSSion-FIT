@@ -867,77 +867,188 @@ height:76px;
 
    }
 
-/* BOTTOM NAV */
+/* =========================
+   BOTTOM NAV — TIKTOK STYLE
+========================= */
 
 .bottom-nav{
 position:fixed;
 left:50%;
-bottom:12px;
+bottom:10px;
 transform:translateX(-50%);
-width:calc(100% - 24px);
+width:calc(100% - 20px);
 max-width:520px;
 height:68px;
-background:rgba(17,24,33,.96);
+
+background:rgba(13,20,28,.97);
 border:1px solid #293442;
-border-radius:20px;
+border-radius:22px;
+
 display:grid;
-grid-template-columns:1fr 1fr 1fr 1fr;
+grid-template-columns:1fr 1fr 1fr;
+
 align-items:center;
-padding:6px;
 box-sizing:border-box;
-z-index:999;
-box-shadow:0 10px 35px rgba(0,0,0,.35);
-backdrop-filter:blur(12px);
+
+padding:5px 8px;
+
+z-index:9999;
+
+box-shadow:
+0 12px 35px rgba(0,0,0,.40);
+
+backdrop-filter:blur(14px);
+-webkit-backdrop-filter:blur(14px);
 }
 
-.bottom-nav button{
+
+/* ELEMENTOS NORMALES */
+
+.nav-item{
+height:100%;
 background:transparent;
 border:0;
-color:#8e9baa;
+
+color:#8593a2;
+
 display:flex;
 flex-direction:column;
 align-items:center;
 justify-content:center;
-gap:3px;
-height:100%;
-border-radius:15px;
+
+gap:4px;
+
+font-family:inherit;
+-webkit-tap-highlight-color:transparent;
+
+transition:
+color .2s ease,
+transform .2s ease;
 }
 
-.bottom-nav button span{
-font-size:22px;
-line-height:1;
+.nav-item svg{
+width:21px;
+height:21px;
+
+fill:none;
+stroke:currentColor;
+
+stroke-width:1.8;
+stroke-linecap:round;
+stroke-linejoin:round;
+
+transition:
+stroke .2s ease,
+fill .2s ease,
+transform .2s ease;
 }
 
-.bottom-nav button small{
+.nav-item small{
 font-size:10px;
 font-weight:700;
+white-space:nowrap;
 }
 
-.bottom-nav button:hover{
-color:#f5f7fa;
-background:rgba(99,213,255,.07);
+
+/* HOVER / ACTIVE */
+
+.nav-item:hover{
+color:#63d5ff;
 }
 
-.bottom-nav .sell-nav{
+.nav-item:active{
+transform:scale(.94);
+}
+
+.nav-favorites:hover svg{
+fill:rgba(99,213,255,.12);
+}
+
+
+/* =========================
+   + CENTRAL FLOTANTE
+========================= */
+
+.sell-nav{
+position:absolute;
+
+left:50%;
+top:-20px;
+
+transform:translateX(-50%);
+
+width:58px;
+height:58px;
+
+border:4px solid #0d141c;
+border-radius:19px;
+
 background:#63d5ff;
 color:#071018;
-width:52px;
-height:52px;
-border-radius:17px;
-justify-self:center;
-box-shadow:0 6px 18px rgba(99,213,255,.20);
+
+font-size:34px;
+font-weight:300;
+line-height:1;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+cursor:pointer;
+
+box-shadow:
+0 7px 20px rgba(99,213,255,.30),
+0 0 0 1px rgba(99,213,255,.18);
+
+transition:
+transform .2s ease,
+box-shadow .2s ease;
 }
 
-.bottom-nav .sell-nav span{
-font-size:27px;
+.sell-nav:hover{
+transform:translateX(-50%) scale(1.05);
+
+box-shadow:
+0 9px 25px rgba(99,213,255,.38),
+0 0 0 1px rgba(99,213,255,.25);
 }
 
-.bottom-nav .sell-nav small{
-display:none;
+.sell-nav:active{
+transform:translateX(-50%) scale(.96);
 }
+
+
+/* ESPACIO INFERIOR */
 
 body{
-padding-bottom:95px;
+padding-bottom:94px;
+}
+
+
+/* MOBILE */
+
+@media(max-width:520px){
+
+.bottom-nav{
+bottom:9px;
+height:66px;
+width:calc(100% - 20px);
+}
+
+.sell-nav{
+width:57px;
+height:57px;
+}
+
+.nav-item svg{
+width:21px;
+height:21px;
+}
+
+.nav-item small{
+font-size:10px;
+}
+
 }
 
 @media(max-width:520px){
