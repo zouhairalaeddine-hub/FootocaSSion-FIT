@@ -2999,6 +2999,30 @@ if(!currentUser){
   }
   handlePayPalReturn();
 
+function getFavorites(){
+return JSON.parse(
+localStorage.getItem("footocassion_favorites") || "[]"
+);
+}
+
+function toggleFavorite(productId){
+
+let favorites = getFavorites();
+
+if(favorites.includes(productId)){
+favorites = favorites.filter(id => id !== productId);
+}else{
+favorites.push(productId);
+}
+
+localStorage.setItem(
+"footocassion_favorites",
+JSON.stringify(favorites)
+);
+
+render();
+}
+   
 function render(){
 
 let q=
