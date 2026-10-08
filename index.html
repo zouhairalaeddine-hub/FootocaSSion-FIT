@@ -4018,26 +4018,52 @@ render();
 </script>
 
 <!-- BOTTOM NAV -->
+
 <nav class="bottom-nav">
 
-<button onclick="window.scrollTo({top:0,behavior:'smooth'})">
-<span>⌂</span>
-<small>Accueil</small>
+<button
+class="nav-item nav-home"
+onclick="window.scrollTo({top:0,behavior:'smooth'})"
+>
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<path d="M3 10.8 12 3l9 7.8v8.2a2 2 0 0 1-2 2h-4.5v-6h-5v6H5a2 2 0 0 1-2-2z"/>
+</svg>
+
+<small>Pour toi</small>
 </button>
 
-<button class="sell-nav" onclick="openSell()">
-<span>＋</span>
-<small>Vendre</small>
-</button>
 
-<button onclick="openM('favoritesPage'); renderFavorites()">
-<span>♥</span>
+<button
+class="nav-item nav-favorites"
+onclick="openM('favoritesPage'); renderFavorites()"
+>
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<path d="M20.8 8.8c0 5.3-8.8 10.2-8.8 10.2S3.2 14.1 3.2 8.8A5.1 5.1 0 0 1 12 5.4a5.1 5.1 0 0 1 8.8 3.4z"/>
+</svg>
+
 <small>Favoris</small>
 </button>
 
-<button onclick="openM('account')">
-<span>👤</span>
-<small>Compte</small>
+
+<button
+class="nav-item nav-account"
+onclick="openM('account')"
+>
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<circle cx="12" cy="8" r="3.5"/>
+<path d="M4.5 21a7.5 7.5 0 0 1 15 0"/>
+</svg>
+
+<small>Mon compte</small>
+</button>
+
+
+<button
+class="sell-nav"
+onclick="openSell()"
+aria-label="Vendre un maillot"
+>
++
 </button>
 
 </nav>
