@@ -1959,3 +1959,1128 @@ header {
 
 /* CLASSEMENT — ladder inspirée des jeux compétitifs */
   
+.classement-page{padding:18px 16px 150px;background:#07110d;color:#eef4f8;min-height:100vh;box-sizing:border-box}
+.classement-heading{display:flex;align-items:center;gap:12px;margin:6px 0 20px}
+.classement-heading .trophy{font-size:35px;filter:drop-shadow(0 4px 10px #e8b84a55)}
+.classement-heading h1{font-size:27px;margin:0;font-weight:900;letter-spacing:-.6px}
+.classement-heading p{margin:4px 0 0;color:#94a2b2;font-size:13px}
+.classement-switch{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:5px;background:#101923;border:1px solid #273544;border-radius:16px;margin-bottom:18px}
+.classement-switch button{border:0;border-radius:12px;padding:13px 6px;background:transparent;color:#9aa8b7;font-weight:800;font-size:13px;line-height:1.25}
+.classement-switch button.active{background:linear-gradient(135deg,#63d5ff,#399dc9);color:#06121a;box-shadow:0 4px 14px #63d5ff25}
+.ladder-note{font-size:12px;color:#94a2b2;line-height:1.5;margin:0 0 14px}
+.ladder-podium{display:grid;grid-template-columns:1fr 1.12fr 1fr;gap:8px;align-items:end;margin:20px 0 22px}
+.podium-card{min-width:0;text-align:center;background:#121c27;border:1px solid #2a3847;border-radius:16px 16px 12px 12px;padding:12px 5px 14px;overflow:hidden}
+.podium-card.first{padding-top:18px;border-color:#cda94d;background:linear-gradient(180deg,#47391c,#151d25 72%);transform:translateY(-8px)}
+.podium-medal{font-size:25px;line-height:1.2;margin-bottom:5px}
+.podium-card.first .podium-medal{font-size:31px}
+.podium-name{font-size:12px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.podium-score{font-size:11px;color:#aab6c3;margin-top:5px}
+.ladder-list{display:flex;flex-direction:column;gap:9px}
+.ladder-row{width:100%;display:flex;align-items:center;gap:10px;text-align:left;border:1px solid #273544;background:#121b25;border-radius:14px;padding:11px;color:#f3f7fb;box-sizing:border-box}
+.ladder-rank{width:28px;flex:none;text-align:center;font-size:14px;font-weight:900;color:#9eabb9}
+.ladder-avatar{width:42px;height:42px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;background:#223343;border:1px solid #3a4d60;overflow:hidden;font-weight:900}
+.ladder-avatar img{width:100%;height:100%;object-fit:cover}
+.ladder-user{flex:1;min-width:0}
+.ladder-user strong{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ladder-user small{display:block;color:#91a0af;font-size:11px;margin-top:3px}
+.ladder-points{font-weight:900;color:#63d5ff;font-size:13px;white-space:nowrap}
+.ladder-empty{border:1px dashed #344657;border-radius:16px;padding:22px 16px;text-align:center;color:#a2afbd;line-height:1.5;background:#101923}
+.ladder-empty .empty-icon{font-size:30px;margin-bottom:7px}
+@media(max-width:380px){.classement-heading h1{font-size:23px}.classement-switch button{font-size:12px}.podium-name{font-size:11px}}
+
+
+/* FIX NAVIGATION MOBILE : 5 boutons visibles + bouton vendre au centre */
+.bottom-nav{
+  display:grid !important;
+  grid-template-columns:repeat(5,minmax(0,1fr)) !important;
+  align-items:center !important;
+  overflow:visible !important;
+}
+.bottom-nav .nav-home{grid-column:1 !important; grid-row:1 !important;}
+.bottom-nav .nav-classement{grid-column:2 !important; grid-row:1 !important;}
+.bottom-nav .sell-nav{grid-column:3 !important; grid-row:1 !important; justify-self:center !important; left:auto !important; transform:none;}
+.bottom-nav .nav-favorites{grid-column:4 !important; grid-row:1 !important;}
+.bottom-nav .nav-account{grid-column:5 !important; grid-row:1 !important;}
+.bottom-nav .nav-item{
+  display:flex !important; visibility:visible !important; opacity:1 !important;
+  width:100% !important; min-width:0 !important; position:relative !important;
+  padding:0 1px !important; z-index:2;
+}
+.bottom-nav .nav-item svg{width:21px !important;height:21px !important;flex-shrink:0;}
+.bottom-nav .nav-item small{font-size:9px !important; line-height:1.1; white-space:nowrap;}
+.bottom-nav .sell-nav{z-index:5; position:relative !important; top:-15px !important; width:57px !important;height:57px !important;}
+@media(max-width:380px){
+ .bottom-nav{width:calc(100% - 12px) !important;padding-left:3px !important;padding-right:3px !important;}
+ .bottom-nav .nav-item small{font-size:8px !important;}
+ .bottom-nav .nav-item svg{width:19px !important;height:19px !important;}
+ .bottom-nav .sell-nav{width:51px !important;height:51px !important;}
+}
+
+
+/* Le frais de service reste intégré au calcul du prix, mais n'est jamais affiché séparément. */
+.service-fee, .service-fee-row, .fee-service, .fee-service-row, #serviceFee, #serviceFeeRow, #bfee, [data-service-fee] {
+  display: none !important;
+}
+
+
+/* Administration responsive et formulaire créateurs */
+#adminPanelPage .creator-dashboard-wrap{max-width:1100px;width:100%;box-sizing:border-box;padding:18px;margin:0 auto;color:#eef5fb}
+#adminPanelPage .cd-section{margin-top:20px;padding:16px;border:1px solid #283949;border-radius:16px;background:#101820}
+#adminPanelPage .cd-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#adminPanelPage .cd-muted{color:#a8b8c8;font-size:14px;line-height:1.45}
+#adminPanelPage .cd-refresh{background:#63d5ff;color:#07131b;border:0;border-radius:12px;padding:11px 14px;font-weight:800;cursor:pointer}
+#adminPanelPage .cd-table{width:100%;border-collapse:collapse;font-size:13px}
+#adminPanelPage .cd-table th,#adminPanelPage .cd-table td{text-align:left;padding:10px 7px;border-bottom:1px solid #283949;vertical-align:top;overflow-wrap:anywhere}
+#adminPanelPage .cd-table th{color:#a8b8c8}
+#adminPanelPage .adm-form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+#adminPanelPage .adm-form-grid label{display:block;font-size:13px;color:#b8c8d8;margin-bottom:6px}
+#adminPanelPage .adm-form-grid input{width:100%;box-sizing:border-box;background:#0a1118;color:#f3f7fa;border:1px solid #35495b;border-radius:10px;padding:12px;font-size:15px}
+#adminPanelPage .cd-stat{background:#101820;border:1px solid #283949;border-radius:14px;padding:14px}
+#adminPanelPage .cd-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:18px}
+#adminPanelPage .cd-stat span{display:block;color:#a8b8c8;font-size:13px}
+#adminPanelPage .cd-stat strong{display:block;font-size:22px;margin-top:5px}
+#adminPanelPage .cd-empty{padding:12px;color:#a8b8c8}
+@media(max-width:650px){#adminPanelPage .adm-form-grid{grid-template-columns:1fr}#adminPanelPage .creator-dashboard-wrap{padding:12px}#adminPanelPage .cd-section{padding:12px}#adminPanelPage .cd-table{font-size:12px}}
+
+/* Réglages des paiements vendeur — interface en attente de l'intégration officielle */
+.seller-payout-card{margin:18px 0 22px;padding:16px;background:#111a24;border:1px solid #2b3b4b;border-radius:18px;}
+.seller-payout-heading{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.seller-payout-heading h3{margin:0 0 4px;font-size:18px;color:#f5f7fa;}
+.seller-payout-heading .note,.seller-payout-provider .note{margin:0;color:#9aa8b7;font-size:12px;}
+.seller-payout-icon{width:42px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:13px;background:rgba(99,213,255,.12);color:#63d5ff;font-size:24px;font-weight:800;}
+.seller-payout-provider{display:flex;align-items:center;gap:10px;padding:12px;margin-bottom:14px;border:1px solid #293847;border-radius:13px;background:#151f2a;}
+.seller-paypal-mark{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;background:#fff;color:#0758a8;font-size:23px;font-weight:900;font-style:italic;}
+.seller-payout-provider>div{flex:1;min-width:0;}.seller-payout-provider strong{color:#f5f7fa;}
+.seller-payout-status{padding:5px 8px;border-radius:999px;background:#332d1c;color:#f4d27b;font-size:10px;font-weight:800;white-space:nowrap;}
+.seller-payout-card label{display:block;margin:12px 0 7px;color:#dbe5ee;font-size:13px;font-weight:700;}
+.seller-payout-card input{width:100%;min-width:0;padding:13px;border-radius:11px;border:1px solid #344655;background:#0d141c;color:#f5f7fa;font-size:15px;}
+.seller-payout-card input:focus{outline:2px solid rgba(99,213,255,.4);border-color:#63d5ff;}
+.seller-payout-card #sellPaypalNotice{font-size:12px;line-height:1.5;color:#b4c0cb;}
+
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL = "https://uwtjjqrsvwbqzxajdqub.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_UbmzdSuIMyI-VjEglZlnCQ_c5k9p_8T";
+  const SITE_URL = "https://zouhairalaeddine-hub.github.io/FOOTOCASSION-FIT/";
+
+const supabaseClient = window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+</script>
+
+<style id="creatorDashboardStyles">
+#creatorDashboardPage{z-index:1200;overflow-y:auto;overflow-x:hidden;background:#0b1118;color:#f3f7fb;padding:calc(18px + env(safe-area-inset-top, 0px)) 12px calc(220px + env(safe-area-inset-bottom, 0px)) !important;box-sizing:border-box;height:100dvh;max-height:100dvh;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;touch-action:pan-y}
+#creatorDashboardPage .creator-dashboard-wrap{max-width:760px;margin:0 auto;background:#111b26;border:1px solid #263849;border-radius:22px;padding:20px;box-shadow:0 18px 60px #0007}
+#creatorDashboardPage .cd-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+#creatorDashboardPage .cd-muted{color:#9eafbf;font-size:13px}
+#creatorDashboardPage .cd-close{border:1px solid #314455;background:#1a2937;color:white;border-radius:12px;padding:9px 12px}
+#creatorDashboardPage .cd-code{margin:18px 0;padding:14px;border-radius:15px;background:#172b3a;border:1px solid #2b4a5d;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#creatorDashboardPage .cd-code strong{font-size:22px;letter-spacing:.5px;color:#63d5ff;overflow-wrap:anywhere}
+#creatorDashboardPage .cd-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:16px 0}
+#creatorDashboardPage .cd-stat{background:#17212d;border:1px solid #283949;border-radius:15px;padding:15px;min-width:0}
+#creatorDashboardPage .cd-stat span{display:block;color:#9eafbf;font-size:12px;margin-bottom:8px}
+#creatorDashboardPage .cd-stat strong{font-size:23px;overflow-wrap:anywhere}
+#creatorDashboardPage .cd-section{margin-top:22px}
+#creatorDashboardPage .cd-table{width:100%;border-collapse:collapse;font-size:13px}
+#creatorDashboardPage .cd-table th,#creatorDashboardPage .cd-table td{text-align:left;padding:11px 7px;border-bottom:1px solid #283949;vertical-align:top}
+#creatorDashboardPage .cd-table th{color:#9eafbf;font-weight:600}
+#creatorDashboardPage .cd-status{display:inline-block;padding:4px 8px;border-radius:999px;background:#263746;color:#d7e7f5;font-size:11px;white-space:nowrap}
+#creatorDashboardPage .cd-refresh{background:#63d5ff;color:#07131b;border:0;border-radius:12px;padding:11px 14px;font-weight:800}
+#creatorDashboardPage .cd-empty{padding:18px;text-align:center;color:#9eafbf;background:#17212d;border-radius:14px}
+@media(max-width:480px){#creatorDashboardPage .creator-dashboard-wrap{padding:15px}#creatorDashboardPage .cd-grid{gap:8px}#creatorDashboardPage .cd-stat{padding:12px}#creatorDashboardPage .cd-stat strong{font-size:20px}#creatorDashboardPage .cd-table{font-size:12px}#creatorDashboardPage .cd-table th,#creatorDashboardPage .cd-table td{padding:9px 4px}}
+</style>
+<style id="feed-end-page-isolation-fix">
+/* Les écrans de navigation restent totalement masqués tant qu'ils ne sont pas ouverts. */
+#account.tab-page:not(.show),
+#favoritesPage.tab-page:not(.show),
+#classementPage.tab-page:not(.show),
+#cartPage.tab-page:not(.show){display:none !important;}
+#account.tab-page.show,
+#favoritesPage.tab-page.show,
+#classementPage.tab-page.show,
+#cartPage.tab-page.show{position:fixed !important;inset:0 !important;width:100% !important;}
+/* Le message de fin appartient au fil Pour toi, pas à la page Mon compte. */
+#feedEndMessage{position:relative;z-index:1;margin-bottom:130px;}
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<nav>
+
+<div class="logo">
+
+<span class="logo-main">⚽ FOOTOCASSION-</span><span class="logo-accent">FIT</span>
+
+<small>FOOTBALL SHIRTS MARKETPLACE</small>
+</div>
+
+<div>
+
+<div class="header-auth">
+
+<button
+  id="headerAuthButton"
+  class="header-auth-btn"
+  onclick="goAccount()"
+>
+  🔐 Se connecter
+</button>
+
+<div
+  id="headerAuthEmail"
+  class="header-auth-email"
+  aria-live="polite"
+></div>
+
+</div>
+
+<!-- Les boutons complets restent disponibles dans Mon compte -->
+<button
+id="accountButton"
+class="outline"
+onclick="goAccount()"
+style="display:none"
+>
+👤 Compte
+</button>
+
+<button
+class="primary"
+onclick="openSell()"
+style="display:none"
+>
+＋ Vendre
+</button>
+
+<div
+id="authStatus"
+class="authStatus"
+style="display:none"
+></div>
+
+</div>
+
+</nav>
+
+</header>
+
+
+<div id="countryWelcome" class="country-welcome" style="display:none" role="dialog" aria-modal="true" aria-labelledby="countryWelcomeTitle">
+  <div class="country-welcome-card">
+    <div style="font-size:42px">🌍</div>
+    <h2 id="countryWelcomeTitle">Bienvenue sur FOOTOCASSION-FIT</h2>
+    <p>Choisis ton pays pour voir d’abord les maillots proches de chez toi et estimer la livraison.</p>
+    <label for="welcomeCountry">Ton pays</label>
+    <select id="welcomeCountry">
+<option value="">Sélectionner un pays</option>
+<option value="France">France</option>
+<option value="Espagne">Espagne</option>
+<option value="Royaume-Uni">Royaume-Uni</option>
+<option value="Belgique">Belgique</option>
+<option value="Italie">Italie</option>
+<option value="Allemagne">Allemagne</option>
+<option value="Pays-Bas">Pays-Bas</option>
+<option value="Brésil">Brésil</option>
+<option value="Argentine">Argentine</option>
+<option value="Mexique">Mexique</option>
+<option value="Colombie">Colombie</option>
+<option value="Chili">Chili</option>
+<option value="Pérou">Pérou</option>
+<option value="Uruguay">Uruguay</option>
+<option value="Paraguay">Paraguay</option>
+<option value="Bolivie">Bolivie</option>
+<option value="Équateur">Équateur</option>
+<option value="Costa Rica">Costa Rica</option>
+<option value="Panama">Panama</option>
+<option value="République dominicaine">République dominicaine</option>
+</select>
+    <button type="button" class="primary" onclick="confirmWelcomeCountry()">Continuer</button>
+  </div>
+</div>
+
+
+<div id="profileSetupOverlay" class="profile-setup-overlay" role="dialog" aria-modal="true" aria-labelledby="profileSetupTitle">
+  <div class="profile-setup-card">
+    <div style="font-size:35px">⚽</div>
+    <h2 id="profileSetupTitle">Mon profil</h2>
+    <p>Gère les informations de ton compte FOOTOCASSION-FIT. Ton adresse e-mail est celle utilisée pour te connecter.</p>
+    <label for="profileEmailDisplay">Adresse e-mail</label>
+    <input id="profileEmailDisplay" type="email" readonly autocomplete="email" placeholder="Connecte-toi pour voir ton e-mail" onclick="if(!currentUser){document.getElementById('profileSetupOverlay').style.display='none';openM('purchaseLogin')}" style="width:100%;box-sizing:border-box;background:#141f2a;border:1px solid #344352;color:#aab6c4;border-radius:13px;padding:14px;font:inherit;margin:8px 0 14px">
+    <label for="profileUsername">Nom d’utilisateur *</label>
+    <input id="profileUsername" type="text" maxlength="24" autocomplete="nickname" placeholder="Ex. AlaFoot11" required>
+    <label for="profileCountry">Pays</label>
+    <select id="profileCountry" style="width:100%;box-sizing:border-box;background:#141f2a;border:1px solid #344352;color:#f5f7fa;border-radius:13px;padding:14px;font:inherit;margin:8px 0 14px"><option value="">Choisir un pays</option><option>France</option><option>Espagne</option><option>Belgique</option><option>Royaume-Uni</option><option>Italie</option><option>Allemagne</option><option>Pays-Bas</option><option>Maroc</option><option>États-Unis</option><option>Canada</option><option>Brésil</option><option>Argentine</option><option>Mexique</option><option>Autre</option></select>
+    <label for="profilePhotoInput">Photo de profil (facultative)</label>
+    <div class="profile-photo-preview" id="profilePhotoPreview">👤</div>
+    <input id="profilePhotoInput" type="file" accept="image/*" onchange="previewProfilePhoto(event)">
+    <p id="profileSetupMessage" style="font-size:13px;margin:0 0 12px"></p>
+    <button type="button" class="primary" style="width:100%" onclick="saveUserProfile()">Enregistrer mon profil</button>
+  </div>
+</div>
+
+<section id="classementPage" class="tab-page classement-page" aria-label="Classement" style="display:none">
+  <div class="classement-heading"><div class="trophy">🏆</div><div><h1>Classement</h1><p>La compétition FOOTOCASSION-FIT</p></div></div>
+  <div class="classement-switch" role="tablist" aria-label="Choisir le classement">
+    <button id="creatorRankTab" class="active" role="tab" aria-selected="true" onclick="switchClassement('creators')">⭐ Créateurs de contenu</button>
+    <button id="sellerRankTab" role="tab" aria-selected="false" onclick="switchClassement('sellers')">👕 Meilleurs vendeurs</button>
+  </div>
+  <p id="classementSubtitle" class="ladder-note">Chaque utilisation validée d’un code créateur rapportera 8 points. Les points seront affichés lorsque le suivi des codes sera connecté.</p>
+  <div id="classementPodium" class="ladder-podium" style="display:none"></div>
+  <div id="classementRows" class="ladder-list"><div class="ladder-empty"><div class="empty-icon">⭐</div><strong>Classement des créateurs</strong><br>Le tableau affichera les créateurs et leurs points dès que le suivi des codes sera activé.</div></div>
+</section>
+<div id="publicProfileModal" class="modal" style="display:none;z-index:15000" onclick="if(event.target===this)closePublicProfile()">
+ <div class="modal-content" style="max-width:560px;max-height:82vh;overflow:auto;background:#101923;border:1px solid #2a3948;border-radius:22px;padding:20px">
+  <button class="outline" onclick="closePublicProfile()" style="float:right">✕</button>
+  <div id="publicProfileContent"></div>
+ </div>
+</div>
+
+<main>
+
+<section class="hero">
+  <h1>Pour toi</h1>
+  <p>Découvre les maillots qui pourraient te plaire.</p>
+</section>
+
+
+<div class="search">
+
+<input
+id="q"
+placeholder="🔎 Rechercher un maillot, une équipe..."
+oninput="render()"
+>
+
+</div>
+
+<div style="margin:15px 0">
+
+<label>
+📦 Livraison vers
+</label>
+
+<select id="buyerCountry" onchange="saveBuyerCountry(); render()">
+<option value="">Sélectionner un pays</option>
+<option value="France">France</option>
+<option value="Espagne">Espagne</option>
+<option value="Royaume-Uni">Royaume-Uni</option>
+<option value="Belgique">Belgique</option>
+<option value="Italie">Italie</option>
+<option value="Allemagne">Allemagne</option>
+<option value="Pays-Bas">Pays-Bas</option>
+<option value="Brésil">Brésil</option>
+<option value="Argentine">Argentine</option>
+<option value="Mexique">Mexique</option>
+<option value="Colombie">Colombie</option>
+<option value="Chili">Chili</option>
+<option value="Pérou">Pérou</option>
+<option value="Uruguay">Uruguay</option>
+<option value="Paraguay">Paraguay</option>
+<option value="Bolivie">Bolivie</option>
+<option value="Équateur">Équateur</option>
+<option value="Costa Rica">Costa Rica</option>
+<option value="Panama">Panama</option>
+<option value="République dominicaine">République dominicaine</option>
+</select>
+
+</div>
+
+<div class="filters">
+
+<select id="team" onchange="render()">
+
+<option value="">
+Toutes les équipes
+</option>
+
+</select>
+
+
+<select id="size" onchange="render()">
+
+<option value="">
+Toutes les tailles
+</option>
+
+<option>XS</option>
+<option>S</option>
+<option>M</option>
+<option>L</option>
+<option>XL</option>
+<option>XXL</option>
+
+</select>
+
+
+<select id="auth" onchange="render()">
+
+<option value="">
+Authenticité
+</option>
+
+<option value="auth">
+Authenticité déclarée
+</option>
+
+<option value="replica">
+Imitation / replica
+</option>
+
+</select>
+
+
+<select id="cond" onchange="render()">
+
+<option value="">
+État
+</option>
+
+<option value="Occasion">Occasion</option>
+<option value="Nouvelle">Nouvelle</option>
+
+</select>
+
+
+<select id="price" onchange="render()">
+
+<option value="">
+Prix
+</option>
+
+<option value="30">
+≤ 30 €
+</option>
+
+<option value="60">
+31–60 €
+</option>
+
+<option value="100">
+61–100 €
+</option>
+
+<option value="101">
+101 €+
+</option>
+
+</select>
+
+</div>
+
+
+<section
+id="catalog"
+class="catalog"
+></section>
+
+<div id="feedEndMessage" class="feed-end-message" role="status" aria-live="polite" style="display:none">
+  <div class="feed-end-icon">⚽</div>
+  <strong>Tu as tout regardé pour le moment !</strong>
+  <p>Reviens bientôt : de nouveaux maillots arrivent régulièrement.</p>
+</div>
+
+</main>
+
+
+<!-- COMPTE -->
+
+<div id="account" class="modal tab-page">
+
+<div class="box">
+
+<div class="account-topbar">
+  <div class="account-top-title">Profil</div>
+  <button type="button" class="account-hamburger" aria-label="Ouvrir le menu du compte" aria-expanded="false" onclick="toggleAccountMenu()"><span></span><span></span><span></span></button>
+  <div id="accountQuickMenu" class="account-quick-menu" style="display:none">
+    <button type="button" class="quick-notifications-button" onclick="closeAccountQuickMenu(); openM('sellerNotificationsPage'); loadSellerNotifications()">🔔 Notifications de ventes <span id="sellerNotificationMenuBadge" class="seller-red-badge" style="display:none">0</span></button>
+    <button type="button" onclick="closeAccountQuickMenu(); openProfileEditor()">✏️ Modifier le profil</button>
+    <button type="button" onclick="closeAccountQuickMenu(); signOut()">↪ Se déconnecter</button>
+  </div>
+</div>
+
+<div class="account-profile account-profile-tiktok">
+  <div class="account-avatar account-avatar-large" id="accountProfileAvatar">👤</div>
+  <h2 id="accountProfileUsername">Mon compte</h2>
+  <p class="note account-handle" id="accountProfileSubline">@utilisateur</p>
+  <button type="button" class="outline account-edit-button" id="accountProfileAction" onclick="handleAccountProfileAction()">Se connecter</button>
+</div>
+
+<div class="account-stats">
+
+<div>
+<strong>0</strong>
+<span>Annonces</span>
+</div>
+
+<div>
+<strong id="accountFavoritesCount">0</strong>
+<span>Cesta</span>
+</div>
+
+<div>
+<strong>0</strong>
+<span>Ventes</span>
+</div>
+
+<div>
+<strong>0</strong>
+<span>Achats</span>
+</div>
+
+</div>
+
+<div class="account-menu">
+<button type="button" onclick="closeM('account'); openCreatorDashboard()">
+<span class="account-icon">⭐</span>
+<strong>Espace créateur</strong>
+<small>Ventes, commissions et solde</small>
+</button>
+
+<button id="adminPanelEntry" type="button" style="display:none" onclick="closeM('account'); openAdminPanel()">
+<span class="account-icon">🛡️</span>
+<strong>Administration</strong>
+<small>Créateurs, ventes, commissions et paiements</small>
+</button>
+
+
+<button onclick="closeM('account'); openM('buyerOrdersPage'); loadBuyerOrders('all')">
+<span class="account-icon">🛒</span>
+<strong>Mes achats <span id="buyerOrdersUnreadBadge" style="display:none;vertical-align:middle;background:#ef4444;color:#fff;border-radius:999px;min-width:22px;height:22px;padding:0 6px;align-items:center;justify-content:center;font-size:12px;font-weight:800"></span></strong>
+<small>Commandes et notifications</small>
+</button>
+
+<button onclick="closeM('account'); openM('buyerOrdersPage'); loadBuyerOrders('shipped')">
+<span class="account-icon">🚚</span>
+<strong>En chemin</strong>
+<small>Suivre mes livraisons</small>
+</button>
+
+<button
+id="sellerSalesMenuButton"
+onclick="closeM('account'); openM('salesPage'); loadMySales()"
+style="position:relative"
+>
+<span class="account-icon">📦</span>
+<strong>Mes ventes <span id="sellerSalesUnreadBadge" style="display:none;vertical-align:middle;background:#ef4444;color:#fff;border-radius:999px;min-width:22px;height:22px;padding:0 6px;align-items:center;justify-content:center;font-size:12px;font-weight:800"></span></strong>
+<small>Gérer mes annonces et commandes</small>
+</button>
+
+</div>
+
+<!-- Les informations PayPal sont demandées dans le formulaire de vente. -->
+
+<label>Email</label>
+
+<input
+id="authEmail"
+type="email"
+placeholder="ton@email.com"
+>
+
+<label>Mot de passe</label>
+
+<input
+id="authPassword"
+type="password"
+placeholder="Minimum 6 caractères"
+>
+
+<div class="row" style="margin-top:15px">
+
+<button class="primary" onclick="signUp()">
+Créer un compte
+</button>
+
+<button class="outline" onclick="signIn()">
+Se connecter
+</button>
+
+</div>
+
+
+
+<div id="mySales" style="margin-top:15px"></div>
+
+<p id="authMessage" class="note"></p>
+
+
+
+<button
+id="resendButton"
+class="outline"
+style="width:100%;margin-top:10px;display:none"
+onclick="resendConfirmation()"
+>
+📧 Renvoyer l’email de confirmation
+</button>
+
+</div>
+
+</div>
+
+<!-- FAVORIS -->
+<div id="favoritesPage" class="modal tab-page">
+
+<div class="box">
+
+<div class="tab-page-brand"><span>⚽ FOOTOCASSION-</span><span class="logo-accent">FIT</span></div>
+
+<button class="close" onclick="closeM('favoritesPage')">×</button>
+
+<div class="cart-head">
+
+<div class="cart-icon-wrap">
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<path d="M3 4h2l2.1 11.2a2 2 0 0 0 2 1.6h8.7a2 2 0 0 0 1.9-1.4L21 8H6"/>
+<circle cx="10" cy="20" r="1.2"/>
+<circle cx="18" cy="20" r="1.2"/>
+</svg>
+</div>
+
+<div>
+<h2>Cesta <span id="cartCount">(0)</span></h2>
+<p class="note">Les maillots que tu as ajoutés au panier</p>
+</div>
+
+</div>
+
+<div class="cart-select-row">
+<label class="cart-check">
+<input id="cartSelectAll" type="checkbox" checked onchange="toggleAllCart(this.checked)">
+<span>Todos</span>
+</label>
+<span id="cartSelectedText" class="cart-muted">0 maillots</span>
+</div>
+
+<div id="favoritesList" class="cart-list"></div>
+
+<div class="cart-bottom-summary">
+<div>
+<span>Total</span>
+<strong id="cartTotal">0,00 €</strong>
+</div>
+<p>Los maillots guardados siguen disponibles hasta que el vendedor los retire.</p>
+</div>
+
+</div>
+</div>
+   
+<div>
+<h2>
+Mon compte
+</h2>
+
+<p class="note">
+Ton espace FOOTOCASSION-FIT
+</p>
+</div>
+
+</div>
+
+<div class="account-menu">
+
+<button>
+🛒
+<strong>Mes achats</strong>
+<span>Voir mes commandes</span>
+</button>
+
+<button>
+🚚
+<strong>En chemin</strong>
+<span>Suivre mes livraisons</span>
+</button>
+
+<button onclick="goFavorites()">
+🛒
+<strong>Ma cesta</strong>
+<span>Maillots de ta cesta</span>
+</button>
+
+<button onclick="openM('salesPage')">
+📦
+<strong>Mes ventes</strong>
+<span>Gérer mes ventes</span>
+</button>
+
+</div>
+
+<label>
+Email
+</label>
+
+<input
+id="authEmail"
+type="email"
+placeholder="ton@email.com"
+>
+
+
+<label>
+Mot de passe
+</label>
+
+<input
+id="authPassword"
+type="password"
+placeholder="Minimum 6 caractères"
+>
+
+
+<div
+class="row"
+style="margin-top:15px"
+>
+
+<button
+class="primary"
+onclick="signUp()"
+>
+Créer un compte
+</button>
+
+<button
+class="outline"
+onclick="signIn()"
+>
+Se connecter
+</button>
+
+</div>
+
+
+
+
+<button
+id="salesButton"
+class="outline"
+style="width:100%;margin-top:10px"
+onclick="openM('salesPage'); loadMySales()"
+>
+📦 Mes ventes
+</button>
+
+<div
+id="mySales"
+style="margin-top:15px"
+>
+</div>
+
+<p
+id="authMessage"
+class="note"
+></p>
+
+<button
+id="resendButton"
+class="outline"
+style="width:100%;margin-top:10px;display:none"
+onclick="resendConfirmation()"
+>
+📧 Renvoyer l’email de confirmation
+</button>
+
+</div>
+
+</div>
+<!-- MES VENTES -->
+<div
+id="salesPage"
+class="modal"
+>
+
+  <div class="box">
+
+    <button
+      class="outline"
+      onclick="closeM('salesPage'); openM('account')"
+      style="margin-bottom:15px"
+    >
+      ← Retour
+    </button>
+
+    <h2>📦 Mes ventes</h2>
+
+    <div
+      id="salesList"
+      style="margin-top:15px"
+    >
+    </div>
+
+  </div>
+
+</div>
+
+<!-- MES ACHATS -->
+<div id="buyerOrdersPage" class="modal">
+  <div class="box">
+    <button class="outline" onclick="closeM('buyerOrdersPage'); openM('account')" style="margin-bottom:15px">← Retour</button>
+    <h2>🛍️ Mes achats</h2>
+    <p class="note">Retrouve ici tes commandes, leur état, le suivi et les dernières mises à jour.</p>
+    <h3 style="margin-top:18px">🔔 Notifications</h3>
+    <div id="buyerOrderNotificationsList" style="margin-top:10px"></div>
+    <h3 style="margin-top:22px">📦 Mes commandes</h3>
+    <div id="buyerOrdersList" style="margin-top:15px"></div>
+  </div>
+</div>
+
+<!-- NOTIFICATIONS VENDEUR -->
+<div id="sellerNotificationsPage" class="modal">
+  <div class="box">
+    <button class="outline" onclick="closeM('sellerNotificationsPage'); openM('account')" style="margin-bottom:15px">← Retour</button>
+    <h2>🔔 Notifications de ventes</h2>
+    <p class="note">Chaque notification correspond à une vente enregistrée pour ton compte.</p>
+    <div id="sellerNotificationsList" style="margin-top:15px"></div>
+  </div>
+</div>
+
+<!-- DETAIL VENTE -->
+<div
+  id="saleDetailPage"
+  class="modal"
+>
+  <div class="box">
+
+    <button
+      class="outline"
+      onclick="closeM('saleDetailPage'); openM('salesPage')"
+      style="margin-bottom:15px"
+    >
+      ← Retour
+    </button>
+
+    <h2>📦 Détail de la vente</h2>
+
+    <div
+      id="saleDetailContent"
+      style="margin-top:15px"
+    >
+    </div>
+
+  </div>
+</div>
+<!-- VENDRE -->
+
+<div
+id="sell"
+class="modal"
+>
+
+<div class="box">
+
+<button
+class="close"
+onclick="closeM('sell')"
+>
+×
+</button>
+
+<h2>
+Vendre un maillot
+</h2>
+
+
+<label>
+Photos — 1 à 3
+</label>
+
+
+<label
+for="photos"
+class="gallery"
+>
+📷 Choisir une photo dans la galerie
+</label>
+
+
+<input
+id="photos"
+type="file"
+accept="image/*"
+multiple
+onchange="preview()"
+>
+
+
+<div
+id="previews"
+class="photos"
+></div>
+
+
+<label>
+Nom du maillot
+</label>
+
+<input
+id="name"
+placeholder="Ex. Real Madrid 2024/25"
+>
+
+
+<div class="row">
+
+<div>
+
+<label>
+Équipe / club
+</label>
+
+<input
+id="club"
+placeholder="Ex. Real Madrid"
+>
+
+</div>
+
+
+<div>
+
+<label>
+Taille
+</label>
+
+<select id="lsize">
+
+<option>XS</option>
+<option>S</option>
+<option>M</option>
+<option>L</option>
+<option>XL</option>
+<option>XXL</option>
+
+</select>
+
+</div>
+
+</div>
+
+
+<div class="row">
+
+<div>
+
+<label>
+Prix (€)
+</label>
+
+<input
+id="lprice"
+type="number"
+min="1"
+placeholder="80"
+>
+
+</div>
+
+
+<div>
+
+<label>
+État du maillot
+</label>
+
+<select id="lcond">
+
+<option value="Occasion">Occasion</option>
+<option value="Nouvelle">Nouvelle</option>
+
+</select>
+
+</div>
+
+</div>
+
+
+<label>
+Authenticité
+</label>
+
+<select id="lauth">
+
+<option value="auth">
+✓ Authenticité déclarée
+</option>
+
+<option value="replica">
+⚠️ Imitation / replica
+</option>
+
+</select>
+
+
+<label>
+Description
+</label>
+
+<textarea
+id="desc"
+placeholder="Saison, défauts éventuels, etc."
+></textarea>
+
+<label>
+Pays du vendeur
+</label>
+
+<select id="sellerCountry">
+<option value="">Sélectionner un pays</option>
+<option value="France">France</option>
+<option value="Espagne">Espagne</option>
+<option value="Royaume-Uni">Royaume-Uni</option>
+<option value="Belgique">Belgique</option>
+<option value="Italie">Italie</option>
+<option value="Allemagne">Allemagne</option>
+<option value="Pays-Bas">Pays-Bas</option>
+<option value="Brésil">Brésil</option>
+<option value="Argentine">Argentine</option>
+<option value="Mexique">Mexique</option>
+<option value="Colombie">Colombie</option>
+<option value="Chili">Chili</option>
+<option value="Pérou">Pérou</option>
+<option value="Uruguay">Uruguay</option>
+<option value="Paraguay">Paraguay</option>
+<option value="Bolivie">Bolivie</option>
+<option value="Équateur">Équateur</option>
+<option value="Costa Rica">Costa Rica</option>
+<option value="Panama">Panama</option>
+<option value="République dominicaine">République dominicaine</option>
+</select>
+
+<label>
+Quantité disponible
+</label>
+
+<input
+  id="stock"
+  type="number"
+  min="1"
+  value="1"
+  placeholder="Ex. 50"
+>
+
+
+<p class="note" style="margin-top:8px">Plusieurs tailles ? Indique le stock de chaque taille ci-dessous. Laisse à 0 les tailles indisponibles.</p>
+<div class="size-stock-grid" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0 14px">
+  <label>XS<input class="size-stock-input" data-size="XS" type="number" min="0" value="0" style="margin-top:5px"></label>
+  <label>S<input class="size-stock-input" data-size="S" type="number" min="0" value="0" style="margin-top:5px"></label>
+  <label>M<input class="size-stock-input" data-size="M" type="number" min="0" value="0" style="margin-top:5px"></label>
+  <label>L<input class="size-stock-input" data-size="L" type="number" min="0" value="0" style="margin-top:5px"></label>
+  <label>XL<input class="size-stock-input" data-size="XL" type="number" min="0" value="0" style="margin-top:5px"></label>
+  <label>XXL<input class="size-stock-input" data-size="XXL" type="number" min="0" value="0" style="margin-top:5px"></label>
+</div>
+
+<section class="seller-payout-card" style="margin-top:18px" aria-labelledby="sellPaypalTitle">
+  <div class="seller-payout-heading">
+    <span class="seller-payout-icon" aria-hidden="true">↗</span>
+    <div>
+      <h3 id="sellPaypalTitle">Recevoir l’argent de cette vente</h3>
+      <p class="note">Méthode de réception : PayPal</p>
+    </div>
+  </div>
+  <label for="sellPaypalEmail">Adresse e-mail de ton compte PayPal</label>
+  <input id="sellPaypalEmail" type="email" inputmode="email" autocomplete="email" placeholder="exemple@email.com" aria-describedby="sellPaypalNotice">
+  <script>document.getElementById("sellPaypalEmail")?.addEventListener("input", function(){ const notice=document.getElementById("sellPaypalNotice"); if(notice && this.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.value.trim())) notice.textContent="Vérifie le format de l’adresse e-mail PayPal avant de publier."; else if(notice) notice.textContent="L’adresse sera vérifiée puis enregistrée de façon privée dans ton compte vendeur avant la création de l’annonce."; });</script>
+  <p id="sellPaypalNotice" class="note" role="status" aria-live="polite" style="margin-top:9px">L’adresse PayPal sera enregistrée de façon privée dans ton compte vendeur. Les versements automatiques ne sont pas encore activés.</p>
+</section>
+
+<button
+class="primary"
+style="width:100%;margin-top:15px"
+onclick="add()"
+>
+Mettre en vente
+</button>
+
+
+<p class="note">
+Ton annonce sera liée à ton compte vendeur.
+</p>
+
+</div>
+
+</div>
+
+<!-- DETAIL PRODUIT -->
+
+<div
+id="productDetail"
+class="modal"
+>
+
+<div class="box">
+
+<button
+class="close"
+onclick="closeM('productDetail')"
+>
+×
+</button>
+
+<div
+id="productGallery"
+style="
+position:relative;
+overflow:hidden;
+border-radius:14px;
+background:#1a222c;
+"
+>
+</div>
+
+<div
+id="productDots"
+style="
+text-align:center;
+margin-top:8px;
+"
+>
+</div>
+
+<div
+id="productDetailInfo"
+style="margin-top:15px"
+>
+</div>
+
+<div id="productActionBar" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 20px;margin-top:16px">
+  <button id="productCartButton" type="button" class="outline" style="min-height:56px;border-radius:15px;border:1px solid #63d5ff;background:#102a38;color:#63d5ff;font-size:16px;font-weight:850">＋ Mettre en panier</button>
+  <button id="productBuyButton" type="button" class="primary" style="min-height:56px;margin:0!important;border-radius:15px;background:#fff;color:#0b0f14;font-size:17px;font-weight:900">Acheter</button>
+</div>
+
+</div>
+
+</div>
+
+<!-- CONNEXION POUR ACHETER -->
+<div id="purchaseLogin" class="modal" style="z-index:11000">
+  <div class="box purchase-login-box">
+    <button class="close" onclick="closePurchaseLogin()">×</button>
+
+    <div class="account-profile">
+      <div class="account-avatar">🛒</div>
+      <div>
+        <h2>Connexion requise</h2>
+        <p class="note">Connecte-toi pour continuer ton achat.</p>
+      </div>
+    </div>
+
+    <p id="purchaseLoginMessage" class="note" style="margin-top:8px"></p>
+
+    <label>Email</label>
+    <input id="purchaseLoginEmail" type="email" placeholder="ton@email.com">
+
+    <label>Mot de passe</label>
+    <input id="purchaseLoginPassword" type="password" placeholder="Minimum 6 caractères">
+
+    <button class="primary" style="width:100%;margin-top:15px" onclick="purchaseSignIn()">
+      Se connecter avec e-mail
+   
