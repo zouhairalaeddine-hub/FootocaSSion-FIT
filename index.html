@@ -4413,4 +4413,1245 @@ function openPurchaseLogin(p){
   const email = document.getElementById("authEmail");
   const purchaseEmail = document.getElementById("purchaseLoginEmail");
    
+   if(purchaseEmail && email && email.value.trim()){
+    purchaseEmail.value = email.value.trim();
+  }
+
+  document.getElementById("purchaseLoginMessage").textContent =
+    "Connecte-toi pour continuer la commande.";
+
+  closeM("productDetail");
+  closeM("account");
+  openM("purchaseLogin");
+}
+
+function closePurchaseLogin(){
+  closeM("purchaseLogin");
+  purchaseLoginProduct = null;
+}
+
+async function purchaseSignIn(){
+  const email = document.getElementById("purchaseLoginEmail").value.trim();
+  const password = document.getElementById("purchaseLoginPassword").value;
+  const msg = document.getElementById("purchaseLoginMessage");
+
+  if(!email || !password){
+    msg.textContent = "Remplis ton email et ton mot de passe.";
+    msg.className = "note error";
+    return;
+  }
+
+  const {data,error} = await supabaseClient.auth.signInWithPassword({email,password});
+
+  if(error){
+    msg.textContent = "Erreur : " + error.message;
+    msg.className = "note error";
+    return;
+  }
+
+  currentUser = data.user;
+  updateAuthUI();
+
+  const p = purchaseLoginProduct;
+  const continueToSell = sellAfterAuth;
+  sellAfterAuth = false;
+  closeM("purchaseLogin");
+  purchaseLoginProduct = null;
+
+  if(continueToSell){
+    openM("sell");
+  } else if(p){
+    buyProductDirect(p);
+  }
+  const title = document.querySelector("#purchaseLogin h2");
+  const subtitle = document.querySelector("#purchaseLogin .account-profile .note");
+  if(title) title.textContent = "Connexion requise";
+  if(subtitle) subtitle.textContent = "Connecte-toi pour continuer ton achat.";
+}
+
+async function purchaseSignUp(){
+  const email = document.getElementById("purchaseLoginEmail").value.trim();
+  const password = document.getElementById("purchaseLoginPassword").value;
+  const msg = document.getElementById("purchaseLoginMessage");
+
+  if(!email || !password){
+    msg.textContent = "Remplis ton email et ton mot de passe.";
+    msg.className = "note error";
+    return;
+  }
+
+  if(password.length < 6){
+    msg.textContent = "Le mot de passe doit contenir au moins 6 caractères.";
+    msg.className = "note error";
+    return;
+  }
+
+  const {data,error} = await supabaseClient.auth.signUp({
+    email,
+    password,
+    options:{emailRedirectTo:SITE_URL}
+  });
+
+  if(error){
+    msg.textContent = "Erreur : " + error.message;
+    msg.className = "note error";
+    return;
+  }
+
+  if(data.session && data.user){
+    currentUser = data.user;
+    updateAuthUI();
+    const p = purchaseLoginProduct;
+    const continueToSell = sellAfterAuth;
+    sellAfterAuth = false;
+    closeM("purchaseLogin");
+    purchaseLoginProduct = null;
+    if(continueToSell) openM("sell");
+    else if(p) buyProductDirect(p);
+    const title = document.querySelector("#purchaseLogin h2");
+    const subtitle = document.querySelector("#purchaseLogin .account-profile .note");
+    if(title) title.textContent = "Connexion requise";
+    if(subtitle) subtitle.textContent = "Connecte-toi pour continuer ton achat.";
+    return;
+  }
+
+  msg.textContent = "Compte créé ✅ Vérifie ton email, puis connecte-toi pour continuer.";
+  msg.className = "note success";
+}
+
+function buyProductDirect(p){
+  if(!currentUser){
+    openPurchaseLogin(p);
+    return;
+  }
+
+  if(String(p.sellerId) === String(currentUser.id)){
+    alert("Tu ne peux pas acheter ton propre maillot.");
+    return;
+  }
+
+  window.selectedProduct = p;
+
+  const buyerCountry = document.getElementById("buyerCountry").value;
+  if(buyerCountry){
+    document.getElementById("shippingCountry").value = buyerCountry;
+  }
+
+  document.getElementById("bt").textContent = "Acheter : " + p.name;
+  document.getElementById("creatorCode").value = "";
+  window.appliedCreatorCode = null;
+  document.getElementById("creatorMessage").textContent = "";
+  document.getElementById("creatorContent").classList.remove("show");
+
+  updateBuySummary();
+  openM("buy");
+}
+
+function updateBuySummary(){
+  const p = window.selectedProduct;
+  if(!p) return;
+
+  const fee = Number(p.price) * 0.15;
+  const shippingCountry = document.getElementById("shippingCountry").value;
+  const shippingCost = shippingCountry
+    ? getShippingCost(p.sellerCountry, shippingCountry, document.getElementById("shippingMethod")?.value)
+    : null;
+
+  document.getElementById("bprice").textContent = (Number(p.price) * 1.15).toFixed(2) + " €";
+  const feeLine = document.getElementById("bfee");
+  if(feeLine) feeLine.textContent = "";
+
+  if(shippingCost === null){
+    document.getElementById("bshipping").textContent = shippingCountry ? "Non disponible" : "Sélectionne un pays";
+    document.getElementById("btotal").textContent = "—";
+    return;
+  }
+
+  const total = (Number(p.price) * 1.15) + Number(shippingCost);
+  document.getElementById("bshipping").textContent = Number(shippingCost).toFixed(2) + " €";
+  document.getElementById("btotal").textContent = total.toFixed(2) + " €";
+}
+
+function toggleCreator(){
+
+document
+.getElementById("creatorContent")
+.classList
+.toggle("show");
+
+}
+
+
+async function applyCreator(){
+  const raw=(document.getElementById("creatorCode")?.value || "").trim();
+  const msg=document.getElementById("creatorMessage");
+  if(!raw){ window.appliedCreatorCode=null; if(msg) msg.textContent="Entre un code créateur."; return; }
+  if(!/^[A-Za-z0-9_.-]{3,32}$/.test(raw)){ window.appliedCreatorCode=null; if(msg) msg.textContent="Format de code invalide."; return; }
+  const {data,error}=await supabaseClient.from("creator_codes").select("user_id,code").eq("is_active",true).ilike("code",raw).limit(1);
+  if(error){ if(msg) msg.textContent="Impossible de vérifier ce code pour le moment."; return; }
+  const match=(data||[])[0];
+  if(!match){ window.appliedCreatorCode=null; if(msg) msg.textContent="Code créateur introuvable ou désactivé."; return; }
+  if(currentUser && match.user_id===currentUser.id){ window.appliedCreatorCode=null; if(msg) msg.textContent="Tu ne peux pas utiliser ton propre code."; return; }
+  window.appliedCreatorCode=match.code;
+  if(msg) msg.textContent="Code créateur appliqué ✅ La commission sera calculée automatiquement après validation de la commande.";
+}
+
+
+
+async function demo(x){
+
+if(!currentUser){
+  openM("account");
+  setAuthMessage(
+    "Connecte-toi pour pouvoir acheter un maillot.",
+    "error"
+  );
+  return;
+}
+
+const p = window.selectedProduct;
+
+if(!p){
+  alert("Aucun maillot sélectionné.");
+  return;
+}
+
+const shippingCountry =
+  document.getElementById("shippingCountry").value;
+   
+const fee = p.price * 0.15;
+
+const shippingCost =
+  getShippingCost(
+    p.sellerCountry,
+    shippingCountry
+  );
+
+if(shippingCost === null){
+  alert(
+    "La livraison vers ce pays n'est pas disponible pour ce maillot."
+  );
+  return;
+}
+
+const total =
+  (p.price * 1.15) +
+  shippingCost;
+
+
+const shippingName =
+document.getElementById("shippingName").value.trim();
+
+const shippingAddress =
+document.getElementById("shippingAddress").value.trim();
+
+const shippingPostalCode =
+document.getElementById("shippingPostalCode").value.trim();
+
+const shippingCity =
+document.getElementById("shippingCity").value.trim();
+
+if(
+!shippingCountry ||
+!shippingName ||
+!shippingAddress ||
+!shippingPostalCode ||
+!shippingCity
+){
+alert("Remplis toutes les informations de livraison.");
+return;
+}
+
+/* =========================
+   PAYPAL
+========================= */
+
+if(x === "PayPal"){
+
+  const { data: paypalData, error: paypalError } =
+    await supabaseClient.functions.invoke(
+      "create-paypal-order",
+      {
+        body: {
+          amount: total
+        }
+      }
+    );
+
+  if(paypalError){
+    console.error(
+      "Erreur PayPal:",
+      paypalError
+    );
+
+    alert(
+      "Erreur lors de la connexion à PayPal : " +
+      paypalError.message
+    );
+
+    return;
+  }
+
+  if(
+    !paypalData ||
+    !paypalData.id ||
+    !paypalData.links
+  ){
+    console.error(
+      "Réponse PayPal invalide:",
+      paypalData
+    );
+
+    alert(
+      "PayPal n'a pas renvoyé une commande valide."
+    );
+
+    return;
+  }
+
+  const approvalLink =
+    paypalData.links.find(
+      link => link.rel === "approve"
+    );
+
+  if(!approvalLink){
+    console.error(
+      "Lien PayPal introuvable:",
+      paypalData
+    );
+
+    alert(
+      "Lien de paiement PayPal introuvable."
+    );
+
+    return;
+  }
+
+  const { data: orderData, error: orderError } =
+    await supabaseClient
+      .from("orders")
+      .insert([
+        {
+          buyer_id: currentUser.id,
+          seller_id: p.sellerId,
+          product_id: p.id,
+          product_name: p.name,
+          shirt_price: p.price,
+          service_fee: fee,
+          total_price: total,
+          status: "pending",
+          creator_code: (window.appliedCreatorCode || null),
+          payment_provider: "PayPal",
+          payment_id: paypalData.id,
+          shipping_country: shippingCountry,
+         shipping_cost: shippingCost,
+        shipping_method: shippingMethod,
+          shipping_method: shippingMethod,
+shipping_origin_country: p.sellerCountry,
+          shipping_name: shippingName,
+          shipping_address: shippingAddress,
+          shipping_postal_code: shippingPostalCode,
+          shipping_city: shippingCity
+        }
+      ])
+      .select()
+      .single();
+
+  if(orderError){
+    console.error(
+      "Erreur création commande:",
+      orderError
+    );
+
+    alert(
+      "Erreur lors de la création de la commande : " +
+      orderError.message
+    );
+
+    return;
+  }
+
+  console.log(
+    "Commande PayPal créée:",
+    orderData
+  );
+
+  window.location.href =
+    approvalLink.href;
+
+  return;
+}
+
+/* =========================
+   AUTRES PAIEMENTS
+========================= */
+
+const { data, error } =
+  await supabaseClient
+    .from("orders")
+    .insert([
+      {
+        buyer_id: currentUser.id,
+        seller_id: p.sellerId,
+        product_id: p.id,
+        product_name: p.name,
+        shirt_price: p.price,
+        service_fee: fee,
+        total_price: total,
+        status: "pending",
+        creator_code: (window.appliedCreatorCode || null),
+        payment_provider: x,
+        shipping_country: shippingCountry,
+        shipping_cost: shippingCost,
+shipping_origin_country: p.sellerCountry,
+        shipping_name: shippingName,
+        shipping_address: shippingAddress,
+        shipping_postal_code: shippingPostalCode,
+        shipping_city: shippingCity
+      }
+    ])
+    .select()
+    .single();
+
+if(error){
+  console.error(
+    "Erreur création commande:",
+    error
+  );
+
+  alert(
+    "Erreur lors de la création de la commande : " +
+    error.message
+  );
+
+  return;
+}
+
+alert(
+  "Commande créée ✅\n\n" +
+  "Maillot : " + p.name +
+  "\nTotal : " + total.toFixed(2) + " €" +
+  "\nPaiement : " + x
+);
+
+console.log(
+  "Commande créée :",
+  data
+);
+
+  }
+async function handlePayPalReturn(){
+
+  const params = new URLSearchParams(
+    window.location.search
+  );
+
+  const paypalStatus =
+    params.get("paypal");
+
+  const paypalToken =
+    params.get("token");
+
+  if(paypalStatus === "cancel"){
+    alert(
+      "Paiement PayPal annulé."
+    );
+
+    window.history.replaceState(
+      {},
+      document.title,
+      SITE_URL
+    );
+
+    return;
+   }
+
+   if(
+    paypalStatus !== "success" ||
+    !paypalToken
+  ){
+    return;
+  }
+
+  const { data: sessionData } =
+  await supabaseClient.auth.getSession();
+
+if(sessionData.session){
+  currentUser = sessionData.session.user;
+}
+
+if(!currentUser){
+  alert(
+    "Connecte-toi pour terminer le paiement."
+  );
+  return;
+  }
+
+  try{
+
+    const {
+      data: captureData,
+      error: captureError
+    } =
+      await supabaseClient.functions.invoke(
+        "capture-paypal-order",
+        {
+          body: {
+            orderId: paypalToken
+          }
+        }
+      );
+
+    if(captureError){
+
+      console.error(
+        "Erreur capture PayPal:",
+        captureError
+      );
+
+      alert(
+        "Erreur lors de la confirmation du paiement."
+      );
+
+      return;
+    }
+
+    console.log(
+      "Résultat capture PayPal:",
+      captureData
+    );
+
+    if(
+      captureData &&
+      captureData.status === "COMPLETED"
+    ){
+
+      alert(
+        "Paiement PayPal confirmé ✅"
+      );
+
+    }else{
+
+      alert(
+        "PayPal n'a pas encore confirmé le paiement."
+      );
+
+    }
+
+    window.history.replaceState(
+      {},
+      document.title,
+      SITE_URL
+    );
+
+  }catch(error){
+
+    console.error(
+      "Erreur PayPal:",
+      error
+    );
+
+    alert(
+      "Une erreur est survenue pendant la confirmation du paiement."
+    );
+  }
+  }
+  handlePayPalReturn();
+
+function getFavorites(){
+return JSON.parse(
+localStorage.getItem("footocassion_favorites") || "[]"
+);
+}
+
+function toggleFavorite(productId){
+  const id = String(productId);
+  let favorites = getFavorites().map(String);
+  const adding = !favorites.includes(id);
+
+  if(adding){
+    favorites.push(id);
+  }else{
+    favorites = favorites.filter(item => item !== id);
+  }
+
+  localStorage.setItem("footocassion_favorites", JSON.stringify(favorites));
+
+  /* Réaffiche l'état du panier puis joue l'animation sur le bouton touché. */
+  render();
+  renderFavorites();
+  if(adding){
+    const buttons = document.querySelectorAll('.favorite');
+    buttons.forEach(button => {
+      const handler = button.getAttribute('onclick') || '';
+      if(handler.includes("'" + id + "'") || handler.includes('"' + id + '"')){
+        button.classList.remove('cart-added');
+        void button.offsetWidth;
+        button.classList.add('cart-added');
+        window.setTimeout(() => button.classList.remove('cart-added'), 520);
+      }
+    });
+  }
+}
+
+function renderFavorites(){
+
+  const favorites = getFavorites().map(String);
+
+  const count = document.getElementById("accountFavoritesCount");
+  if(count){
+    count.textContent = favorites.length;
+  }
+
+  const cartCount = document.getElementById("cartCount");
+  if(cartCount){
+    cartCount.textContent = "(" + favorites.length + ")";
+  }
+
+  const badge = document.getElementById("bottomCartBadge");
+  if(badge){
+    badge.textContent = favorites.length;
+    badge.style.display = favorites.length ? "flex" : "none";
+  }
+
+  const list = document.getElementById("favoritesList");
+  if(!list) return;
+
+  const favoriteProducts = products.filter(p =>
+    favorites.includes(String(p.id))
+  );
+
+  if(favoriteProducts.length === 0){
+    list.innerHTML = `
+      <div class="empty-cart">
+        <div class="empty-cart-icon">🛒</div>
+        <h3>Ton panier est vide</h3>
+        <p>Touche la 🛒 d’un maillot pour le retrouver ici.</p>
+        <button class="primary" onclick="goHome()">Découvrir les maillots</button>
+      </div>
+    `;
+    updateCartSummary();
+    return;
+  }
+
+  list.innerHTML = favoriteProducts.map((p, index) => `
+    <article class="cart-item" data-product-id="${esc(String(p.id))}">
+      <label class="cart-item-check">
+        <input
+          type="checkbox"
+          class="cart-product-check"
+          data-product-id="${esc(String(p.id))}"
+          checked
+          onchange="confirmRemoveFromCart(this)"
+        >
+      </label>
+
+      <button
+        class="cart-item-image"
+        type="button"
+        onclick="openProductById('${String(p.id).replace(/'/g,"\\'")}')"
+        aria-label="Voir ${esc(p.name)}"
+      >
+        ${p.img
+          ? `<img src="${esc(p.img)}" alt="${esc(p.name)}">`
+          : "⚽"}
+      </button>
+
+      <div class="cart-item-info">
+        <button
+          class="cart-item-title"
+          type="button"
+          onclick="openProductById('${String(p.id).replace(/'/g,"\\'")}')"
+        >
+          ${esc(p.name || "Maillot")}
+        </button>
+
+        <div class="cart-item-meta">
+          ${esc(p.club || "")}${p.size ? " · Taille " + esc(p.size) : ""}
+        </div>
+
+        <div class="cart-item-bottom">
+          <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-start">
+            <strong>${formatCartFinalPrice(p)}</strong>
+            <small style="color:#63d5ff;font-weight:750">📦 Livraison incluse ✓</small>
+          </div>
+          <button
+            class="cart-buy"
+            type="button"
+            onclick="openProductById('${String(p.id).replace(/'/g,"\\'")}')"
+          >
+            Voir
+          </button>
+        </div>
+      </div>
+
+    </article>
+  `).join("");
+
+  const selectAll = document.getElementById("cartSelectAll");
+  if(selectAll) selectAll.checked = true;
+
+  updateCartSummary();
+}
+
+function confirmRemoveFromCart(checkbox){
+  if(!checkbox) return;
+  const productId = String(checkbox.dataset.productId || "");
+  if(!productId) return;
+  const product = products.find(p => String(p.id) === productId);
+  const label = product && product.name ? product.name : "ce maillot";
+  if(!checkbox.checked){
+    const confirmed = window.confirm("Tu veux vraiment retirer « " + label + " » du panier ?");
+    if(confirmed){
+      const updated = getFavorites().map(String).filter(id => id !== productId);
+      localStorage.setItem("footocassion_favorites", JSON.stringify(updated));
+      renderFavorites();
+      if(typeof render === "function") render();
+      return;
+    }
+    checkbox.checked = true;
+  }
+  updateCartSummary();
+}
+
+function toggleAllCart(checked){
+  document.querySelectorAll(".cart-product-check").forEach(cb => {
+    cb.checked = checked;
+  });
+  updateCartSummary();
+}
+
+function cartFinalPrice(product){
+  const price = Number(product && product.price || 0);
+  const buyerCountry = document.getElementById("buyerCountry")?.value || localStorage.getItem("buyerCountry") || "";
+  const shipping = buyerCountry ? getShippingCost(product.sellerCountry || product.seller_country, buyerCountry) : null;
+  if(shipping === null || shipping === undefined || !Number.isFinite(Number(shipping))) return null;
+  return Math.round((price + price * 0.15 + Number(shipping)) * 100) / 100;
+}
+
+function formatCartFinalPrice(product){
+  const finalPrice = cartFinalPrice(product);
+  return finalPrice === null ? "Zone de livraison non disponible" : finalPrice.toFixed(2).replace(".", ",") + " € (estimé, Point Relais)";
+}
+
+function updateCartSummary(){
+
+  const selected = Array.from(
+    document.querySelectorAll(".cart-product-check:checked")
+  );
+
+  let total = 0;
+  let hasUnknownShipping = false;
+
+  selected.forEach(cb => {
+    const product = products.find(
+      p => String(p.id) === String(cb.dataset.productId)
+    );
+    if(product){
+      const finalPrice = cartFinalPrice(product);
+      if(finalPrice === null) hasUnknownShipping = true;
+      else total += finalPrice;
+    }
+  });
+
+  const totalEl = document.getElementById("cartTotal");
+  if(totalEl){
+    totalEl.textContent = hasUnknownShipping
+      ? "Zone de livraison non disponible"
+      : total.toFixed(2).replace(".", ",") + " € (estimé, Point Relais)";
+  }
+
+  const selectedText = document.getElementById("cartSelectedText");
+  if(selectedText){
+    selectedText.textContent =
+      selected.length + (selected.length === 1 ? " maillot" : " maillots");
+  }
+
+  const selectAll = document.getElementById("cartSelectAll");
+  const all = document.querySelectorAll(".cart-product-check");
+  if(selectAll && all.length){
+    selectAll.checked = selected.length === all.length;
+  }
+}
+
+function render(){
+
+let q=
+document
+.getElementById("q")
+.value
+.toLowerCase();
+
+let t=
+document.getElementById("team")?.value || "";
+
+let s=
+document.getElementById("size")?.value || "";
+
+let a=
+document.getElementById("auth")?.value || "";
+
+let c=
+document.getElementById("cond")?.value || "";
+
+let pr=
+document
+.getElementById("price")
+.value;
+
+filtered=
+products.filter(p=>{
+// Un vendeur ne voit pas ses propres annonces dans le fil public « Pour toi ».
+if(currentUser && (p.seller_id===currentUser.id || p.sellerId===currentUser.id || p.user_id===currentUser.id)) return false;
+
+let okpr=
+!pr
+||
+(
+pr==="30"
+?
+p.price<=30
+:
+pr==="60"
+?
+p.price>=31&&p.price<=60
+:
+pr==="100"
+?
+p.price>=61&&p.price<=100
+:
+p.price>=101
+);
+
+return(
+
+!q
+||
+(
+p.name+
+" "+
+p.club+
+" "+
+p.desc
+)
+.toLowerCase()
+.includes(q)
+
+)
+&&(!t||p.club===t)
+
+&&(!s||p.size===s)
+
+&&(!a||p.auth===a)
+
+&&(!c||p.condition===c)
+
+&&okpr
+
+&&(
+!document.getElementById("buyerCountry").value
+||
+getShippingRoute(
+p.sellerCountry,
+document.getElementById("buyerCountry").value
+)==="allowed"
+);
+
+});
+
+const buyerCountryForSort=document.getElementById("buyerCountry")?.value || "";
+filtered.sort((a,b)=>{
+  const pa=countryPriority(a.sellerCountry,buyerCountryForSort);
+  const pb=countryPriority(b.sellerCountry,buyerCountryForSort);
+  if(pa!==pb) return pa-pb;
+  const scoreA=(Number(a.cartAddCount||0)*3)+Number(a.viewCount||0);
+  const scoreB=(Number(b.cartAddCount||0)*3)+Number(b.viewCount||0);
+  if(scoreA!==scoreB) return scoreB-scoreA;
+  return new Date(b.createdAt||0)-new Date(a.createdAt||0);
+});
+
+const feedEndMessage=document.getElementById("feedEndMessage");
+if(feedEndMessage) feedEndMessage.style.display=filtered.length ? "block" : "none";
+
+document
+.getElementById("catalog")
+.innerHTML=
+
+filtered.length
+
+?
+
+filtered.map((p,i)=>`
+
+<article
+class="card"
+onclick="openProductDetail(${i})"
+style="cursor:pointer"
+>
+
+<div class="shirt">
+
+${
+p.img
+?
+'<img src="'+p.img+'" alt="Maillot">'
+:
+'⚽'
+}
+
+<button
+  type="button"
+  class="favorite ${getFavorites().map(String).includes(String(p.id)) ? "active" : ""}"
+  onclick="event.preventDefault(); event.stopPropagation(); toggleFavorite('${p.id}')"
+  aria-label="Ajouter au panier"
+  title="Ajouter au panier"
+>
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M3 4h2l2.1 11.2a2 2 0 0 0 2 1.6h8.7a2 2 0 0 0 1.9-1.4L21 8H6"/>
+    <circle cx="10" cy="20" r="1.2"/>
+    <circle cx="18" cy="20" r="1.2"/>
+  </svg>
+</button>
+
+<div class="card-auth">
+  <span class="tag">
+    ${p.auth==="replica" ? "⚠️ Replica" : "✓ Authenticité"}
+  </span>
+</div>
+
+${currentUser && String(p.sellerId) === String(currentUser.id) ? `
+<button
+  type="button"
+  class="delete-listing"
+  onclick="event.preventDefault(); event.stopPropagation(); deleteProduct('${p.id}')"
+  aria-label="Supprimer mon annonce"
+>
+  🗑️
+</button>` : ""}
+
+</div>
+
+<div class="info">
+
+  <h3>
+    ${esc(p.name)}
+  </h3>
+
+  <div class="muted">
+    ${esc(p.club)} · Taille ${esc(p.size)}
+  </div>
+
+  <div class="price">
+    ${
+      (Number(p.price) * 1.15).toFixed(2)
+    } €
+  </div>
+
+  <div class="shipping-included">
+    📦 Livraison estimée à partir de 3,99 €
+  </div>
+
+</div>
+
+</article>
+
+`).join("")
+
+:
+
+'<div class="empty">Aucun maillot ne correspond aux filtres.</div>';
+
+  }
+
+   function updateTeams(){
+
+let cur=
+document
+.getElementById("team")
+.value;
+
+
+let ts=
+[
+...new Set(
+products.map(p=>p.club)
+)
+]
+.sort();
+
+
+document
+.getElementById("team")
+.innerHTML=
+
+'<option value="">Toutes les équipes</option>'+
+
+ts
+.map(x=>
+'<option>'+
+esc(x)+
+'</option>'
+)
+.join("");
+
+
+document
+.getElementById("team")
+.value=
+ts.includes(cur)
+?
+cur
+:
+"";
+
+}
+
+
+function esc(s){
+
+return String(s).replace(
+/[&<>"']/g,
+m=>({
+
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#039;"
+
+}[m])
+);
+
+}
+
+function fillProductDetail(p){
+
+  if(!p) return;
+
+  window.selectedProduct = p;
+
+  const images =
+    p.imgs && p.imgs.length
+      ? p.imgs
+      : (p.img ? [p.img] : []);
+
+  const gallery = document.getElementById("productGallery");
+  const dots = document.getElementById("productDots");
+  const info = document.getElementById("productDetailInfo");
+  const buyButton = document.getElementById("productBuyButton");
+  const cartButton = document.getElementById("productCartButton");
+
+  gallery.innerHTML = `
+    <div style="display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;width:100%">
+      ${images.length ? images.map(img=>`
+        <img src="${esc(img)}" alt="Maillot" style="width:100%;min-width:100%;height:360px;object-fit:contain;object-position:center;background:#080d13;scroll-snap-align:start;flex-shrink:0;padding:0 2px;box-sizing:border-box">
+      `).join("") : `<div style="width:100%;height:360px;display:flex;align-items:center;justify-content:center;font-size:70px">⚽</div>`}
+    </div>
+  `;
+
+  dots.textContent = images.length > 1 ? "● ".repeat(images.length) : "";
+
+  const isOwner = currentUser && String(p.sellerId) === String(currentUser.id);
+
+  const sizeStock = p.stock_by_size && typeof p.stock_by_size === "object"
+    ? p.stock_by_size
+    : {};
+  const availableSizes = Object.entries(sizeStock)
+    .map(([size, quantity]) => [size, Math.max(0, parseInt(quantity, 10) || 0)])
+    .filter(([, quantity]) => quantity > 0);
+  const hasSizeStock = availableSizes.length > 0;
+  const initialSize = hasSizeStock
+    ? (sizeStock[p.size] > 0 ? p.size : availableSizes[0][0])
+    : (p.size || "M");
+  p.selectedSize = initialSize;
+  const availableQuantity = hasSizeStock
+    ? (sizeStock[initialSize] || 0)
+    : Math.max(0, Number(p.stock ?? 0));
+
+  info.innerHTML = `
+    <h2>${esc(p.name)}</h2>
+    <p class="muted" style="font-size:15px;margin-bottom:14px">${esc(p.club || "Équipe non précisée")}</p>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:12px 0 15px">
+      <div style="background:#151f2b;border:1px solid #293747;border-radius:12px;padding:11px"><small style="display:block;color:#91a0b2;margin-bottom:4px">État</small><strong>${esc(p.condition || "Non précisé")}</strong></div>
+      <div style="background:#151f2b;border:1px solid #293747;border-radius:12px;padding:11px"><small style="display:block;color:#91a0b2;margin-bottom:4px">Authenticité</small><strong>${p.auth === "replica" ? "Replica" : "À vérifier auprès du vendeur"}</strong></div>
+    </div>
+    ${hasSizeStock ? `
+      <label for="buyerProductSize" style="display:block;margin:12px 0 6px">Taille disponible</label>
+      <select id="buyerProductSize" style="width:100%;padding:13px;border-radius:12px;border:1px solid #2b3948;background:#111923;color:#f4f7fb;font-size:16px">
+        ${availableSizes.map(([size]) => `<option value="${esc(size)}" ${size === initialSize ? "selected" : ""}>${esc(size)}</option>`).join("")}
+      </select>
+      <p id="buyerStockCount" class="stock" style="margin-top:10px">✓ ${availableQuantity} en stock pour la taille ${esc(initialSize)}</p>
+    ` : `
+      <p class="muted">Taille ${esc(p.size || "—")}</p>
+      <p class="stock">${availableQuantity > 0 ? `✓ ${availableQuantity} en stock` : "Indisponible"}</p>
+    `}
+    <div style="margin-top:16px;padding:14px;border:1px solid #2a3948;border-radius:16px;background:#131d28">
+      <div style="display:flex;justify-content:space-between;gap:12px;color:#b9c4d1;font-size:14px;margin-bottom:8px"><span>Prix du maillot</span><strong style="color:#f4f7fb">${(Number(p.price || 0)*1.15).toFixed(2)} €</strong></div>
+      ${(() => { const countryEl=document.getElementById("buyerCountry"); const buyerCountry=countryEl ? countryEl.value : ""; const ship=buyerCountry ? getShippingCost(p.sellerCountry,buyerCountry) : null; return ship===null ? `<div style="display:flex;justify-content:space-between;gap:12px;color:#b9c4d1;font-size:14px;margin-bottom:8px"><span>Livraison</span><strong style="color:#f4f7fb">${buyerCountry ? "Non disponible" : "Choisis ton pays"}</strong></div><div style="border-top:1px solid #344252;padding-top:10px;margin-top:10px;display:flex;justify-content:space-between;gap:12px;align-items:center"><strong style="font-size:15px">Prix total estimé</strong><strong style="font-size:23px;color:#63d5ff">${buyerCountry ? "—" : "À calculer"}</strong></div>` : `<div style="display:flex;justify-content:space-between;gap:12px;color:#b9c4d1;font-size:14px;margin-bottom:8px"><span>Livraison</span><strong style="color:#f4f7fb">${Number(ship).toFixed(2)} €</strong></div><div style="border-top:1px solid #344252;padding-top:10px;margin-top:10px;display:flex;justify-content:space-between;gap:12px;align-items:center"><strong style="font-size:15px">Prix total</strong><strong style="font-size:25px;color:#63d5ff">${(Number(p.price||0)*1.15+Number(ship)).toFixed(2)} €</strong></div>`; } )()}
+      <p style="font-size:11px;color:#8391a1;margin:10px 0 0;line-height:1.4">Le total définitif sera confirmé à l’étape de commande selon le pays de livraison.</p>
+    </div>
+    <div style="height:1px;background:#293443;margin:14px 0"></div>
+    <h3 style="margin:0 0 7px;font-size:16px">Description du maillot</h3>
+    <p style="color:#b9c4d1;line-height:1.55;margin:0 0 14px;white-space:pre-wrap">${esc(p.desc || "Aucune description ajoutée par le vendeur pour le moment.")}</p>
+    <p style="font-size:12px;color:#8492a3;margin:0">Vérifie la taille, l’état et les photos avant de commander.</p>
+  `;
+
+  if (hasSizeStock) {
+    const sizeSelect = document.getElementById("buyerProductSize");
+    sizeSelect.addEventListener("change", () => {
+      p.selectedSize = sizeSelect.value;
+      const quantity = Math.max(0, parseInt(sizeStock[sizeSelect.value], 10) || 0);
+      const stockCount = document.getElementById("buyerStockCount");
+      if (stockCount) stockCount.textContent = quantity > 0
+        ? `✓ ${quantity} en stock pour la taille ${sizeSelect.value}`
+        : "Indisponible";
+    });
+  }
+
+  if(isOwner){
+    if(cartButton) cartButton.style.display = "none";
+    buyButton.textContent = "🗑️ Supprimer mon annonce";
+    buyButton.className = "outline";
+    buyButton.onclick = async function(){
+      closeM("productDetail");
+      await deleteProduct(p.id);
+    };
+  }else{
+    if(cartButton){
+      cartButton.style.display = "block";
+      cartButton.onclick = function(){
+        toggleFavorite(p.id);
+        cartButton.textContent = getFavorites().map(String).includes(String(p.id)) ? "✓ Dans le panier" : "＋ Mettre en panier";
+      };
+      cartButton.textContent = getFavorites().map(String).includes(String(p.id)) ? "✓ Dans le panier" : "＋ Mettre en panier";
+    }
+    buyButton.textContent = "Acheter";
+    buyButton.className = "primary";
+    buyButton.onclick = function(){
+      closeM("productDetail");
+      const index = filtered.findIndex(x => String(x.id) === String(p.id));
+      if(index !== -1){
+        buy(index);
+      }else{
+        window.selectedProduct = p;
+        buyProductDirect(p);
+      }
+    };
+  }
+
+  openM("productDetail");
+}
+
+document.addEventListener("click", function(event){
+  const modal = document.getElementById("productDetail");
+  if(modal && event.target === modal) closeM("productDetail");
+});
+
+function openProductDetail(i){
+  const p = filtered[i];
+  if(p) fillProductDetail(p);
+}
+
+function openProductById(id){
+  const p = products.find(x => String(x.id) === String(id));
+  if(p) fillProductDetail(p);
+}
+
+async function refreshBuyerOrderNotificationBadge() {
+  const badge = document.getElementById("buyerOrdersUnreadBadge");
+  if (!badge) return;
+  if (!currentUser) { badge.style.display = "none"; return; }
+  try {
+    const {count, error} = await supabaseClient.from("buyer_order_notifications")
+      .select("id", {count:"exact", head:true})
+      .eq("buyer_id", currentUser.id).is("read_at", null);
+    if (error) throw error;
+    badge.textContent = String(count || 0);
+    badge.style.display = count ? "inline-flex" : "none";
+  } catch (e) { console.warn("Compteur des notifications acheteur indisponible", e); }
+}
+
+async function loadBuyerOrderNotifications() {
+  const box = document.getElementById("buyerOrderNotificationsList");
+  if (!box) return;
+  if (!currentUser) { box.innerHTML = "<p class='note'>Connecte-toi pour consulter tes notifications.</p>"; return; }
+  box.innerHTML = "<p class='note'>Chargement des notifications…</p>";
+  try {
+    const {data, error} = await supabaseClient.from("buyer_order_notifications")
+      .select("id,order_id,notification_type,title,message,read_at,created_at")
+      .eq("buyer_id", currentUser.id).order("created_at", {ascending:false}).limit(30);
+    if (error) throw error;
+    if (!data || !data.length) {
+      box.innerHTML = "<div class='box'><p>Aucune notification pour le moment. Les mises à jour de tes commandes apparaîtront ici.</p></div>";
+      await refreshBuyerOrderNotificationBadge();
+      return;
+    }
+    box.innerHTML = data.map(n => `<div class='box' style='margin-top:10px;border:1px solid ${n.read_at ? 'var(--border, #333)' : '#63d5ff'}'><strong>${n.read_at ? '🔔' : '🆕'} ${esc(n.title || 'Mise à jour de commande')}</strong><p>${esc(n.message || '')}</p><p class='note'>${esc(n.created_at ? new Date(n.created_at).toLocaleString('fr-FR') : '')}</p></div>`).join("");
+    const unreadIds = data.filter(n => !n.read_at).map(n => n.id);
+    if (unreadIds.length) {
+      const {error: readError} = await supabaseClient.from("buyer_order_notifications")
+        .update({read_at:new Date().toISOString()}).in("id", unreadIds).eq("buyer_id", currentUser.id);
+      if (readError) console.warn("Impossible de marquer les notifications comme lues", readError);
+    }
+    await refreshBuyerOrderNotificationBadge();
+  } catch(e) {
+    console.error("Erreur de chargement des notifications acheteur", e);
+    box.innerHTML = "<p class='note'>Impossible de charger les notifications. Réessaie dans un instant.</p>";
+  }
+}
+
+async function dispatchPendingBuyerOrderEmails() {
+  if (!currentUser || !supabaseClient?.functions) return;
+  try {
+    const { data: pending, error } = await supabaseClient
+      .from("order_email_outbox")
+      .select("id,order_id,event_type,status")
+      .eq("buyer_id", currentUser.id)
+      .in("status", ["pending", "failed"])
+      .order("created_at", { ascending: true })
+      .limit(10);
+    if (error) {
+      console.warn("Cola de correos aún no disponible", error);
+      return;
+    }
+    for (const item of (pending || [])) {
+      // La función valida que el usuario conectado sea el comprador o vendedor del pedido.
+      const { data, error: sendError } = await supabaseClient.functions.invoke("send-order-email", {
+        body: { outboxId: item.id }
+      });
+      if (sendError || data?.error) {
+        console.warn("Correo pendiente; no se pudo enviar todavía", item.event_type, sendError || data?.error);
+      }
+    }
+  } catch (e) {
+    // Un fallo del correo nunca debe impedir consultar los pedidos.
+    console.warn("No se pudieron procesar los correos de pedido", e);
+  }
+}
+
+async function loadBuyerOrders(filter = "all") {
+  const box = document.getElementById("buyerOrdersList");
+  if (!box) return;
+  if (!currentUser) { box.innerHTML = "<p class='note'>Connecte-toi pour consulter tes achats.</p>"; return; }
+  box.innerHTML = "<p class='note'>Chargement de tes commandes…</p>";
+  await loadBuyerOrderNotifications();
+  // Intenta enviar correos pendientes al abrir Mes achats; un fallo de correo no bloquea los pedidos.
+  await dispatchPendingBuyerOrderEmails();
+  try {
+    let query = supabaseClient.from("orders").select("*").eq("buyer_id", currentUser.id).order("created_at", {ascending:false});
+    if (filter === "shipped") query = query.eq("shipping_status", "shipped");
+    const {data, error} = await query;
+    if (error) throw error;
+    if (!data || !data.length) {
+      box.innerHTML = `<div class="box"><p>${filter === "shipped" ? "Aucune commande expédiée pour le moment." : "Tu n’as pas encore de commande."}</p></div>`;
+      return;
+    }
+    const statusInfo = o => {
+      if (['cancelled','canceled'].includes(String(o.status||'').toLowerCase())) return {label:'Commande annulée',icon:'🔴'};
+      if (String(o.status||'').toLowerCase()==='refunded') return {label:'Commande remboursée',icon:'↩️'};
+      if (String(o.shipping_status||'').toLowerCase()==='delivered' || String(o.order_stage||'').toLowerCase()==='delivered') return {label:'Livré',icon:'✅'};
+      if (String(o.shipping_status||'').toLowerCase()==='shipped' || String(o.order_stage||'').toLowerCase()==='shipped') return {label:'Expédié',icon:'🚚'};
+      if (String(o.status||'').toLowerCase()==='completed') return {label:'Paiement confirmé · en préparation',icon:'🟢'};
+      if (String(o.status||'').toLowerCase()==='pending') return {label:'Paiement en attente',icon:'🟠'};
+      return {label:'Commande enregistrée · vérification du paiement',icon:'🔵'};
    
