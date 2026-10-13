@@ -3084,3 +3084,1333 @@ style="margin-top:15px"
     <button class="primary" style="width:100%;margin-top:15px" onclick="purchaseSignIn()">
       Se connecter avec e-mail
    
+</button>
+
+    <button class="google-login" type="button" style="width:100%;margin-top:10px" onclick="signInWithGoogle()">
+      <span class="google-g" aria-hidden="true">G</span> Continuer avec Google
+    </button>
+
+    <button class="outline" style="width:100%;margin-top:10px" onclick="purchaseSignUp()">
+      Créer un compte avec e-mail
+    </button>
+  </div>
+</div>
+
+<!-- ACHAT -->
+
+<div
+id="buy"
+class="modal"
+>
+
+<div class="box">
+
+<button
+class="close"
+onclick="closeM('buy')"
+>
+×
+</button>
+
+
+<h2 id="bt">
+Acheter
+</h2>
+
+
+<div class="fee">
+
+<p>📦 Récapitulatif de la commande</p>
+<p style="margin:4px 0">Maillot : <strong id="bprice">0,00 €</strong></p>
+
+<p style="margin:4px 0">Livraison : <strong id="bshipping">—</strong></p>
+
+<span class="total">
+Total :
+<span id="btotal"></span>
+</span>
+
+</div>
+
+<label for="shippingMethod" style="display:block;margin:12px 0 6px;color:#b9c4d1">Mode de livraison</label>
+<select id="shippingMethod" onchange="updateBuySummary()" style="width:100%;margin-bottom:12px">
+  <option value="relay">Point Relais (estimation)</option>
+  <option value="home">À domicile (estimation)</option>
+</select>
+
+<select id="shippingCountry" onchange="updateBuySummary()">
+<option value="">Sélectionner un pays</option>
+<option value="France">France</option>
+<option value="Espagne">Espagne</option>
+<option value="Royaume-Uni">Royaume-Uni</option>
+<option value="Belgique">Belgique</option>
+<option value="Italie">Italie</option>
+<option value="Allemagne">Allemagne</option>
+<option value="Pays-Bas">Pays-Bas</option>
+<option value="Brésil">Brésil</option>
+<option value="Argentine">Argentine</option>
+<option value="Mexique">Mexique</option>
+<option value="Colombie">Colombie</option>
+<option value="Chili">Chili</option>
+<option value="Pérou">Pérou</option>
+<option value="Uruguay">Uruguay</option>
+<option value="Paraguay">Paraguay</option>
+<option value="Bolivie">Bolivie</option>
+<option value="Équateur">Équateur</option>
+<option value="Costa Rica">Costa Rica</option>
+<option value="Panama">Panama</option>
+<option value="République dominicaine">République dominicaine</option>
+</select>
+  <input id="shippingName" type="text" placeholder="Nom complet">
+
+<input id="shippingAddress" type="text" placeholder="Adresse">
+
+<input id="shippingPostalCode" type="text" placeholder="Code postal">
+
+<input id="shippingCity" type="text" placeholder="Ville">
+
+
+<div class="creatorBox">
+
+<button
+class="creatorButton"
+onclick="toggleCreator()"
+>
+
+🤝 Soutenir un créateur de contenu
+
+<span style="float:right">
+⌄
+</span>
+
+</button>
+
+
+<div
+id="creatorContent"
+class="creatorContent"
+>
+
+<p class="note">
+Optionnel. Entre le code d'un créateur.
+</p>
+
+
+<input
+id="creatorCode"
+placeholder="Ex. Messi1010"
+>
+
+
+<button
+class="outline"
+style="width:100%"
+onclick="applyCreator()"
+>
+Appliquer le code
+</button>
+
+
+<p
+id="creatorMessage"
+class="note"
+></p>
+
+</div>
+
+</div>
+
+
+<h3>
+Mode de paiement
+</h3>
+
+
+<button
+class="outline"
+style="width:100%;margin:4px 0"
+onclick="demo('PayPal')"
+>
+🅿️ PayPal
+</button>
+
+
+<button
+class="outline"
+style="width:100%;margin:4px 0"
+onclick="demo('Carte bancaire')"
+>
+💳 Carte bancaire
+</button>
+
+
+<button
+class="outline"
+style="width:100%;margin:4px 0"
+onclick="demo('Virement bancaire')"
+>
+🏦 Virement bancaire
+</button>
+
+
+<p class="note">
+Démo : aucun paiement réel n'est effectué à cette étape.
+</p>
+
+</div>
+
+</div>
+
+
+<script>
+
+let products=[
+
+{
+name:"Real Madrid 2024/25",
+club:"Real Madrid",
+size:"M",
+price:80,
+condition:"Occasion",
+auth:"auth",
+desc:"Maillot en très bon état.",
+img:""
+},
+
+{
+name:"FC Barcelona 2023/24",
+club:"FC Barcelona",
+size:"L",
+price:55,
+condition:"Occasion",
+auth:"auth",
+desc:"Porté quelques fois.",
+img:""
+},
+
+{
+name:"PSG vintage",
+club:"PSG",
+size:"S",
+price:35,
+condition:"Occasion",
+auth:"replica",
+desc:"Imitation / replica.",
+img:""
+}
+
+];
+
+
+let currentUser=null;
+
+let filtered=[];
+
+function loadBuyerCountry(){
+
+const savedCountry =
+localStorage.getItem("buyerCountry");
+
+if(savedCountry){
+
+document.getElementById("buyerCountry").value =
+savedCountry;
+
+}
+
+}
+   
+function saveBuyerCountry(){
+
+
+const country=
+document.getElementById("buyerCountry").value;
+
+localStorage.setItem(
+"buyerCountry",
+country
+);
+
+   }
+
+async function loadProducts(){
+
+const {data,error}=await supabaseClient
+.from("products")
+.select("*")
+.eq("sold", false)
+
+
+if(error){
+
+console.error(
+"Error cargando productos:",
+error.message
+);
+
+return;
+
+}
+
+
+if(data && data.length){
+
+products=data.map(p=>({
+
+id:p.id,
+
+sellerId:p.seller_id,
+
+name:p.name,
+
+club:p.club,
+
+size:p.size,
+
+price:Number(p.price),
+   
+stock:Number(p.stock ?? 0),
+stock_by_size:p.stock_by_size && typeof p.stock_by_size === 'object' ? p.stock_by_size : {},
+
+sellerCountry:p.seller_country,
+
+condition:p.condition,
+
+auth:p.authenticity,
+
+desc:p.description,
+
+img:p.image_url,
+imgs:p.image_urls || []
+
+}));
+
+}
+
+
+updateTeams();
+
+render();
+
+}
+
+
+function confirmWelcomeCountry(){
+  const chosen=document.getElementById("welcomeCountry").value;
+  if(!chosen){ alert("Sélectionne ton pays pour continuer."); return; }
+  const buyer=document.getElementById("buyerCountry");
+  if(buyer){
+    let option=Array.from(buyer.options).find(o=>o.value===chosen);
+    if(!option){ option=document.createElement("option"); option.value=chosen; option.textContent=chosen; buyer.appendChild(option); }
+    buyer.value=chosen;
+  }
+  saveBuyerCountry();
+  const modal=document.getElementById("countryWelcome"); if(modal) modal.style.display="none";
+  render();
+}
+function countryPriority(country, buyerCountry){
+  if(!buyerCountry || !country) return 3;
+  if(country===buyerCountry) return 0;
+  const region = c => {
+    if(["France","Espagne","Royaume-Uni","Belgique","Italie","Allemagne","Pays-Bas"].includes(c)) return "europe";
+    if(["Brésil","Argentine","Mexique","Colombie","Chili","Pérou","Uruguay","Paraguay","Bolivie","Équateur","Costa Rica","Panama","République dominicaine"].includes(c)) return "latam";
+    return "unavailable";
+  };
+  if(region(country) !== region(buyerCountry) || region(country) === "unavailable") return 3;
+  return 1;
+}
+
+function getRegion(country){
+  const europe = ["France","Espagne","Royaume-Uni","Belgique","Italie","Allemagne","Pays-Bas"];
+  const latam = ["Brésil","Argentine","Mexique","Colombie","Chili","Pérou","Uruguay","Paraguay","Bolivie","Équateur","Costa Rica","Panama","République dominicaine"];
+  if(europe.includes(country)) return "europe";
+  if(latam.includes(country)) return "latam";
+  return "unavailable";
+}
+  function getShippingRoute(sellerCountry, buyerCountry){
+  const sellerRegion = getRegion(sellerCountry);
+  const buyerRegion = getRegion(buyerCountry);
+  if(sellerRegion === "unavailable" || buyerRegion === "unavailable") return "unavailable";
+  if(sellerRegion === buyerRegion) return "allowed";
+  return "unavailable";
+}
+
+function getShippingCost(sellerCountry, buyerCountry, deliveryMethod){
+  const method = deliveryMethod || document.getElementById("shippingMethod")?.value || "relay";
+  if(getShippingRoute(sellerCountry, buyerCountry) !== "allowed") return null;
+  const home = method === "home";
+
+  // Estimations de plateforme, non garanties par un transporteur : vérifier les coûts réels avant lancement.
+  if(getRegion(sellerCountry) === "europe"){
+    // Tarif national estimatif au sein d'un même pays.
+    if(sellerCountry === buyerCountry) return home ? 5.99 : 3.99;
+    // Le Royaume-Uni est autorisé, mais son passage de frontière peut entraîner des frais supplémentaires.
+    if(sellerCountry === "Royaume-Uni" || buyerCountry === "Royaume-Uni") return home ? 14.99 : 9.99;
+    // Les six autres pays européens et leurs échanges transfrontaliers.
+    return home ? 6.99 : 5.99;
+  }
+
+  // Tarif LATAM provisoire, à confirmer selon le transporteur et la distance.
+  return home ? 14.99 : 9.99;
+}
+
+function showSellerPayoutSetupNotice(){
+  const input=document.getElementById("sellerPaypalEmail");
+  const notice=document.getElementById("sellPaypalNotice");
+  if(!input||!notice)return;
+  const email=input.value.trim();
+  if(email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    notice.textContent="Vérifie le format de l’adresse e-mail PayPal. Elle sera validée avant la création de l’annonce.";
+    return;
+  }
+  notice.textContent="L’adresse sera vérifiée puis enregistrée de façon privée dans ton compte vendeur. Les versements PayPal ne sont pas encore activés.";
+}
+
+function openM(x){
+document
+.getElementById(x)
+.classList
+.add("show");
+
+}
+
+
+function closeM(x){
+
+const el = document.getElementById(x);
+if(el) el.classList.remove("show");
+
+}
+
+/* Navigation principale façon TikTok : une seule page ouverte à la fois. */
+function closeNavigationPages(){
+  ["account","favoritesPage","salesPage","classementPage","creatorDashboardPage"].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.classList.remove("show");
+  });
+}
+
+function updateBottomNavActive(active){
+  document.querySelectorAll(".bottom-nav .nav-item").forEach(el => el.classList.remove("active"));
+  const target = document.querySelector(".bottom-nav .nav-" + active);
+  if(target) target.classList.add("active");
+}
+
+let classementMode = "creators";
+async function switchClassement(mode){
+  classementMode = mode === "sellers" ? "sellers" : "creators";
+  const creatorTab=document.getElementById("creatorRankTab"), sellerTab=document.getElementById("sellerRankTab");
+  creatorTab.classList.toggle("active",classementMode==="creators"); creatorTab.setAttribute("aria-selected",String(classementMode==="creators"));
+  sellerTab.classList.toggle("active",classementMode==="sellers"); sellerTab.setAttribute("aria-selected",String(classementMode==="sellers"));
+  const subtitle=document.getElementById("classementSubtitle"), rows=document.getElementById("classementRows"), podium=document.getElementById("classementPodium");
+  podium.style.display="none"; rows.innerHTML='<div class="ladder-empty">Chargement du classement…</div>';
+  if(classementMode==="creators"){
+    subtitle.textContent="8 points par commande confirmée utilisant un code créateur valide.";
+    const {data,error}=await supabaseClient.from("public_profiles").select("user_id,username,avatar_url,creator_code,creator_points").order("creator_points",{ascending:false}).limit(100);
+    if(error){ rows.innerHTML='<div class="ladder-empty">Le classement n’a pas pu être chargé. Réessaie plus tard.</div>'; return; }
+    renderLeaderboard((data||[]).filter(x=>x.creator_code),"creators");
+  }else{
+    subtitle.textContent="Classement selon les commandes confirmées, hors commandes annulées et paiements en attente.";
+    const {data:ranked,error}=await supabaseClient.from("seller_leaderboard").select("user_id,username,avatar_url,sales").order("sales",{ascending:false}).limit(100);
+    if(error){ rows.innerHTML='<div class="ladder-empty">Les ventes n’ont pas pu être chargées. Réessaie plus tard.</div>'; return; }
+    renderLeaderboard(ranked||[],"sellers");
+  }
+}
+function renderLeaderboard(items,mode){
+ const rows=document.getElementById("classementRows"),podium=document.getElementById("classementPodium");
+ if(!items.length){rows.innerHTML='<div class="ladder-empty"><div class="empty-icon">🏆</div><strong>Aucun résultat pour le moment</strong><br>Les classements se rempliront avec les profils et commandes réels.</div>';return;}
+ const medal=["🥇","🥈","🥉"];
+ rows.innerHTML=items.map((p,i)=>'<button type="button" class="ladder-row" onclick="openPublicProfile(\''+String(p.user_id).replace(/'/g,"\\'")+ '\')"><span class="ladder-rank">'+(medal[i]||('#'+(i+1)))+'</span><span class="ladder-avatar">'+(p.avatar_url?'<img src="'+p.avatar_url+'" alt="">':'⚽')+'</span><span class="ladder-user"><strong>'+escapeHTML(p.username||"Utilisateur")+'</strong><small>'+(mode==="creators"?'Créateur de contenu':'Vendeur')+'</small></span><span class="ladder-points">'+(mode==="creators"?(p.creator_points||0)+' pts':p.sales+' vente(s)')+'</span></button>').join("");
+}
+function escapeHTML(v){return String(v??"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+async function openPublicProfile(userId){
+ const modal=document.getElementById("publicProfileModal"), content=document.getElementById("publicProfileContent");
+ if(!modal||!content)return; modal.style.display="flex"; content.innerHTML='<p>Chargement du profil…</p>';
+ const {data:profile,error}=await supabaseClient.from("public_profiles").select("user_id,username,avatar_url,creator_code,creator_points").eq("user_id",userId).maybeSingle();
+ if(error||!profile){content.innerHTML='<p>Ce profil n’est pas disponible.</p>';return;}
+ const {data:products}=await supabaseClient.from("products").select("id,name,club,price,size,condition,image_url,image_urls,sold,seller_id").eq("seller_id",userId).eq("sold",false).order("created_at",{ascending:false}).limit(30);
+ content.innerHTML='<div style="text-align:center;padding:18px 0"><div style="width:92px;height:92px;border-radius:50%;overflow:hidden;margin:auto;background:#1b2935;display:grid;place-items:center;font-size:35px">'+(profile.avatar_url?'<img style="width:100%;height:100%;object-fit:cover" src="'+profile.avatar_url+'" alt="">':'⚽')+'</div><h2>'+escapeHTML(profile.username)+'</h2><p style="color:#9baab8">'+(profile.creator_code?'Créateur · '+escapeHTML(profile.creator_code):'Membre FOOTOCASSION-FIT')+'</p><p>⭐ '+(profile.creator_points||0)+' points créateur</p></div><h3>Maillots publiés</h3>';
+ if(!products||!products.length){content.innerHTML+='<p style="color:#9baab8">Aucun maillot disponible pour le moment.</p>';return;}
+ content.innerHTML+='<div class="product-grid">'+products.map(p=>'<article class="product-card" style="cursor:default"><img src="'+escapeHTML(p.image_url||((p.image_urls||[])[0]||''))+'" alt=""><div class="product-info"><strong>'+escapeHTML(p.name||p.club||"Maillot")+'</strong><p>'+escapeHTML(p.club||"")+' · Taille '+escapeHTML(p.size||"—")+'</p><strong>'+Number(p.price||0).toFixed(2)+' €</strong></div></article>').join('')+'</div>';
+}
+function closePublicProfile(){const m=document.getElementById("publicProfileModal");if(m)m.style.display="none";}
+
+function goClassement(){
+  closeM("productDetail");
+  closeNavigationPages();
+  updateBottomNavActive("classement");
+  const page=document.getElementById("classementPage");
+  if(page) page.classList.add("show");
+  switchClassement(classementMode);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function goHome(){
+  closeM("productDetail");
+  closeNavigationPages();
+  updateBottomNavActive("home");
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+function goFavorites(){
+  closeM("productDetail");
+  closeNavigationPages();
+  updateBottomNavActive("favorites");
+  openM("favoritesPage");
+  renderFavorites();
+}
+
+function goAccount(){
+  closeM("productDetail");
+  closeNavigationPages();
+  updateBottomNavActive("account");
+  openM("account");
+}
+
+
+let sellAfterAuth = false;
+
+async function loadSellerPaypalEmail(){
+  const input=document.getElementById("sellPaypalEmail");
+  const notice=document.getElementById("sellPaypalNotice");
+  if(!input || !currentUser || !currentUser.id) return;
+  try {
+    const {data,error}=await supabaseClient
+      .from("seller_payout_details")
+      .select("paypal_email")
+      .eq("user_id",currentUser.id)
+      .maybeSingle();
+    if(error) throw error;
+    if(data && data.paypal_email) input.value=data.paypal_email;
+  } catch(error) {
+    console.error("Impossible de charger le moyen de réception vendeur:",error);
+    if(notice) notice.textContent="Impossible de charger les informations PayPal enregistrées. Vérifie ta connexion puis réessaie.";
+  }
+   }  
+ function openSell(){
+  if(!currentUser){
+    sellAfterAuth = true;
+    purchaseLoginProduct = null;
+    closeM("account");
+    closeM("sell");
+    const title = document.querySelector("#purchaseLogin h2");
+    const subtitle = document.querySelector("#purchaseLogin .account-profile .note");
+    const message = document.getElementById("purchaseLoginMessage");
+    if(title) title.textContent = "Connecte-toi pour vendre";
+    if(subtitle) subtitle.textContent = "Crée ton compte gratuitement ou connecte-toi pour publier un maillot.";
+    if(message){ message.textContent = "Une fois connecté, tu pourras ajouter ton maillot."; message.className = "note"; }
+    openM("purchaseLogin");
+    return;
+  }
+  sellAfterAuth = false;
+  openM("sell");
+  loadSellerPaypalEmail();
+}
+
+
+function setAuthMessage(
+text,
+type=""
+){
+
+const el=
+document.getElementById("authMessage");
+
+el.textContent=text;
+
+el.className="note "+type;
+
+}
+
+
+let pendingProfilePhotoData = "";
+
+function currentProfileMetadata(){
+  return (currentUser && currentUser.user_metadata) ? currentUser.user_metadata : {};
+}
+
+function toggleAccountMenu(){
+  const menu=document.getElementById("accountQuickMenu");
+  const button=document.querySelector(".account-hamburger");
+  if(!menu) return;
+  const opening=menu.style.display==="none" || !menu.style.display;
+  menu.style.display=opening?"block":"none";
+  if(button) button.setAttribute("aria-expanded",opening?"true":"false");
+}
+function closeAccountQuickMenu(){
+  const menu=document.getElementById("accountQuickMenu");
+  const button=document.querySelector(".account-hamburger");
+  if(menu) menu.style.display="none";
+  if(button) button.setAttribute("aria-expanded","false");
+}
+document.addEventListener("click",function(event){
+  const menu=document.getElementById("accountQuickMenu");
+  const button=document.querySelector(".account-hamburger");
+  if(menu && menu.style.display!=="none" && !menu.contains(event.target) && button && !button.contains(event.target)) closeAccountQuickMenu();
+});
+
+function renderOwnProfile(){
+  const meta=currentProfileMetadata();
+  const username=meta.username || meta.display_name || "Mon compte";
+  const action=document.getElementById("accountProfileAction");
+  if(action){ action.textContent=currentUser ? "Modifier le profil" : "Se connecter"; action.onclick=currentUser ? openProfileEditor : function(){ openM("purchaseLogin"); }; }
+  const quickEdit=document.querySelector('#accountQuickMenu button[onclick*="openProfileEditor"]');
+  if(quickEdit) quickEdit.style.display=currentUser ? "" : "none";
+  const signOutButton=document.querySelector('#accountQuickMenu button[onclick*="signOut"]');
+  if(signOutButton) signOutButton.style.display=currentUser ? "" : "none";
+  const avatar=meta.avatar_data || meta.avatar_url || "";
+  const title=document.getElementById("accountProfileUsername");
+  const sub=document.getElementById("accountProfileSubline");
+  const avatarBox=document.getElementById("accountProfileAvatar");
+  if(title) title.textContent=username;
+  if(sub) sub.textContent=currentUser ? "@"+username : "Ton espace FOOTOCASSION-FIT";
+  if(avatarBox) avatarBox.innerHTML=avatar ? '<img alt="Photo de profil" src="'+avatar+'">' : '👤';
+}
+
+function handleAccountProfileAction(){ if(currentUser) openProfileEditor(); else openM("purchaseLogin"); }
+
+function openProfileEditor(){
+  if(!currentUser){
+    const overlay=document.getElementById("profileSetupOverlay"); if(overlay) overlay.style.display="none";
+    openM("purchaseLogin");
+    return;
+  }
+  const meta=currentProfileMetadata();
+  const input=document.getElementById("profileUsername");
+  if(input) input.value=meta.username || meta.display_name || "";
+  const emailInput=document.getElementById("profileEmailDisplay"); if(emailInput) emailInput.value=currentUser.email || "";
+  const countryInput=document.getElementById("profileCountry"); if(countryInput) countryInput.value=meta.country || meta.user_country || "";
+  pendingProfilePhotoData=meta.avatar_data || meta.avatar_url || "";
+  const preview=document.getElementById("profilePhotoPreview");
+  if(preview) preview.innerHTML=pendingProfilePhotoData ? '<img alt="Aperçu de la photo" src="'+pendingProfilePhotoData+'">' : '👤';
+  const msg=document.getElementById("profileSetupMessage"); if(msg) msg.textContent="";
+  const file=document.getElementById("profilePhotoInput"); if(file) file.value="";
+  document.getElementById("profileSetupOverlay").style.display="flex";
+}
+
+function previewProfilePhoto(event){
+  const file=event.target.files && event.target.files[0];
+  if(!file) return;
+  if(!file.type.startsWith("image/")){ event.target.value=""; return; }
+  if(file.size>8*1024*1024){ const msg=document.getElementById("profileSetupMessage"); if(msg) msg.textContent="Choisis une image de moins de 8 Mo."; event.target.value=""; return; }
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{
+      const canvas=document.createElement("canvas");
+      const max=240; const scale=Math.min(1,max/Math.max(img.width,img.height));
+      canvas.width=Math.max(1,Math.round(img.width*scale)); canvas.height=Math.max(1,Math.round(img.height*scale));
+      canvas.getContext("2d").drawImage(img,0,0,canvas.width,canvas.height);
+      pendingProfilePhotoData=canvas.toDataURL("image/jpeg",0.72);
+      const preview=document.getElementById("profilePhotoPreview"); if(preview) preview.innerHTML='<img alt="Aperçu de la photo" src="'+pendingProfilePhotoData+'">';
+      const msg=document.getElementById("profileSetupMessage"); if(msg) msg.textContent="Photo prête ✅";
+    };
+    img.src=reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveUserProfile(){
+  if(!currentUser){ const msg=document.getElementById("profileSetupMessage"); if(msg) msg.textContent="Connecte-toi d’abord."; return; }
+  const input=document.getElementById("profileUsername");
+  const username=(input ? input.value : "").trim().replace(/^@+/,"");
+  const msg=document.getElementById("profileSetupMessage");
+  if(!username || username.length<3){ if(msg) msg.textContent="Le nom d’utilisateur doit contenir au moins 3 caractères."; return; }
+  if(!/^[\p{L}\p{N}_.-]+$/u.test(username)){ if(msg) msg.textContent="Utilise des lettres, chiffres, points, tirets ou _ uniquement."; return; }
+  if(msg) msg.textContent="Enregistrement…";
+  const oldMeta=currentProfileMetadata();
+  const countryInput=document.getElementById("profileCountry");
+  const updates={username:username,display_name:username,country:countryInput ? countryInput.value : (oldMeta.country || "")};
+  if(pendingProfilePhotoData) updates.avatar_data=pendingProfilePhotoData;
+  else if(oldMeta.avatar_data) updates.avatar_data=oldMeta.avatar_data;
+  const {data,error}=await supabaseClient.auth.updateUser({data:updates});
+  if(error){ if(msg) msg.textContent="Erreur : "+error.message; return; }
+  currentUser=data.user || currentUser;
+  const profileRow={user_id:currentUser.id,username:username,avatar_url:updates.avatar_data || null,updated_at:new Date().toISOString()};
+  const {error:profileError}=await supabaseClient.from("public_profiles").upsert(profileRow,{onConflict:"user_id"});
+  if(profileError){ console.warn("Profil public non synchronisé:",profileError.message); if(msg) msg.textContent="Profil enregistré, mais le profil public n’a pas pu être synchronisé: "+profileError.message; }
+  renderOwnProfile();
+  const overlay=document.getElementById("profileSetupOverlay"); if(overlay) overlay.style.display="none";
+  setAuthMessage("Profil enregistré ✅","success");
+}
+
+function ensureRequiredProfile(){
+  if(!currentUser) return;
+  const meta=currentProfileMetadata();
+  if(!meta.username || String(meta.username).trim().length<3){
+    const overlay=document.getElementById("profileSetupOverlay"); if(overlay) overlay.style.display="flex";
+    const input=document.getElementById("profileUsername"); if(input) input.value=meta.username || "";
+  }
+}
+
+async function signUp(){
+
+const email=
+document
+.getElementById("authEmail")
+.value
+.trim();
+
+const password=
+document
+.getElementById("authPassword")
+.value;
+if(!email||!password){
+
+setAuthMessage(
+"Remplis ton email et ton mot de passe.",
+"error"
+);
+
+return;
+
+}
+
+
+if(password.length<6){
+
+setAuthMessage(
+"Le mot de passe doit contenir au moins 6 caractères.",
+"error"
+);
+
+return;
+
+}
+
+
+const {data,error}=
+await supabaseClient.auth.signUp({
+
+email:email,
+
+password:password,
+
+options:{
+emailRedirectTo:SITE_URL,
+data:{}
+}
+
+});
+
+
+if(error){
+
+setAuthMessage(
+"Erreur : "+error.message,
+"error"
+);
+
+return;
+
+}
+
+
+if(data.session){
+currentUser=data.session.user;
+renderOwnProfile();
+setAuthMessage(
+"Compte créé et connecté ✅",
+"success"
+);
+openProfileEditor();
+
+}else{
+
+setAuthMessage(
+"Compte créé ✅ Vérifie ton email pour confirmer ton compte.",
+"success"
+);
+
+document.getElementById("resendButton").style.display="block";
+}
+
+}
+async function resendConfirmation(){
+
+const email=
+document
+.getElementById("authEmail")
+.value
+.trim();
+
+if(!email){
+
+setAuthMessage(
+"Entre ton email pour renvoyer la confirmation.",
+"error"
+);
+
+return;
+
+}
+
+const {error}=
+await supabaseClient.auth.resend({
+
+type:"signup",
+
+email:email,
+
+options:{
+emailRedirectTo:SITE_URL
+}
+
+});
+
+if(error){
+
+setAuthMessage(
+"Erreur : "+error.message,
+"error"
+);
+
+return;
+
+}
+
+setAuthMessage(
+"Email de confirmation renvoyé ✅ Vérifie ta boîte Gmail.",
+"success"
+);
+
+  }
+
+async function signInWithGoogle(){
+
+  setAuthMessage("Redirection vers Google…", "success");
+
+  const { error } = await supabaseClient.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: SITE_URL,
+      queryParams: {
+        prompt: "select_account"
+      }
+    }
+  });
+
+  if(error){
+    console.error("Erreur Google OAuth:", error);
+    setAuthMessage(
+      "Google n'est pas encore activé ou la redirection n'est pas configurée dans Supabase.",
+      "error"
+    );
+  }
+}
+
+async function signIn(){
+
+const email=
+document
+.getElementById("authEmail")
+.value
+.trim();
+
+const password=
+document
+.getElementById("authPassword")
+.value;
+
+
+if(!email||!password){
+
+setAuthMessage(
+"Remplis ton email et ton mot de passe.",
+"error"
+);
+
+return;
+
+}
+
+
+const {data,error}=
+await supabaseClient.auth.signInWithPassword({
+
+email:email,
+
+password:password
+
+});
+
+
+if(error){
+
+setAuthMessage(
+"Erreur : "+error.message,
+"error"
+);
+
+return;
+
+}
+
+
+currentUser=data.user;
+updateAuthUI();
+renderOwnProfile();
+setAuthMessage(
+"Connexion réussie ✅",
+"success"
+);
+ensureRequiredProfile();
+
+}
+
+
+async function signOut(){
+
+const {error}=
+await supabaseClient.auth.signOut();
+
+
+if(error){
+
+setAuthMessage(
+"Erreur : "+error.message,
+"error"
+);
+
+return;
+
+}
+
+
+setAuthMessage(
+"Déconnexion réussie.",
+"success"
+);
+
+}
+
+
+function updateAuthUI(){
+
+const button=document.getElementById("accountButton");
+const logout=document.getElementById("logoutButton");
+const status=document.getElementById("authStatus");
+const headerButton=document.getElementById("headerAuthButton");
+const headerEmail=document.getElementById("headerAuthEmail");
+const googleStatus=document.getElementById("accountGoogleStatus");
+const googleEmail=document.getElementById("accountGoogleEmail");
+
+if(currentUser){
+
+  const email=currentUser.email || "";
+
+  if(button) button.textContent="👤 Mon compte";
+  if(logout) logout.style.display="block";
+  if(status) status.textContent=email;
+
+  if(headerButton){
+    headerButton.textContent="✓ Connecté";
+  }
+  if(headerEmail){
+    headerEmail.textContent=email;
+  }
+
+  if(googleStatus){
+    googleStatus.style.display="block";
+  }
+  if(googleEmail){
+    googleEmail.textContent=email;
+  }
+
+}else{
+
+  if(button) button.textContent="👤 Compte";
+  if(logout) logout.style.display="none";
+  if(status) status.textContent="";
+
+  if(headerButton){
+    headerButton.textContent="🔐 Se connecter";
+  }
+  if(headerEmail){
+    headerEmail.textContent="";
+  }
+
+  if(googleStatus){
+    googleStatus.style.display="none";
+  }
+}
+renderOwnProfile();
+
+}
+
+async function initAuth(){
+
+const {data}=
+await supabaseClient.auth.getSession();
+
+currentUser=
+data.session
+?
+data.session.user
+:
+null;
+
+updateAuthUI();
+refreshSellerNotificationBadge();
+ensureRequiredProfile();
+
+supabaseClient.auth.onAuthStateChange(
+(event,session)=>{
+
+currentUser=
+session
+?
+session.user
+:
+null;
+
+updateAuthUI();
+refreshSellerNotificationBadge();
+ensureRequiredProfile();
+
+}
+);
+
+}
+
+
+function preview(){
+
+let input=
+document.getElementById("photos");
+
+let f=[...input.files];
+
+let box=
+document.getElementById("previews");
+
+box.innerHTML="";
+
+
+if(f.length<1||f.length>3){
+
+alert(
+"Choisis entre 1 et 3 photos."
+);
+
+input.value="";
+
+return;
+
+}
+
+
+f.forEach(x=>{
+
+let i=
+document.createElement("img");
+
+i.className="preview";
+
+i.src=
+URL.createObjectURL(x);
+
+box.appendChild(i);
+
+});
+
+}
+
+
+async function add(){
+
+if(add.locked)return;
+add.locked=true;
+
+if(!currentUser){
+  add.locked=false;
+  openM("account");
+  setAuthMessage(
+    "Connecte-toi pour pouvoir vendre un maillot.",
+    "error"
+  );
+  return;
+}
+
+
+const paypalInput=document.getElementById("sellPaypalEmail");
+const paypalNotice=document.getElementById("sellPaypalNotice");
+const paypalEmail=validateSellerPaypalEmail(true);
+if(!paypalEmail){ add.locked=false; return; }
+// Enregistrer l’adresse dans la table privée du vendeur AVANT l’upload et la création de l’annonce.
+try {
+  if(paypalNotice) paypalNotice.textContent="Enregistrement sécurisé de ton adresse PayPal…";
+  const payoutSave=await saveSellerPaypalEmailSecurely(paypalEmail);
+  if(!payoutSave.ok){
+    alert(payoutSave.message || "Impossible d’enregistrer les informations PayPal. Aucune annonce n’a été créée.");
+    if(paypalNotice) paypalNotice.textContent=payoutSave.message || "Enregistrement impossible. Réessaie.";
+    add.locked=false;
+    if(paypalInput) paypalInput.focus();
+    return;
+  }
+  if(paypalNotice) paypalNotice.textContent="Adresse enregistrée dans ton compte vendeur. Vérification des informations de l’annonce…";
+} catch(payoutError) {
+  console.error("Erreur inattendue lors de l’enregistrement PayPal:",payoutError);
+  alert("Impossible d’enregistrer l’adresse PayPal. Aucune annonce n’a été créée. Réessaie.");
+  add.locked=false;
+  return;
+}
+
+let input=
+document.getElementById("photos");
+
+let f=[...input.files];
+
+let p=parseFloat(
+document
+.getElementById("lprice")
+.value
+);
+
+
+if(f.length<1||f.length>3){
+
+alert(
+"Ajoute entre 1 et 3 photos."
+);
+add.locked=false;
+return;
+
+}
+
+
+if(
+!document
+.getElementById("name")
+.value
+.trim()
+||
+!document
+.getElementById("club")
+.value
+.trim()
+||
+!p
+||
+p<=0
+){
+
+alert(
+"Remplis le nom, l’équipe et le prix."
+);
+add.locked=false;
+return;
+
+}
+
+
+const sizeStock = {};
+  document.querySelectorAll(".size-stock-input").forEach(input => {
+    const quantity = Math.max(0, parseInt(input.value || "0", 10) || 0);
+    if (quantity > 0) sizeStock[input.dataset.size] = quantity;
+  });
+  const totalSizeStock = Object.values(sizeStock).reduce((sum, quantity) => sum + quantity, 0);
+  const selectedSingleSize = document.getElementById("lsize").value || "M";
+  if (totalSizeStock > 0 && !sizeStock[selectedSingleSize]) {
+    alert("La taille choisie doit avoir au moins une unité disponible, ou choisis une taille qui en a.");
+    add.locked = false;
+    return;
+  }
+
+  const imageUrls = [];
+
+try {
+
+  // 1. Upload des photos
+  for(let i = 0; i < f.length; i++){
+
+    const file = f[i];
+
+    const extension =
+      file.name.split(".").pop().toLowerCase();
+
+    const filePath =
+      currentUser.id +
+      "/" +
+      Date.now() +
+      "-" +
+      i +
+      "." +
+      extension;
+
+    const { error: uploadError } =
+      await supabaseClient
+        .storage
+        .from("products-images")
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: false
+        });
+
+    if(uploadError){
+      console.error(
+        "Erreur upload photo:",
+        uploadError
+      );
+
+      alert(
+        "Erreur lors de l’envoi de la photo : " +
+        uploadError.message
+      );
+      add.locked=false;
+      return;
+    }
+
+    const { data: publicUrlData } =
+      supabaseClient
+        .storage
+        .from("products-images")
+        .getPublicUrl(filePath);
+
+    imageUrls.push(
+      publicUrlData.publicUrl
+    );
+  }
+
+
+  // 2. Créer le produit
+  const { data, error } =
+    await supabaseClient
+      .from("products")
+      .insert([
+        {
+          name:
+            document
+              .getElementById("name")
+              .value
+              .trim(),
+
+          club:
+            document
+              .getElementById("club")
+              .value
+              .trim(),
+
+          size:
+            document
+              .getElementById("lsize")
+              .value || "M",
+
+          condition:
+            document
+              .getElementById("lcond")
+              .value || "Neuf",
+
+          authenticity: "auth",
+
+          description:
+            document
+              .getElementById("desc")
+              .value
+              .trim() || "",
+
+          image_url:
+            imageUrls[0] || "",
+
+          image_urls:
+            imageUrls,
+
+          price: p,
+
+          seller_id:
+  currentUser.id,
+
+seller_country:
+  document.getElementById("sellerCountry").value,
+
+stock: totalSizeStock > 0 ? totalSizeStock : (Number(document.getElementById("stock").value) || 1),
+          stock_by_size: sizeStock,
+        }
+      ])
+      .select()
+      .single();
+
+
+  if(error){
+
+    console.error(
+      "Erreur création annonce:",
+      error
+    );
+
+    alert(
+      "Erreur lors de la publication : " +
+      error.message
+    );
+    add.locked=false;
+    return;
+  }
+
+
+  alert("Maillot publié avec ses photos ✅\nTon adresse PayPal est enregistrée de façon privée dans ton compte vendeur. Les versements automatiques ne sont pas encore activés.");
+
+} catch(error){
+
+  console.error(error);
+
+  alert(
+    "Une erreur est survenue : " +
+    error.message
+  );
+  add.locked=false;
+  }
+      
+      
+      
+
+await loadProducts();
+add.locked=false;
+closeM("sell");
+
+}
+
+async function deleteProduct(id){
+
+if(!currentUser){
+alert("Connecte-toi pour supprimer une annonce.");
+return;
+}
+
+if(!confirm("Supprimer cette annonce ?")){
+return;
+}
+
+const {error}=await supabaseClient
+.from("products")
+.delete()
+.eq("id",id)
+.eq("seller_id",currentUser.id);
+
+if(error){
+alert("Erreur lors de la suppression : "+error.message);
+return;
+}
+
+alert("Annonce supprimée ✅");
+
+await loadProducts();
+render();
+
+  }
+
+
+function buy(i){
+  const p = filtered[i];
+  if (p && window.selectedProduct && String(window.selectedProduct.id) === String(p.id) && window.selectedProduct.selectedSize) p.selectedSize = window.selectedProduct.selectedSize;
+  if(p) buyProductDirect(p);
+}
+
+let purchaseLoginProduct = null;
+
+function openPurchaseLogin(p){
+  purchaseLoginProduct = p || window.selectedProduct || null;
+
+  const email = document.getElementById("authEmail");
+  const purchaseEmail = document.getElementById("purchaseLoginEmail");
+   
+   
