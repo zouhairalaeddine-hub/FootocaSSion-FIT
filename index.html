@@ -5655,3 +5655,450 @@ async function loadBuyerOrders(filter = "all") {
       if (String(o.status||'').toLowerCase()==='pending') return {label:'Paiement en attente',icon:'🟠'};
       return {label:'Commande enregistrée · vérification du paiement',icon:'🔵'};
    
+    };
+    box.innerHTML = data.map(o => {
+      const st = statusInfo(o);
+      const eta = o.estimated_delivery_from && o.estimated_delivery_to ? `<p>📅 Livraison estimée : <strong>${esc(new Date(o.estimated_delivery_from+'T12:00:00').toLocaleDateString('fr-FR'))} – ${esc(new Date(o.estimated_delivery_to+'T12:00:00').toLocaleDateString('fr-FR'))}</strong></p>` : `<p class="note">📅 Date de livraison estimée non disponible pour le moment.</p>`;
+      const tracking = (o.shipping_status === 'shipped' || o.tracking_number) ? `<p>🚚 Numéro de suivi : <strong>${esc(o.tracking_number || 'En attente du numéro')}</strong></p>` : '';
+      const shippedAt = o.shipped_at ? `<p>📦 Expédié le : ${esc(new Date(o.shipped_at).toLocaleDateString('fr-FR'))}</p>` : '';
+      const lastUpdate = o.updated_at || o.shipped_at || o.created_at;
+      const lastUpdateText = lastUpdate ? new Date(lastUpdate).toLocaleString('fr-FR') : 'Date inconnue';
+      return `<div class="box" style="margin-top:12px"><h3>${esc(o.product_name || 'Maillot')}</h3><p style="font-size:20px;font-weight:700">${Number(o.total_price || o.shirt_price || 0).toFixed(2)} €</p><p style="font-size:16px;font-weight:700">${st.icon} ${st.label}</p>${eta}${tracking}${shippedAt}<p class="note">Commande du ${esc(o.created_at ? new Date(o.created_at).toLocaleDateString('fr-FR') : 'date inconnue')}</p><p class="note">Dernière mise à jour : ${esc(lastUpdateText)}</p></div>`;
+    }).join("");
+  } catch(e) {
+    console.error("Erreur de chargement des commandes acheteur", e);
+    box.innerHTML = "<p class='note'>Impossible de charger tes achats pour le moment. Vérifie ta connexion puis réessaie.</p>";
+  }
+}
+
+async function refreshSellerNotificationBadge() {
+  const badges = [document.getElementById("sellerNotificationBadge"), document.getElementById("sellerNotificationMenuBadge")].filter(Boolean);
+  if (!currentUser) { badges.forEach(b=>b.style.display="none"); return; }
+  const {count, error} = await supabaseClient.from("seller_notifications").select("id", {count:"exact", head:true}).eq("seller_id", currentUser.id).is("read_at", null);
+  if (error) { console.warn("Compteur de notifications indisponible", error); return; }
+  badges.forEach(b=>{b.textContent=String(count||0);b.style.display=count?"inline-flex":"none";});
+}
+
+async function loadSellerNotifications() {
+  const box = document.getElementById("sellerNotificationsList");
+  if (!box) return;
+  if (!currentUser) { box.innerHTML = "<p class='note'>Connecte-toi pour consulter les notifications de ventes.</p>"; return; }
+  box.innerHTML = "<p class='note'>Chargement des notifications…</p>";
+  try {
+    const {data, error} = await supabaseClient.from("seller_notifications").select("*").eq("seller_id", currentUser.id).order("created_at", {ascending:false});
+    if (error) { console.error(error); box.innerHTML = "<p class='note'>Impossible de charger les notifications. Vérifie la connexion puis réessaie.</p>"; return; }
+    if (!data || !data.length) { box.innerHTML = "<div class='box'><p>Aucune notification de vente pour le moment.</p></div>"; await refreshSellerNotificationBadge(); return; }
+    box.innerHTML = data.map(n => `<div class='box' style='margin-top:12px;border:1px solid ${n.read_at ? 'var(--border, #333)' : '#63d5ff'}'><strong>${n.read_at ? '🔔' : '🆕'} ${esc(n.title || 'Nouvelle vente')}</strong><p>${esc(n.message || 'Une commande concerne un de tes maillots.')}</p><p class='note'>${esc(n.created_at ? new Date(n.created_at).toLocaleString('fr-FR') : '')}</p>${n.order_id ? `<button class='outline' onclick='openSaleDetail(${Number(n.order_id)})'>Voir la vente</button>` : ''}</div>`).join("");
+    const unreadIds = data.filter(n => !n.read_at).map(n => n.id);
+    if (unreadIds.length) {
+      const {error: readError} = await supabaseClient.from("seller_notifications").update({read_at:new Date().toISOString()}).in("id", unreadIds).eq("seller_id", currentUser.id);
+      if (readError) console.warn("Impossible de marquer les notifications comme lues", readError);
+    }
+    await refreshSellerNotificationBadge();
+  } catch(e) { console.error(e); box.innerHTML = "<p class='note'>Une erreur est survenue pendant le chargement.</p>"; }
+}
+
+let sellerSalesPage = 0;
+const SELLER_SALES_PAGE_SIZE = 25;
+async function refreshSellerSalesUnreadBadge(){
+  const badge=document.getElementById("sellerSalesUnreadBadge");
+  if(!badge) return;
+  if(!currentUser){badge.style.display="none";return;}
+  try{
+    const {count,error}=await supabaseClient.from("seller_notifications")
+      .select("id",{count:"exact",head:true})
+      .eq("seller_id",currentUser.id).is("read_at",null);
+    if(error) throw error;
+    const n=Number(count||0);
+    badge.textContent=String(n);
+    badge.style.display=n?"inline-flex":"none";
+  }catch(e){console.warn("Compteur des ventes non disponible",e);}
+}
+
+async function editMyProduct(productId){
+  if(!currentUser){alert("Connecte-toi pour modifier une annonce.");return;}
+  const {data:product,error}=await supabaseClient.from("products").select("id,name,club,price,description,seller_id").eq("id",productId).eq("seller_id",currentUser.id).maybeSingle();
+  if(error||!product){alert("Impossible de charger cette annonce. Vérifie que tu es bien le vendeur.");return;}
+  const name=prompt("Nom de la camiseta :",product.name||"");
+  if(name===null)return;
+  const club=prompt("Équipe :",product.club||"");
+  if(club===null)return;
+  const priceText=prompt("Prix en euros :",String(product.price||""));
+  if(priceText===null)return;
+  const price=Number(String(priceText).replace(",","."));
+  if(!name.trim()||!club.trim()||!Number.isFinite(price)||price<=0){alert("Indique un nom, une équipe et un prix supérieur à zéro.");return;}
+  const description=prompt("Description :",product.description||"");
+  if(description===null)return;
+  const {error:updateError}=await supabaseClient.from("products").update({name:name.trim(),club:club.trim(),price,description:description.trim()}).eq("id",productId).eq("seller_id",currentUser.id);
+  if(updateError){console.error(updateError);alert("Modification impossible : "+updateError.message);return;}
+  alert("Annonce mise à jour.");
+  await loadProducts();
+  await loadMySales(sellerSalesPage);
+}
+
+async function loadMySales(page = 0){
+  if(!currentUser){
+    const box=document.getElementById("salesList");
+    if(box)box.innerHTML="<p class='note'>Connecte-toi pour gérer tes annonces et commandes.</p>";
+    return;
+  }
+  const box=document.getElementById("salesList");
+  if(!box)return;
+  sellerSalesPage=Math.max(0,Number(page)||0);
+  box.innerHTML="<p class='note'>Chargement de tes annonces et commandes…</p>";
+  try{
+    const [productsResult,ordersResult]=await Promise.all([
+      supabaseClient.from("products").select("*").eq("seller_id",currentUser.id).order("created_at",{ascending:false}),
+      supabaseClient.from("orders").select("*").eq("seller_id",currentUser.id).order("created_at",{ascending:false})
+    ]);
+    if(productsResult.error)throw productsResult.error;
+    if(ordersResult.error)throw ordersResult.error;
+    const listings=productsResult.data||[];
+    const orders=ordersResult.data||[];
+    const validOrders=orders.filter(o=>['completed','complete','delivered','paid','succeeded'].includes(String(o.status||'').toLowerCase()));
+    const soldByProduct={};
+    validOrders.forEach(o=>{const id=String(o.product_id);soldByProduct[id]=(soldByProduct[id]||0)+Math.max(1,Number(o.quantity||1));});
+    const listingCards=listings.map(p=>{
+      const soldQty=soldByProduct[String(p.id)]||0;
+      const stock=Number(p.stock||0);
+      const date=p.created_at?new Date(p.created_at).toLocaleString('fr-FR'):'Date inconnue';
+      const isUnavailable=Boolean(p.sold)||stock<=0;
+      const stockLabel=isUnavailable?'Indisponible':`${stock} unité(s) restantes`;
+      const sizes=p.stock_by_size&&typeof p.stock_by_size==='object'?Object.entries(p.stock_by_size).map(([size,qty])=>`${esc(size)} : ${Number(qty)||0}`).join(' · '):'';
+      return `<article class="box" style="margin-top:14px;border:1px solid var(--border,#293746)">
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <img src="${esc(p.image_url||((p.image_urls||[])[0]||''))}" alt="${esc(p.name||'Maillot')}" style="width:92px;height:112px;object-fit:cover;border-radius:12px;background:#18212b;flex-shrink:0">
+          <div style="min-width:0;flex:1"><h3 style="margin:0 0 6px">${esc(p.name||'Maillot')}</h3><p style="margin:4px 0">${esc(p.club||'Équipe non précisée')} · Taille ${esc(p.size||'—')}</p><strong>${Number(p.price||0).toFixed(2)} €</strong><p style="margin:6px 0">${isUnavailable?'⚪':'🟢'} ${stockLabel}</p><p style="margin:4px 0">📦 ${soldQty} unité(s) vendue(s)</p><p class="note" style="margin:4px 0">Publiée le ${esc(date)}</p>${sizes?`<p class="note">Stock par taille : ${sizes}</p>`:''}</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="outline" onclick="editMyProduct(${Number(p.id)})">✏️ Modifier</button><button class="outline" onclick="deleteProduct(${Number(p.id)}); setTimeout(()=>loadMySales(),500)">🗑️ Supprimer</button></div>
+      </article>`;
+    }).join('');
+    const ordersCards=orders.map(order=>{
+      const date=order.created_at?new Date(order.created_at).toLocaleString('fr-FR'):'Date inconnue';
+      const status=String(order.status||'').toLowerCase();
+      const cancelled=['cancelled','canceled','refunded','failed'].includes(status);
+      const completed=['completed','complete','delivered','paid','succeeded'].includes(status);
+      const label=cancelled?'Commande annulée / remboursée':completed?'Paiement confirmé':'Paiement en attente';
+      const icon=cancelled?'🔴':completed?'🟢':'🟠';
+      return `<div class="box" style="margin-top:12px;cursor:pointer" onclick="openSaleDetail(${Number(order.id)})"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><h3 style="margin:0">📦 ${esc(order.product_name||'Maillot')}</h3><span class="note">${esc(date)}</span></div><p style="font-size:19px;font-weight:bold">${Number(order.shirt_price||0).toFixed(2)} € · Qté ${Math.max(1,Number(order.quantity||1))}</p><p>${icon} ${label}</p><p class="note">Commande #${esc(String(order.id))}${order.creator_code?' · Code créateur : '+esc(order.creator_code):''}</p><hr><strong>📍 Livraison</strong><p>${esc(order.shipping_name||'')}<br>${esc(order.shipping_address||'')}<br>${esc(order.shipping_postal_code||'')} ${esc(order.shipping_city||'')}<br>${esc(order.shipping_country||'')}</p></div>`;
+       }).join('');
+    box.innerHTML=`<section><h3>👕 Mes annonces <span class="note">(${listings.length})</span></h3><p class="note">Modifie les informations, consulte la date de publication et suis le stock de chaque maillot.</p>${listingCards||'<div class="box"><p>Aucune annonce publiée pour le moment.</p><p class="note">Après une publication réussie, ton maillot apparaîtra ici.</p></div>'}</section><section style="margin-top:26px"><h3>🛍️ Commandes reçues <span class="note">(${orders.length})</span></h3><p class="note">Les commandes apparaissent ici quand un acheteur passe commande. Une annonce publiée n’est pas une vente.</p>${ordersCards||'<div class="box"><p>Aucune commande reçue pour le moment.</p></div>'}</section>`;
+    await refreshSellerSalesUnreadBadge();
+  }catch(e){console.error('Mes ventes :',e);box.innerHTML="<p class='note'>Impossible de charger tes annonces et commandes. Vérifie la connexion et réessaie.</p>";}
+}
+
+async function openSaleDetail(orderId){
+
+  const box = document.getElementById("saleDetailContent");
+
+  box.innerHTML = "<p>Chargement...</p>";
+
+  openM("saleDetailPage");
+
+  const { data: order, error } = await supabaseClient
+    .from("orders")
+    .select("*")
+    .eq("id", orderId)
+    .single();
+
+  if(error || !order){
+    box.innerHTML = "<p class='note'>Impossible de charger cette vente.</p>";
+    return;
+  }
+
+  let paiement = "🟠 Paiement en attente";
+
+  if(order.status === "completed"){
+    paiement = "🟢 Paiement confirmé";
+  }
+
+  let expedition = "🚚 À expédier";
+
+  if(order.shipping_status === "shipped"){
+    expedition = "🟢 Expédié";
+  }
+
+  box.innerHTML = `
+    <div class="box">
+
+      <h3>
+        📦 ${esc(order.product_name || "Maillot")}
+      </h3>
+
+      <p style="font-size:22px;font-weight:700">
+        ${Number(order.shirt_price || 0).toFixed(2)} €
+      </p>
+
+      <hr>
+
+      <p style="font-size:18px">
+        ${paiement}
+      </p>
+
+      <p style="font-size:18px">
+        ${expedition}
+      </p>
+
+${order.status==="completed" && order.shipping_status!=="shipped"
+  ? "<button class='outline' onclick='markOrderShipped("+order.id+")' style='width:100%;margin-top:10px'>🚚 Marquer comme expédié</button>"
+  : ""}
+
+${order.shipping_status==="shipped"
+  ? "<p style='margin-top:10px'>🔎 Suivi : "+esc(order.tracking_number || "")+"</p>"
+  : ""}
+
+      <hr>
+
+      <strong>👤 Acheteur</strong>
+
+      <p>
+        ${esc(order.shipping_name || "")}
+      </p>
+
+      <strong>📍 Adresse de livraison</strong>
+
+      <p>
+        ${esc(order.shipping_address || "")}<br>
+        ${esc(order.shipping_postal_code || "")}
+        ${esc(order.shipping_city || "")}<br>
+        ${esc(order.shipping_country || "")}
+      </p>
+
+    </div>
+  `;
+  }
+  async function markOrderShipped(orderId){
+
+  const tracking = prompt("Numéro de suivi :");
+
+  if(!tracking){
+    return;
+  }
+
+  const { error } = await supabaseClient
+    .from("orders")
+    .update({
+      shipping_status: "shipped",
+      tracking_number: tracking,
+      shipped_at: new Date().toISOString()
+    })
+    .eq("id", orderId);
+
+  if(error){
+    alert("Erreur lors de l'expédition.");
+    return;
+  }
+
+  alert("Expédition enregistrée ✅");
+
+  openSaleDetail(orderId);
+  }
+(async()=>{
+
+await initAuth();
+refreshAdminEntry();
+
+supabaseClient.auth.onAuthStateChange(()=>{setTimeout(()=>{refreshAdminEntry();refreshBuyerOrderNotificationBadge();},0);});
+refreshSellerNotificationBadge();
+loadBuyerCountry();
+const savedBuyerCountry=localStorage.getItem("buyerCountry");
+if(!savedBuyerCountry){ const welcome=document.getElementById("countryWelcome"); if(welcome) welcome.style.display="flex"; }
+   
+await loadProducts();
+
+updateTeams();
+
+render();
+
+})();
+
+function creatorEuro(value){return new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR'}).format(Number(value||0));}
+function creatorStatusLabel(status){return ({awaiting_order:'Commande en attente',pending:'En attente (24 h)',available:'Disponible',paid:'Payée',cancelled:'Annulée'})[status] || status || '—';}
+let creatorHistoryPage=0;
+const CREATOR_HISTORY_PAGE_SIZE=25;
+async function openCreatorDashboard(){
+  if(!currentUser){openM('account');setAuthMessage('Connecte-toi pour accéder à ton espace créateur.','error');return;}
+  openM('creatorDashboardPage');
+  await loadCreatorDashboard();
+}
+async function loadCreatorDashboard(page=0){
+  creatorHistoryPage=Math.max(0,Number(page)||0);
+  const msg=document.getElementById('cdMessage');
+  const history=document.getElementById('cdHistory');
+  if(!currentUser){if(msg)msg.textContent='Connecte-toi pour consulter tes chiffres.';return;}
+  if(msg)msg.textContent='Actualisation des commissions…';
+  if(history)history.innerHTML='<div class="cd-empty">Chargement…</div>';
+  try{
+    // Chaque créateur peut uniquement libérer ses propres commissions échues.
+    const {error:releaseError}=await supabaseClient.rpc('refresh_my_creator_commissions');
+    if(releaseError) console.warn('Libération des commissions:',releaseError.message);
+    const [{data:codeRows,error:codeError},{data:rows,error:rowsError,count:historyCount}]=await Promise.all([
+      supabaseClient.from('creator_codes').select('code,commission_rate,is_active').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(1),
+      supabaseClient.from('creator_commissions').select('id,order_id,creator_code,shirt_price,commission_rate,commission_amount,status,eligible_at,paid_at,payout_reference,created_at,orders(product_name)',{count:'exact'}).eq('creator_user_id',currentUser.id).order('created_at',{ascending:false}).range(creatorHistoryPage*CREATOR_HISTORY_PAGE_SIZE,creatorHistoryPage*CREATOR_HISTORY_PAGE_SIZE+CREATOR_HISTORY_PAGE_SIZE-1)
+    ]);
+    if(codeError) throw codeError;
+    if(rowsError) throw rowsError;
+    const code=(codeRows||[])[0];
+    document.getElementById('cdCodeValue').textContent=code?code.code+(code.is_active?'':' · désactivé'):'Aucun code attribué pour le moment';
+    document.getElementById('cdRateValue').textContent='Commission : '+(code?(Number(code.commission_rate)*100).toLocaleString('fr-FR',{maximumFractionDigits:2}):'5')+' %';
+    const list=rows||[];
+    const valid=list.filter(x=>x.status!=='cancelled');
+    const sum=status=>list.filter(x=>x.status===status).reduce((a,x)=>a+Number(x.commission_amount||0),0);
+    document.getElementById('cdSalesCount').textContent=String(valid.length);
+    document.getElementById('cdPending').textContent=creatorEuro(sum('pending')+sum('awaiting_order'));
+    document.getElementById('cdAvailable').textContent=creatorEuro(sum('available'));
+    document.getElementById('cdPaid').textContent=creatorEuro(sum('paid'));
+    if(!list.length){history.innerHTML='<div class="cd-empty">Aucune vente attribuée pour le moment. Quand un acheteur utilise ton code et que la commande est enregistrée, elle apparaîtra ici.</div>';}
+    else{
+      history.innerHTML='<div class="cd-muted" style="margin-bottom:10px">Les ventes les plus récentes apparaissent en premier.</div><div style="overflow-x:auto"><table class="cd-table"><thead><tr><th>Date</th><th>Maillot / commande</th><th>Prix maillot</th><th>Code utilisé</th><th>Commission</th><th>État</th></tr></thead><tbody>'+list.map(x=>{
+        const date=x.created_at?new Date(x.created_at).toLocaleDateString('fr-FR'):'';
+        const extra=x.status==='paid'&&x.payout_reference?'<div class="cd-muted">Réf. '+escapeHTML(x.payout_reference)+'</div>':'';
+        const eligible=x.status==='pending'&&x.eligible_at?'<div class="cd-muted">Disponible après le '+new Date(x.eligible_at).toLocaleString('fr-FR')+'</div>':'';
+        const product=x.orders&&x.orders.product_name?x.orders.product_name:'Maillot';
+        return '<tr><td>'+escapeHTML(x.created_at?new Date(x.created_at).toLocaleString('fr-FR'):'Date inconnue')+'</td><td>'+escapeHTML(product)+'<div class="cd-muted">Commande #'+escapeHTML(String(x.order_id))+'</div></td><td>'+creatorEuro(x.shirt_price)+'</td><td>'+escapeHTML(x.creator_code||'—')+'</td><td>'+creatorEuro(x.commission_amount)+'<div class="cd-muted">'+(Number(x.commission_rate)*100).toLocaleString('fr-FR')+' %</div></td><td><span class="cd-status">'+escapeHTML(creatorStatusLabel(x.status))+'</span>'+eligible+extra+'</td></tr>';
+      }).join('')+'</tbody></table></div>'+'<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px"><span class="cd-muted">Page '+(creatorHistoryPage+1)+' / '+Math.max(1,Math.ceil(Number(historyCount||0)/CREATOR_HISTORY_PAGE_SIZE))+' · '+Number(historyCount||0)+' vente(s)</span><div style="display:flex;gap:8px">'+(creatorHistoryPage>0?'<button class="cd-refresh" onclick="loadCreatorDashboard('+(creatorHistoryPage-1)+')">← Plus récentes</button>':'')+(creatorHistoryPage+1<Math.ceil(Number(historyCount||0)/CREATOR_HISTORY_PAGE_SIZE)?'<button class="cd-refresh" onclick="loadCreatorDashboard('+(creatorHistoryPage+1)+')">Plus anciennes →</button>':'')+'</div></div>';
+    }
+    if(msg)msg.textContent=releaseError?'Données chargées. La libération automatique n’a pas pu être actualisée : '+releaseError.message:'Données actualisées. Les commissions arrivées à échéance ont été libérées si la commande est toujours terminée.';
+  }catch(e){
+    console.error('Espace créateur:',e);
+    if(history)history.innerHTML='<div class="cd-empty">Impossible de charger les données. Vérifie ta connexion puis réessaie.</div>';
+    if(msg)msg.textContent='Erreur : '+(e.message||'chargement impossible');
+  }
+}
+
+// Administration: l'interface vérifie l'adresse et la base vérifie aussi le rôle app_metadata.
+const FOOTOCASSION_ADMIN_EMAIL='zouhairalaeddine@gmail.com';
+let adminOrderRows=[];
+function isFootocassionAdmin(){return !!(currentUser && String(currentUser.email||'').toLowerCase()===FOOTOCASSION_ADMIN_EMAIL);}
+function refreshAdminEntry(){const b=document.getElementById('adminPanelEntry');if(b)b.style.display=isFootocassionAdmin()?'flex':'none';}
+async function openAdminPanel(){
+  if(!currentUser){openM('account');setAuthMessage('Connecte-toi avec le compte administrateur.','error');return;}
+  if(!isFootocassionAdmin()){setAuthMessage('Accès réservé à l’administrateur.','error');return;}
+  openM('adminPanelPage'); await loadAdminPanel();
+}
+function adminDate(v){return v?new Date(v).toLocaleString('fr-FR'):'Date inconnue';}
+function adminStatus(v){return ({awaiting_order:'Commande en attente',pending:'En attente (24 h)',available:'Disponible',paid:'Payée',cancelled:'Annulée',completed:'Terminée',complete:'Terminée',delivered:'Livrée',shipped:'Expédiée',refunded:'Remboursée',failed:'Échec'})[v]||v||'—';}
+async function loadAdminPanel(){
+ const msg=document.getElementById('admMessage'); if(!isFootocassionAdmin()){if(msg)msg.textContent='Accès refusé.';return;}
+ if(msg)msg.textContent='Chargement des données administratives…';
+ for(const id of ['admCodes','admOrders','admCommissions']){const el=document.getElementById(id);if(el)el.innerHTML='<div class="cd-empty">Chargement…</div>';}
+ try{
+  const [codesRes,ordersRes,commRes,payoutRes]=await Promise.all([
+   supabaseClient.from('creator_codes').select('id,user_id,code,is_active,commission_rate,created_at').order('created_at',{ascending:false}).limit(200),
+   supabaseClient.from('orders').select('id,buyer_id,seller_id,product_name,shirt_price,total_price,status,creator_code,created_at,shipping_status').order('created_at',{ascending:false}).limit(100),
+   supabaseClient.from('creator_commissions').select('id,order_id,creator_user_id,creator_code,shirt_price,commission_rate,commission_amount,status,eligible_at,paid_at,payout_reference,created_at,orders(product_name,created_at,status)').order('created_at',{ascending:false}).limit(200),
+   supabaseClient.from('creator_payout_details').select('user_id,paypal_email,updated_at')
+  ]);
+  if(codesRes.error)throw codesRes.error;if(ordersRes.error)throw ordersRes.error;if(commRes.error)throw commRes.error;if(payoutRes.error)throw payoutRes.error;
+  const codes=codesRes.data||[], orders=ordersRes.data||[], comms=commRes.data||[], payouts=payoutRes.data||[];adminOrderRows=orders;
+  document.getElementById('admOrderCount').textContent=String(orders.length)+(orders.length===100?'+':'');
+  document.getElementById('admPendingCount').textContent=String(comms.filter(x=>['pending','awaiting_order'].includes(x.status)).length);
+  document.getElementById('admAvailableTotal').textContent=creatorEuro(comms.filter(x=>x.status==='available').reduce((a,x)=>a+Number(x.commission_amount||0),0));
+  document.getElementById('admPaidTotal').textContent=creatorEuro(comms.filter(x=>x.status==='paid').reduce((a,x)=>a+Number(x.commission_amount||0),0));
+  document.getElementById('admCodes').innerHTML=codes.length?'<div style="overflow-x:auto"><table class="cd-table"><thead><tr><th>Code</th><th>Compte créateur</th><th>PayPal</th><th>Commission</th><th>Statut</th><th>Action</th></tr></thead><tbody>'+codes.map(c=>{const payout=payouts.find(p=>p.user_id===c.user_id);return '<tr><td><strong>'+escapeHTML(c.code)+'</strong><div class="cd-muted">Créé le '+escapeHTML(adminDate(c.created_at))+'</div></td><td style="max-width:190px;overflow-wrap:anywhere">'+escapeHTML(c.user_id)+'</td><td>'+escapeHTML(payout?payout.paypal_email:'À renseigner')+'</td><td>'+(Number(c.commission_rate)*100).toLocaleString('fr-FR')+' %</td><td>'+(c.is_active?'Actif':'Désactivé')+'</td><td><button class="cd-refresh" onclick="toggleAdminCode(\''+c.id+'\','+(!c.is_active)+')">'+(c.is_active?'Désactiver':'Réactiver')+'</button></td></tr>';}).join('')+'</tbody></table></div>':'<div class="cd-empty">Aucun code créateur. Utilise le formulaire ci-dessus pour en créer un.</div>';
+
+   document.getElementById('admOrders').innerHTML=orders.length?'<div style="overflow-x:auto"><table class="cd-table"><thead><tr><th>Date</th><th>Commande / maillot</th><th>Vendeur</th><th>Prix maillot</th><th>Code</th><th>État</th></tr></thead><tbody>'+orders.map(o=>'<tr><td>'+escapeHTML(adminDate(o.created_at))+'</td><td>'+escapeHTML(o.product_name||'Maillot')+'<div class="cd-muted">#'+escapeHTML(String(o.id))+'</div></td><td style="max-width:120px;overflow-wrap:anywhere">'+escapeHTML(o.seller_id||'—')+'</td><td>'+creatorEuro(o.shirt_price)+'</td><td>'+escapeHTML(o.creator_code||'—')+'</td><td>'+escapeHTML(adminStatus(o.status))+'</td></tr>').join('')+'</tbody></table></div>':'<div class="cd-empty">Aucune commande trouvée.</div>';
+  document.getElementById('admCommissions').innerHTML=comms.length?'<div style="overflow-x:auto"><table class="cd-table"><thead><tr><th>Date</th><th>Commande / maillot</th><th>Créateur / PayPal</th><th>Commission</th><th>État</th><th>Action</th></tr></thead><tbody>'+comms.map(x=>{const payout=payouts.find(p=>p.user_id===x.creator_user_id);return '<tr><td>'+escapeHTML(adminDate(x.created_at))+'</td><td>'+escapeHTML(x.orders&&x.orders.product_name||'Maillot')+'<div class="cd-muted">#'+escapeHTML(String(x.order_id))+'</div></td><td style="max-width:190px;overflow-wrap:anywhere">'+escapeHTML(x.creator_user_id)+'<div class="cd-muted">'+escapeHTML(payout?payout.paypal_email:'PayPal non renseigné')+'</div></td><td>'+creatorEuro(x.commission_amount)+'<div class="cd-muted">Code '+escapeHTML(x.creator_code||'—')+'</div></td><td>'+escapeHTML(adminStatus(x.status))+(x.payout_reference?'<div class="cd-muted">Réf. '+escapeHTML(x.payout_reference)+'</div>':'')+'</td><td>'+(x.status==='available'?'<button class="cd-refresh" onclick="markAdminCommissionPaid(\''+x.id+'\')">Enregistrer paiement</button>':(x.status==='paid'?'—':'Non payable'))+'</td></tr>';}).join('')+'</tbody></table></div>':'<div class="cd-empty">Aucune commission.</div>';
+  if(msg)msg.textContent='Données chargées. Les commandes sont triées de la plus récente à la plus ancienne. Codes : '+codes.length+' · commandes affichées : '+orders.length+' · commissions affichées : '+comms.length+'.';
+ }catch(e){console.error('Admin panel:',e);if(msg)msg.textContent='Impossible de charger les données. Si tu viens de recevoir les droits administrateur, déconnecte-toi puis reconnecte-toi pour renouveler la session. Détail : '+(e.message||'erreur inconnue');for(const id of ['admCodes','admOrders','admCommissions']){const el=document.getElementById(id);if(el)el.innerHTML='<div class="cd-empty">Chargement refusé ou impossible. Vérifie les droits administrateur et réessaie.</div>';}}
+}
+async function createAdminCreatorCode(){
+ if(!isFootocassionAdmin())return alert('Accès administrateur refusé.');
+ const email=(document.getElementById('admCreatorEmail')?.value||'').trim();
+ const code=(document.getElementById('admCreatorCode')?.value||'').trim().toUpperCase();
+ const paypal=(document.getElementById('admPaypalEmail')?.value||'').trim();
+ if(!email||!code||!paypal)return alert('Remplis les trois champs : email du compte créateur, code et email PayPal.');
+ if(!/^[A-Z0-9][A-Z0-9_-]{2,24}$/.test(code))return alert('Le code doit faire 3 à 25 caractères : lettres, chiffres, tiret ou underscore.');
+ if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(paypal))return alert('Vérifie l’adresse email PayPal.');
+ const button=document.getElementById('admCreateCodeBtn');if(button){button.disabled=true;button.textContent='Création…';}
+ const msg=document.getElementById('admMessage');if(msg)msg.textContent='Création du code et enregistrement du PayPal…';
+ try{
+   const {data,error}=await supabaseClient.rpc('admin_create_creator_code',{p_creator_email:email,p_code:code,p_paypal_email:paypal});
+   if(error)throw error;
+   const form=document.getElementById('admCreateCodeForm');if(form)form.reset();
+   if(msg)msg.textContent='Code '+(data?.code||code)+' créé/activé. Commission créateur : 5 %. Email PayPal enregistré.';
+   await loadAdminPanel();
+ }catch(e){console.error('Création code créateur:',e);if(msg)msg.textContent='Création impossible : '+(e.message||'erreur inconnue');alert('Impossible de créer le code : '+(e.message||'erreur inconnue'));}
+ finally{if(button){button.disabled=false;button.textContent='Créer le code créateur';}}
+}
+
+async function toggleAdminCode(id,active){
+ if(!isFootocassionAdmin())return alert('Accès refusé.');
+ if(!confirm((active?'Réactiver':'Désactiver')+' ce code créateur ?'))return;
+ const {error}=await supabaseClient.from('creator_codes').update({is_active:!!active,updated_at:new Date().toISOString()}).eq('id',id);
+ if(error){alert('Modification impossible : '+error.message);return;} await loadAdminPanel();
+}
+async function markAdminCommissionPaid(id){
+ if(!isFootocassionAdmin())return alert('Accès refusé.');
+ const ref=prompt('Saisis la référence réelle du paiement (ex. référence PayPal). Aucun argent ne sera envoyé par cette action :');
+ if(ref===null)return;if(!ref.trim())return alert('La référence est obligatoire.');
+ if(!confirm('Confirmer que le paiement a réellement été envoyé et enregistrer la commission comme payée ?'))return;
+ const {error}=await supabaseClient.from('creator_commissions').update({status:'paid',paid_at:new Date().toISOString(),payout_reference:ref.trim(),updated_at:new Date().toISOString()}).eq('id',id).eq('status','available');
+ if(error){alert('Paiement non enregistré : '+error.message);return;} await loadAdminPanel();
+}
+
+</script>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav" aria-label="Navigation principale">
+<button class="nav-item nav-home active" onclick="goHome()" aria-label="Pour toi">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.8 12 3l9 7.8v8.2a2 2 0 0 1-2 2h-4.5v-6h-5v6H5a2 2 0 0 1-2-2z"/></svg><small>Pour toi</small>
+</button>
+<button class="nav-item nav-classement" onclick="goClassement()" aria-label="Classement">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4H4v3a4 4 0 0 0 4 4M17 4h3v3a4 4 0 0 1-4 4M7 3h10v7a5 5 0 0 1-10 0z"/><path d="m9 8 2 2 4-4"/></svg><small>Classement</small>
+</button>
+<button class="sell-nav" onclick="openSell()" aria-label="Vendre un maillot">+</button>
+<button class="nav-item nav-favorites" onclick="goFavorites()" aria-label="Ouvrir mon panier">
+<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.1 11.2a2 2 0 0 0 2 1.6h8.7a2 2 0 0 0 1.9-1.4L21 8H6"/><circle cx="10" cy="20" r="1.2"/><circle cx="18" cy="20" r="1.2"/></svg><span id="bottomCartBadge" class="cart-badge">0</span><small>Panier</small>
+</button>
+<button class="nav-item nav-account" onclick="goAccount()" aria-label="Mon compte">
+<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/></svg><small>Mon compte</small>
+</button>
+</nav>
+   
+
+<div id="adminPanelPage" class="modal tab-page" aria-label="Administration FOOTOCASSION FIT">
+  <div class="creator-dashboard-wrap">
+    <div class="cd-head"><div><h2 style="margin:0">🛡️ Administration</h2><p class="cd-muted" style="margin:6px 0 0">Accès réservé au compte administrateur</p></div><button class="cd-close" type="button" onclick="closeM('adminPanelPage')">Fermer ✕</button></div>
+    <div class="cd-grid">
+      <div class="cd-stat"><span>Commandes chargées</span><strong id="admOrderCount">—</strong></div>
+      <div class="cd-stat"><span>Commissions à examiner</span><strong id="admPendingCount">—</strong></div>
+      <div class="cd-stat"><span>Commissions disponibles</span><strong id="admAvailableTotal">—</strong></div>
+      <div class="cd-stat"><span>Commissions payées</span><strong id="admPaidTotal">—</strong></div>
+    </div>
+    <div class="cd-section"><div class="cd-head"><h3 style="margin:0">Codes créateurs</h3><button class="cd-refresh" type="button" onclick="loadAdminPanel()">Actualiser</button></div>
+      <p class="cd-muted">Le créateur doit d’abord créer son compte FOOTOCASSION FIT avec son email. Ensuite, renseigne son email de compte, son code promotionnel et son email PayPal. Le code attribue 5 % du prix du maillot au créateur, pris sur les 15 % de frais de plateforme.</p>
+      <form id="admCreateCodeForm" onsubmit="event.preventDefault();createAdminCreatorCode()">
+        <div class="adm-form-grid">
+          <div><label for="admCreatorEmail">Email du compte créateur</label><input id="admCreatorEmail" type="email" autocomplete="off" placeholder="createur@email.com" required></div>
+          <div><label for="admCreatorCode">Code créateur (ex. MESSI1010)</label><input id="admCreatorCode" type="text" minlength="3" maxlength="25" pattern="[A-Za-z0-9_-]{3,25}" placeholder="MESSI1010" required></div>
+          <div><label for="admPaypalEmail">Email PayPal du créateur</label><input id="admPaypalEmail" type="email" autocomplete="off" placeholder="paiements@email.com" required></div>
+        </div>
+        <button id="admCreateCodeBtn" class="cd-refresh" type="submit" style="margin-top:12px;width:100%">Créer le code créateur</button>
+      </form>
+      <div id="admCodes" style="margin-top:16px">Chargement…</div></div>
+    <div class="cd-section"><div class="cd-head"><h3 style="margin:0">Commandes récentes</h3></div><p class="cd-muted">Les 100 commandes les plus récentes. Les commandes plus anciennes restent consultables via les filtres et l’historique des commandes.</p><div id="admOrders" style="margin-top:12px">Chargement…</div></div>
+    <div class="cd-section"><div class="cd-head"><h3 style="margin:0">Commissions et paiements</h3></div><p class="cd-muted">Marquer « Payée » uniquement après avoir réellement envoyé le paiement. Cette action enregistre le paiement, elle n’envoie pas d’argent via PayPal.</p><div id="admCommissions" style="margin-top:12px">Chargement…</div></div>
+    <p id="admMessage" class="cd-muted" role="status" style="margin-top:14px"></p>
+  </div>
+</div>
+
+<div id="creatorDashboardPage" class="modal tab-page" aria-label="Espace créateur">
+  <div class="creator-dashboard-wrap">
+    <div class="cd-head"><div><h2 style="margin:0">⭐ Espace créateur</h2><p class="cd-muted" style="margin:6px 0 0">Tes ventes attribuées et tes commissions</p></div><button class="cd-close" type="button" onclick="closeM('creatorDashboardPage')">Fermer ✕</button></div>
+    <div id="cdCodeBox" class="cd-code"><div><div class="cd-muted">Ton code créateur</div><strong id="cdCodeValue">—</strong></div><span class="cd-muted" id="cdRateValue">Commission : 5 %</span></div>
+    <div class="cd-grid">
+      <div class="cd-stat"><span>Ventes attribuées</span><strong id="cdSalesCount">0</strong></div>
+      <div class="cd-stat"><span>Commissions en attente</span><strong id="cdPending">0,00 €</strong></div>
+      <div class="cd-stat"><span>Solde disponible</span><strong id="cdAvailable">0,00 €</strong></div>
+      <div class="cd-stat"><span>Versements enregistrés</span><strong id="cdPaid">0,00 €</strong></div>
+    </div>
+    <div class="cd-muted">Les commissions sont calculées sur le prix de la camiseta, hors livraison. Le solde disponible n'indique pas qu'un virement PayPal a été envoyé.</div>
+    <div class="cd-section"><div class="cd-head"><h3 style="margin:0">Historique des commissions</h3><button class="cd-refresh" type="button" onclick="loadCreatorDashboard()">Actualiser</button></div><div id="cdHistory" style="margin-top:12px"><div class="cd-empty">Chargement…</div></div></div>
+    <p id="cdMessage" class="cd-muted" role="status" style="margin-top:14px"></p>
+  </div>
+</div>
+
+</body>
+  </html>
+  
